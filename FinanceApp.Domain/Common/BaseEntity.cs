@@ -10,7 +10,7 @@ public abstract class BaseEntity
 
     public bool IsDeleted { get; private set; }
 
-    protected void SetCreated(DateTimeOffset createdAt)
+    public void SetCreated(DateTimeOffset createdAt)
     {
         CreatedAt = createdAt;
     }
