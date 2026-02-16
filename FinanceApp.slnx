@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="FinanceApp.Application/FinanceApp.Application.csproj" />
+  <Project Path="FinanceApp.Domain/FinanceApp.Domain.csproj" />
+  <Project Path="FinanceApp.Infrastructure/FinanceApp.Infrastructure.csproj" />
+  <Project Path="FinanceApp.Web/FinanceApp.Web.csproj" />
+</Solution>
