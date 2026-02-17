@@ -79,4 +79,5 @@ public class Expense : BaseEntity
     {
         CategoryId = categoryId;
     }
+    
 }

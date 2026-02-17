@@ -1,4 +1,4 @@
-@model FinanceApp.Domain.Entities.Expense
+@model FinanceApp.Web.Models.ExpenseEditViewModel
 
 @{
     ViewData["Title"] = "Edit Expense";
@@ -7,7 +7,7 @@
 
 <h1>Edit Expense</h1>
 
-<form asp-action="Edit" method="post">
+<form asp-action="Edit" method="post" style="width:400px">
     <input type="hidden" asp-for="Id" />
 
     <div class="mb-3">
@@ -23,7 +23,7 @@
 
     <div class="mb-3">
         <label asp-for="Currency" class="form-label">Currency</label>
-        <select asp-for="Currency" class="form-select" disabled>
+        <select asp-for="Currency" class="form-select" >
             <option value="0" selected="@((int)Model.Currency == 0)">USD</option>
             <option value="1" selected="@((int)Model.Currency == 1)">EUR</option>
             <option value="2" selected="@((int)Model.Currency == 2)">TZS</option>
@@ -32,7 +32,7 @@
 
     <div class="mb-3">
         <label asp-for="ExpenseDate" class="form-label">Expense Date</label>
-        <input asp-for="ExpenseDate" type="date" class="form-control" readonly />
+        <input asp-for="ExpenseDate" type="date" class="form-control"  />
     </div>
 
     <div class="mb-3">
@@ -49,7 +49,7 @@
 
     <div class="mb-3">
         <label asp-for="ReceiptPath" class="form-label">Receipt Path</label>
-        <input asp-for="ReceiptPath" class="form-control" />
+        <input asp-for="ReceiptPath" class="form-control" readonly/>
         <span asp-validation-for="ReceiptPath" class="text-danger"></span>
     </div>
 

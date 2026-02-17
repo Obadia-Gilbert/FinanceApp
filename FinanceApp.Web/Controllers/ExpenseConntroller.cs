@@ -36,13 +36,44 @@ public class ExpenseController : Controller
     // POST: /Expense/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(ExpenseViewModel model)
+    public async Task<IActionResult> Create(ExpenseCreateViewModel model)
 {
     if (!ModelState.IsValid)
     {
         ViewBag.Categories = await _categoryRepository.GetAllAsync();
         ViewBag.Currencies = Enum.GetValues(typeof(Currency));
         return View(model);
+    }
+
+    // Handle file upload
+    string? receiptPath = null;
+    if (model.ReceiptFile != null && model.ReceiptFile.Length > 0)
+    {
+        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads/receipts");
+        if (!Directory.Exists(uploadsFolder))
+            Directory.CreateDirectory(uploadsFolder);
+
+        // Generate descriptive filename
+        // Example: Expense-Food-2026-02-17-<expenseId>.jpg
+        var category = await _categoryRepository.GetByIdAsync(model.CategoryId);
+        var categoryName = category?.Name.Replace(" ", "-") ?? "Unknown";
+        var dateString = model.ExpenseDate.ToString("yyyy-MM-dd");
+    
+        // If creating new expense, generate a GUID for filename
+        var expenseId = Guid.NewGuid(); // will assign to expense.Id later
+        var fileExtension = Path.GetExtension(model.ReceiptFile.FileName);
+        var fileName = $"Expense-{categoryName}-{dateString}-{expenseId}{fileExtension}";
+
+        //var uniqueFileName = $"{Guid.NewGuid()}{Path.GetExtension(model.ReceiptFile.FileName)}";
+        var filePath = Path.Combine(uploadsFolder, fileName);
+
+        // Save the file to disk
+        using (var fileStream = new FileStream(filePath, FileMode.Create))
+        {
+        await model.ReceiptFile.CopyToAsync(fileStream);
+        }
+
+        receiptPath = $"/uploads/receipts/{fileName}";
     }
 
     // Example: get UserId from logged-in user
@@ -55,7 +86,7 @@ public class ExpenseController : Controller
         categoryId: model.CategoryId,
         userId: userId,
         description: model.Description,
-        receiptPath: model.ReceiptPath
+        receiptPath: receiptPath
     );
 
     await _expenseRepository.AddAsync(expense);
@@ -66,31 +97,58 @@ public class ExpenseController : Controller
 
     // GET: /Expense/Edit/{id}
     public async Task<IActionResult> Edit(Guid id)
-    {
-        var expense = await _expenseRepository.GetByIdAsync(id);
-        if (expense == null) return NotFound();
+{
+    var expense = await _expenseRepository.GetByIdAsync(id);
+    if (expense == null) return NotFound();
 
-        ViewBag.Categories = await _categoryRepository.GetAllAsync();
-        return View(expense);
-    }
+    var model = new ExpenseEditViewModel
+    {
+        Id = expense.Id,
+        Amount = expense.Amount,
+        Currency = expense.Currency,
+        ExpenseDate = expense.ExpenseDate,
+        CategoryId = expense.CategoryId,
+        Description = expense.Description,
+        ReceiptPath = expense.ReceiptPath
+    };
+
+    ViewBag.Categories = await _categoryRepository.GetAllAsync();
+    ViewBag.Currencies = Enum.GetValues(typeof(Currency));
+
+    return View(model);
+}
 
     // POST: /Expense/Edit/{id}
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(Guid id, Expense updatedExpense)
+public async Task<IActionResult> Edit(ExpenseEditViewModel model)
+{
+    if (!ModelState.IsValid)
     {
-        var expense = await _expenseRepository.GetByIdAsync(id);
-        if (expense == null) return NotFound();
-
-        // Update fields
-        expense.UpdateDescription(updatedExpense.Description ?? expense.Description);
-        expense.UpdateReceipt(updatedExpense.ReceiptPath ?? expense.ReceiptPath);
-
-        _expenseRepository.Update(expense);
-        await _expenseRepository.SaveChangesAsync();
-
-        return RedirectToAction(nameof(Index));
+        ViewBag.Categories = await _categoryRepository.GetAllAsync();
+        ViewBag.Currencies = Enum.GetValues(typeof(Currency));
+        return View(model);
     }
+
+    var expense = await _expenseRepository.GetByIdAsync(model.Id);
+    if (expense == null) return NotFound();
+
+    // Update via domain logic (clean way)
+    expense.UpdateDescription(model.Description ?? "");
+    expense.UpdateReceipt(model.ReceiptPath ?? "");
+    expense.UpdateCategory(model.CategoryId);
+    expense.UpdateCurrency(model.Currency);
+    expense.UpdateExpenseDate(model.ExpenseDate);
+    expense.UpdateAmount(model.Amount);
+
+    // If you want to allow updating amount/currency/date,
+    // we should add domain update methods instead of setting directly.
+
+    _expenseRepository.Update(expense);
+    await _expenseRepository.SaveChangesAsync();
+
+    return RedirectToAction(nameof(Index));
+}
 
     // GET: /Expense/Delete/{id}
     public async Task<IActionResult> Delete(Guid id)
