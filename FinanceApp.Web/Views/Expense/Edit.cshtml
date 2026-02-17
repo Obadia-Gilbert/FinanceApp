@@ -7,7 +7,7 @@
 
 <h1>Edit Expense</h1>
 
-<form asp-action="Edit" method="post" style="width:400px">
+<form asp-action="Edit" method="post" enctype="multipart/form-data" style="width:400px">
     <input type="hidden" asp-for="Id" />
 
     <div class="mb-3">
@@ -24,9 +24,10 @@
     <div class="mb-3">
         <label asp-for="Currency" class="form-label">Currency</label>
         <select asp-for="Currency" class="form-select" >
-            <option value="0" selected="@((int)Model.Currency == 0)">USD</option>
-            <option value="1" selected="@((int)Model.Currency == 1)">EUR</option>
-            <option value="2" selected="@((int)Model.Currency == 2)">TZS</option>
+            @foreach (var currency in Enum.GetValues(typeof(FinanceApp.Domain.Enums.Currency)))
+            {
+                <option value="@currency">@currency</option>
+            }
         </select>
     </div>
 

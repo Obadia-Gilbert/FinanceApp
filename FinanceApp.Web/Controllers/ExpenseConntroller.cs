@@ -151,12 +151,28 @@ public async Task<IActionResult> Edit(ExpenseEditViewModel model)
 }
 
     // GET: /Expense/Delete/{id}
-    public async Task<IActionResult> Delete(Guid id)
+   public async Task<IActionResult> Delete(Guid id)
+{
+     var expenses = await _expenseRepository.GetAllAsync(e => e.Category);
+     var expense = expenses.FirstOrDefault(e => e.Id == id);
+
+    if (expense == null)
+        return NotFound();
+
+    var vm = new ExpenseDeleteViewModel
     {
-        var expense = await _expenseRepository.GetByIdAsync(id);
-        if (expense == null) return NotFound();
-        return View(expense);
-    }
+        Id = expense.Id,
+        Description = expense.Description,
+        Currency = expense.Currency,
+        CategoryName = expense.Category.Name,
+        Amount = expense.Amount,
+        ExpenseDate = expense.ExpenseDate
+        
+        
+    };
+
+    return View(vm); // ✅ Now correct type
+}
 
     // POST: /Expense/Delete/{id}
     [HttpPost, ActionName("Delete")]
