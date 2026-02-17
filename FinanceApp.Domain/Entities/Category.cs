@@ -17,6 +17,7 @@ public class Category : BaseEntity
         Name = string.Empty;
     }
 
+
     // Main constructor
     public Category(string name, string? description = null)
     {

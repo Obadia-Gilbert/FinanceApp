@@ -1,0 +1,63 @@
+@model FinanceApp.Domain.Entities.Expense
+
+@{
+    ViewData["Title"] = "Create Expense";
+    var categories = ViewBag.Categories as IEnumerable<FinanceApp.Domain.Entities.Category>;
+}
+
+<h1>Create Expense</h1>
+
+<form asp-action="Create" method="post" style="width:400px">
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label">Description</label>
+        <input asp-for="Description" class="form-control" />
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Amount" class="form-label">Amount</label>
+        <input asp-for="Amount" class="form-control" />
+        <span asp-validation-for="Amount" class="text-danger"></span>
+    </div>
+
+    <label asp-for="Currency" class="form-label">Currency</label>
+    <select asp-for="Currency" class="form-select">
+    <option value="">-- Select Currency --</option>
+    @foreach (var currency in Enum.GetValues(typeof(FinanceApp.Domain.Enums.Currency)))
+    {
+        <option value="@currency">@currency</option>
+    }
+    </select>
+
+    <div class="mb-3">
+        <label asp-for="ExpenseDate" class="form-label">Expense Date</label>
+        <input asp-for="ExpenseDate" type="date" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+        <span asp-validation-for="ExpenseDate" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="CategoryId" class="form-label">Category</label>
+        <select asp-for="CategoryId" class="form-select">
+            <option value="">-- Select Category --</option>
+            @foreach (var cat in categories)
+            {
+                <option value="@cat.Id">@cat.Name</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ReceiptPath" class="form-label">Receipt Path</label>
+        <input asp-for="ReceiptPath" class="form-control" />
+        <span asp-validation-for="ReceiptPath" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <input type="submit" value="Create" class="btn btn-primary" />
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

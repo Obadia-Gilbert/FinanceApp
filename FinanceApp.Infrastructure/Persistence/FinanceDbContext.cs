@@ -41,18 +41,39 @@ public class FinanceDbContext : DbContext
         // ==============================
         // BaseEntity configuration
         // ==============================
-        modelBuilder.Entity<BaseEntity>()
-            .HasKey(b => b.Id);
+        modelBuilder.Entity<BaseEntity>(entity =>
+        {
+            entity.HasKey(b => b.Id);
 
-        modelBuilder.Entity<BaseEntity>()
-            .Property(b => b.CreatedAt)
-            .HasDefaultValueSql("GETUTCDATE()");
+            entity.Property(b => b.CreatedAt)
+                  .HasDefaultValueSql("GETUTCDATE()");
+        });
 
         // ==============================
-        // Expense configuration
+        // Category configuration (TPT)
+        // ==============================
+        modelBuilder.Entity<Category>(entity =>
+        {
+            entity.ToTable("Categories"); // TPT: separate table
+
+            entity.Property(c => c.Name)
+                  .HasMaxLength(100)
+                  .IsRequired();
+
+            entity.Property(c => c.Description)
+                  .HasMaxLength(500);
+
+            // Seed some categories
+            
+        });
+
+        // ==============================
+        // Expense configuration (TPT)
         // ==============================
         modelBuilder.Entity<Expense>(entity =>
         {
+            entity.ToTable("Expenses"); // TPT: separate table
+
             entity.Property(e => e.Amount)
                   .HasColumnType("decimal(18,2)")
                   .IsRequired();
@@ -68,25 +89,6 @@ public class FinanceDbContext : DbContext
                   .WithMany(c => c.Expenses)
                   .HasForeignKey(e => e.CategoryId)
                   .OnDelete(DeleteBehavior.Restrict);
-
-            // ✅ Remove global filter
-            // entity.HasQueryFilter(e => !e.IsDeleted);
-        });
-
-        // ==============================
-        // Category configuration
-        // ==============================
-        modelBuilder.Entity<Category>(entity =>
-        {
-            entity.Property(c => c.Name)
-                  .HasMaxLength(100)
-                  .IsRequired();
-
-            entity.Property(c => c.Description)
-                  .HasMaxLength(500);
-
-            // ✅ Remove global filter
-            // entity.HasQueryFilter(c => !c.IsDeleted);
         });
     }
 }

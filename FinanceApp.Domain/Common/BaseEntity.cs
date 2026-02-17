@@ -4,6 +4,7 @@ public abstract class BaseEntity
 {
     // Primary key
     public Guid Id { get; protected set; } = Guid.NewGuid();
+    
 
     // Automatically set by DbContext on insert
     public DateTimeOffset CreatedAt { get; private set; }

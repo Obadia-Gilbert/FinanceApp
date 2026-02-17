@@ -29,11 +29,21 @@ namespace FinanceApp.Infrastructure.Repositories
         }
 
         // Get all entities (ignores soft deleted)
-        public async Task<IEnumerable<T>> GetAllAsync()
+        /*public async Task<IEnumerable<T>> GetAllAsync()
         {
             return await _dbSet.Where(x => !x.IsDeleted).ToListAsync();
+        }*/
+        public async Task<IEnumerable<T>> GetAllAsync(params Expression<Func<T, object>>[] includes)
+        {
+            IQueryable<T> query = _dbSet.Where(x => !x.IsDeleted);
+
+            if (includes != null && includes.Any())
+        {
+            query = includes.Aggregate(query, (current, include) => current.Include(include));
         }
 
+            return await query.ToListAsync();
+        }
         // Find entities by predicate (combines with soft delete filter)
         public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
         {

@@ -12,7 +12,8 @@ namespace FinanceApp.Application.Interfaces
         Task<T?> GetByIdAsync(Guid id);
 
         // Get all entities (ignores soft deleted entities)
-        Task<IEnumerable<T>> GetAllAsync();
+        //Task<IEnumerable<T>> GetAllAsync(
+        Task<IEnumerable<T>> GetAllAsync(params Expression<Func<T, object>>[] includes);
 
         // Find entities matching a predicate (combined with soft delete)
         Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);

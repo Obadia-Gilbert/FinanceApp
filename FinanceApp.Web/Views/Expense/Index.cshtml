@@ -1,0 +1,39 @@
+@model IEnumerable<FinanceApp.Domain.Entities.Expense>
+@{
+    ViewData["Title"] = "Expenses";
+}
+
+<h1>Expenses</h1>
+
+<p>
+    <a class="btn btn-primary" asp-action="Create">Add New Expense</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Description</th>
+            <th>Amount</th>
+            <th>Currency</th>
+            <th>Category</th>
+            <th>Expense Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach(var expense in Model)
+    {
+        <tr>
+            <td>@expense.Description</td>
+            <td>@expense.Amount</td>
+            <td>@expense.Currency</td>
+            <td>@expense.Category.Name</td>
+            <td>@expense.ExpenseDate.ToString("yyyy-MM-dd")</td>
+            <td>
+                <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@expense.Id">Edit</a>
+                <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@expense.Id">Delete</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

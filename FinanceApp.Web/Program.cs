@@ -3,6 +3,9 @@ using FinanceApp.Infrastructure.Repositories;
 using FinanceApp.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
+using FinanceApp.Application.Interfaces.Services; // for IExpenseService
+using FinanceApp.Infrastructure.Services;        // for ExpenseService
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +15,7 @@ builder.Services.AddDbContext<FinanceDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IExpenseService, ExpenseService>();
 
 var app = builder.Build();
 
