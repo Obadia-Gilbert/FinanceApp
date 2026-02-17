@@ -1,6 +1,5 @@
 using FinanceApp.Domain.Entities;
 using FinanceApp.Domain.Common;
-
 using Microsoft.EntityFrameworkCore;
 
 namespace FinanceApp.Infrastructure.Persistence;
@@ -13,10 +12,10 @@ public class FinanceDbContext : DbContext
     }
 
     // DbSets
-    public DbSet<Expense> Expenses { get; set; }
-    public DbSet<Category> Categories { get; set; }
+    public DbSet<Expense> Expenses { get; set; } = null!;
+    public DbSet<Category> Categories { get; set; } = null!;
 
-    // Automatically handle CreatedAt, UpdatedAt
+    // Automatically handle CreatedAt and UpdatedAt
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         foreach (var entry in ChangeTracker.Entries<BaseEntity>())
@@ -43,17 +42,17 @@ public class FinanceDbContext : DbContext
         // BaseEntity configuration
         // ==============================
         modelBuilder.Entity<BaseEntity>()
-            .Property(b => b.Id)
-            .ValueGeneratedOnAdd();
+            .HasKey(b => b.Id);
+
+        modelBuilder.Entity<BaseEntity>()
+            .Property(b => b.CreatedAt)
+            .HasDefaultValueSql("GETUTCDATE()");
 
         // ==============================
         // Expense configuration
         // ==============================
         modelBuilder.Entity<Expense>(entity =>
         {
-            entity.HasKey(e => e.Id);
-
-            // Money precision
             entity.Property(e => e.Amount)
                   .HasColumnType("decimal(18,2)")
                   .IsRequired();
@@ -65,13 +64,13 @@ public class FinanceDbContext : DbContext
                   .HasMaxLength(500);
 
             // Relationships
-            entity.HasOne<Category>()
+            entity.HasOne(e => e.Category)
                   .WithMany(c => c.Expenses)
                   .HasForeignKey(e => e.CategoryId)
                   .OnDelete(DeleteBehavior.Restrict);
 
-            // Soft delete global filter
-            entity.HasQueryFilter(e => !e.IsDeleted);
+            // ✅ Remove global filter
+            // entity.HasQueryFilter(e => !e.IsDeleted);
         });
 
         // ==============================
@@ -79,8 +78,6 @@ public class FinanceDbContext : DbContext
         // ==============================
         modelBuilder.Entity<Category>(entity =>
         {
-            entity.HasKey(c => c.Id);
-
             entity.Property(c => c.Name)
                   .HasMaxLength(100)
                   .IsRequired();
@@ -88,8 +85,8 @@ public class FinanceDbContext : DbContext
             entity.Property(c => c.Description)
                   .HasMaxLength(500);
 
-            // Soft delete global filter
-            entity.HasQueryFilter(c => !c.IsDeleted);
+            // ✅ Remove global filter
+            // entity.HasQueryFilter(c => !c.IsDeleted);
         });
     }
 }

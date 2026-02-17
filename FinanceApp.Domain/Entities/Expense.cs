@@ -19,8 +19,13 @@ public class Expense : BaseEntity
 
     public Guid UserId { get; private set; }
 
-    private Expense() { } // Required by EF Core
+    // Navigation property to Category
+    public Category Category { get; private set; } = null!;
 
+    // Parameterless constructor for EF Core
+    private Expense() { }
+
+    // Main constructor
     public Expense(
         decimal amount,
         Currency currency,
@@ -31,7 +36,7 @@ public class Expense : BaseEntity
         string? receiptPath = null)
     {
         if (amount <= 0)
-            throw new ArgumentException("Amount must be greater than zero.");
+            throw new ArgumentException("Amount must be greater than zero.", nameof(amount));
 
         Amount = amount;
         Currency = currency;
@@ -42,6 +47,7 @@ public class Expense : BaseEntity
         ReceiptPath = receiptPath;
     }
 
+    // Update methods
     public void UpdateDescription(string description)
     {
         Description = description;
@@ -50,5 +56,23 @@ public class Expense : BaseEntity
     public void UpdateReceipt(string receiptPath)
     {
         ReceiptPath = receiptPath;
+    }
+
+    public void UpdateAmount(decimal amount)
+    {
+        if (amount <= 0)
+            throw new ArgumentException("Amount must be greater than zero.", nameof(amount));
+
+        Amount = amount;
+    }
+
+    public void UpdateCurrency(Currency currency)
+    {
+        Currency = currency;
+    }
+
+    public void UpdateExpenseDate(DateTimeOffset expenseDate)
+    {
+        ExpenseDate = expenseDate;
     }
 }
