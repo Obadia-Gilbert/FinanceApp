@@ -7,60 +7,69 @@ using FinanceApp.Application.Interfaces;
 using FinanceApp.Domain.Common;
 using FinanceApp.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using FinanceApp.Infrastructure.Extensions;
 
-namespace FinanceApp.Infrastructure.Repositories;
-
-public class Repository<T> : IRepository<T> where T : BaseEntity
+namespace FinanceApp.Infrastructure.Repositories
 {
-    protected readonly FinanceDbContext _context;
-    protected readonly DbSet<T> _dbSet;
-
-    public Repository(FinanceDbContext context)
+    public class Repository<T> : IRepository<T> where T : BaseEntity
     {
-        _context = context;
-        _dbSet = context.Set<T>();
-    }
+        protected readonly FinanceDbContext _context;
+        protected readonly DbSet<T> _dbSet;
 
-    public async Task<T?> GetByIdAsync(Guid id)
-    {
-        return await _dbSet.FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
-    }
+        public Repository(FinanceDbContext context)
+        {
+            _context = context;
+            _dbSet = context.Set<T>();
+        }
 
-    public async Task<IEnumerable<T>> GetAllAsync()
-    {
-        return await _dbSet.Where(x => !x.IsDeleted).ToListAsync();
-    }
+        // Get entity by Id (ignores soft deleted)
+        public async Task<T?> GetByIdAsync(Guid id)
+        {
+            return await _dbSet.FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
+        }
 
-    public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
-    {
-        return await _dbSet.Where(predicate)
-                           .Where(x => !x.IsDeleted)
-                           .ToListAsync();
-    }
+        // Get all entities (ignores soft deleted)
+        public async Task<IEnumerable<T>> GetAllAsync()
+        {
+            return await _dbSet.Where(x => !x.IsDeleted).ToListAsync();
+        }
 
-    public async Task AddAsync(T entity)
-    {
-        await _dbSet.AddAsync(entity);
-    }
+        // Find entities by predicate (combines with soft delete filter)
+        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
+        {
+            var notDeletedPredicate = predicate.AndAlso(x => !x.IsDeleted);
+            return await _dbSet.Where(notDeletedPredicate).ToListAsync();
+        }
 
-    public void Update(T entity)
-    {
-        _dbSet.Update(entity);
-    }
+        // Add new entity
+        public async Task AddAsync(T entity)
+        {
+            await _dbSet.AddAsync(entity);
+        }
 
-    public void Remove(T entity)
-    {
-        _dbSet.Remove(entity);
-    }
+        // Update existing entity
+        public void Update(T entity)
+        {
+            _dbSet.Update(entity);
+        }
 
-    public void SoftDelete(T entity)
-    {
-        entity.SoftDelete();
-        _dbSet.Update(entity);
-    }
+        // Hard delete entity
+        public void Remove(T entity)
+        {
+            _dbSet.Remove(entity);
+        }
 
-    public async Task SaveChangesAsync()
-    {
-        await _context.SaveChangesAsync();
+        // Soft delete entity
+        public void SoftDelete(T entity)
+        {
+            entity.SoftDelete();
+            _dbSet.Update(entity);
+        }
+
+        // Commit changes
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
     }
 }
