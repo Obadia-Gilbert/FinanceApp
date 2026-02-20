@@ -9,6 +9,8 @@ public class Expense : BaseEntity
 
     public Currency Currency { get; private set; }
 
+    public string UserId { get; private set; } = null!;
+
     public DateTimeOffset ExpenseDate { get; private set; }
 
     public string? Description { get; private set; }
@@ -17,7 +19,7 @@ public class Expense : BaseEntity
 
     public string? ReceiptPath { get; private set; }
 
-    public Guid UserId { get; private set; }
+    //public Guid UserId { get; private set; }
 
     // 🔹 Navigation property to Category
     public Category Category { get; private set; } = null!;
@@ -31,7 +33,7 @@ public class Expense : BaseEntity
         Currency currency,
         DateTimeOffset expenseDate,
         Guid categoryId,
-        Guid userId,
+        string userId,
         string? description = null,
         string? receiptPath = null)
     {

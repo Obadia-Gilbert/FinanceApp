@@ -1,21 +1,30 @@
 using FinanceApp.Domain.Entities;
 using FinanceApp.Domain.Common;
+using FinanceApp.Infrastructure.Identity; // <-- where ApplicationUser lives
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinanceApp.Infrastructure.Persistence;
 
-public class FinanceDbContext : DbContext
+public class FinanceDbContext 
+    : IdentityDbContext<ApplicationUser> // 🔥 changed here
 {
     public FinanceDbContext(DbContextOptions<FinanceDbContext> options)
         : base(options)
     {
     }
 
+    // ==============================
     // DbSets
+    // ==============================
+
     public DbSet<Expense> Expenses { get; set; } = null!;
     public DbSet<Category> Categories { get; set; } = null!;
 
+    // ==============================
     // Automatically handle CreatedAt and UpdatedAt
+    // ==============================
+
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         foreach (var entry in ChangeTracker.Entries<BaseEntity>())
@@ -36,6 +45,7 @@ public class FinanceDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // 🔥 VERY IMPORTANT: call base FIRST for Identity tables
         base.OnModelCreating(modelBuilder);
 
         // ==============================
@@ -50,11 +60,11 @@ public class FinanceDbContext : DbContext
         });
 
         // ==============================
-        // Category configuration (TPT)
+        // Category configuration
         // ==============================
         modelBuilder.Entity<Category>(entity =>
         {
-            entity.ToTable("Categories"); // TPT: separate table
+            entity.ToTable("Categories");
 
             entity.Property(c => c.Name)
                   .HasMaxLength(100)
@@ -62,17 +72,14 @@ public class FinanceDbContext : DbContext
 
             entity.Property(c => c.Description)
                   .HasMaxLength(500);
-
-            // Seed some categories
-            
         });
 
         // ==============================
-        // Expense configuration (TPT)
+        // Expense configuration
         // ==============================
         modelBuilder.Entity<Expense>(entity =>
         {
-            entity.ToTable("Expenses"); // TPT: separate table
+            entity.ToTable("Expenses");
 
             entity.Property(e => e.Amount)
                   .HasColumnType("decimal(18,2)")
@@ -84,7 +91,9 @@ public class FinanceDbContext : DbContext
             entity.Property(e => e.ReceiptPath)
                   .HasMaxLength(500);
 
-            // Relationships
+            entity.Property(e => e.UserId)
+                  .IsRequired(); // 🔥 we will add this in Expense
+
             entity.HasOne(e => e.Category)
                   .WithMany(c => c.Expenses)
                   .HasForeignKey(e => e.CategoryId)

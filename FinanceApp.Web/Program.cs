@@ -2,6 +2,9 @@ using FinanceApp.Application.Interfaces;
 using FinanceApp.Infrastructure.Repositories;
 using FinanceApp.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using FinanceApp.Infrastructure.Identity;   
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 using FinanceApp.Application.Interfaces.Services; // for IExpenseService
 using FinanceApp.Infrastructure.Services;        // for ExpenseService
@@ -16,6 +19,10 @@ builder.Services.AddDbContext<FinanceDbContext>(options =>
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
+builder.Services
+    .AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<FinanceDbContext>()
+    .AddDefaultTokenProviders();
 
 var app = builder.Build();
 
@@ -28,11 +35,15 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+
 app.UseRouting();
 
+app.UseAuthentication(); // Add this before UseAuthorization
 app.UseAuthorization();
 
-app.MapStaticAssets();
+//app.MapStaticAssets();
+
 
 app.MapControllerRoute(
     name: "default",
