@@ -3,20 +3,28 @@ using FinanceApp.Domain.Entities;
 using FinanceApp.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using FinanceApp.Web.Models;
+using FinanceApp.Infrastructure.Identity; // for ApplicationUser
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization; // for UserManager
 
 namespace FinanceApp.Web.Controllers;
 
+[Authorize] // Ensure only authenticated users can access   
 public class ExpenseController : Controller
 {
     private readonly IRepository<Expense> _expenseRepository;
     private readonly IRepository<Category> _categoryRepository;
+    
+    private readonly UserManager<ApplicationUser> _userManager; // 🔥 for getting current user
 
     public ExpenseController(
         IRepository<Expense> expenseRepository,
-        IRepository<Category> categoryRepository)
+        IRepository<Category> categoryRepository,
+        UserManager<ApplicationUser> userManager) // 🔥 inject UserManage   r
     {
         _expenseRepository = expenseRepository;
         _categoryRepository = categoryRepository;
+        _userManager = userManager; // 🔥 assign to field
     }
 
     // GET: /Expense
@@ -77,8 +85,11 @@ public class ExpenseController : Controller
     }
 
     // Example: get UserId from logged-in user
-    var userId = Guid.NewGuid(); // TODO: replace with actual user ID
-
+    var userId = _userManager.GetUserId(User); // TODO: replace with actual user ID
+    if (userId == null)
+    {
+        return Unauthorized();
+    }   
     var expense = new Expense(
         amount: model.Amount,
         currency: model.Currency,

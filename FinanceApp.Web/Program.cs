@@ -19,10 +19,15 @@ builder.Services.AddDbContext<FinanceDbContext>(options =>
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
+
 builder.Services
-    .AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<FinanceDbContext>()
-    .AddDefaultTokenProviders();
+    .AddDefaultIdentity<ApplicationUser>(options =>
+    {
+        options.SignIn.RequireConfirmedAccount = false;
+    })
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<FinanceDbContext>();
+builder.Services.AddRazorPages(); // For Identity UI
 
 var app = builder.Build();
 
@@ -41,6 +46,8 @@ app.UseRouting();
 
 app.UseAuthentication(); // Add this before UseAuthorization
 app.UseAuthorization();
+
+app.MapRazorPages(); // For Identity UI 
 
 //app.MapStaticAssets();
 
