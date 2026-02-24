@@ -13,7 +13,7 @@ namespace FinanceApp.Web.Models
         public decimal Amount { get; set; }
         public DateTime Date { get; set; }
 
-        public string Description { get; set; } = string.Empty;
+        public string? Description { get; set; } = string.Empty;
 
         public Currency Currency { get; set; }
 

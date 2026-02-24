@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 using FinanceApp.Application.Interfaces.Services; // for IExpenseService
-using FinanceApp.Infrastructure.Services;        // for ExpenseService
+using FinanceApp.Application.Services;        // for ExpenseService
 
 
 var builder = WebApplication.CreateBuilder(args);
