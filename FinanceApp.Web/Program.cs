@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using FinanceApp.Infrastructure.Identity;   
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-
 using FinanceApp.Application.Interfaces.Services; // for IExpenseService
 using FinanceApp.Application.Services;        // for ExpenseService
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +19,7 @@ builder.Services.AddDbContext<FinanceDbContext>(options =>
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 builder.Services
     .AddDefaultIdentity<ApplicationUser>(options =>

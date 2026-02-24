@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using FinanceApp.Application.Interfaces;
 using FinanceApp.Domain.Common;
+using FinanceApp.Application.Common;
 using FinanceApp.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using FinanceApp.Infrastructure.Extensions;
@@ -81,5 +82,40 @@ namespace FinanceApp.Infrastructure.Repositories
         {
             await _context.SaveChangesAsync();
         }
+
+        public async Task<PagedResult<T>> GetPagedAsync(
+        int pageNumber,
+        int pageSize,
+        Expression<Func<T, bool>>? filter = null,
+        Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
+        params Expression<Func<T, object>>[] includes)
+        {
+        IQueryable<T> query = _dbSet.Where(x => !x.IsDeleted);
+
+        if (filter != null)
+        query = query.Where(filter);
+
+        if (includes != null && includes.Any())
+        query = includes.Aggregate(query, (current, include) => current.Include(include));
+
+        if (orderBy != null)
+        query = orderBy(query);
+
+        var totalItems = await query.CountAsync();
+
+        var items = await query
+        .Skip((pageNumber - 1) * pageSize)
+        .Take(pageSize)
+        .ToListAsync();
+
+        return new PagedResult<T>
+        {
+            Items = items,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalItems = totalItems
+        };
+        }
+
     }
 }

@@ -1,4 +1,5 @@
 using FinanceApp.Application.Interfaces.Services;
+using FinanceApp.Application.Common;    
 using FinanceApp.Domain.Entities;
 using FinanceApp.Web.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -21,19 +22,34 @@ namespace FinanceApp.Web.Controllers
         }
 
         // GET: /Category
-        public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
-        {
-            var userId = _userManager.GetUserId(User);
-            var pagedCategories = await _categoryService.GetPagedCategoriesAsync(page, pageSize, userId!);
+      public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10)
+{
+    var userId = _userManager.GetUserId(User); // get logged-in user
+    var pagedCategories = await _categoryService.GetPagedCategoriesAsync(
+        pageNumber, pageSize, userId
+    );
 
-            return View(pagedCategories);
-        }
-
-        // GET: /Category/Create
-        public IActionResult Create()
+    // Map Category -> CategoryViewModel
+    var pagedViewModel = new PagedResult<CategoryViewModel>
+    {
+        Items = pagedCategories.Items.Select(c => new CategoryViewModel
         {
-            return View();
-        }
+            Id = c.Id,
+            Name = c.Name,
+            Description = c.Description
+        }).ToList(),
+        PageNumber = pagedCategories.PageNumber,
+        PageSize = pagedCategories.PageSize,
+        TotalItems = pagedCategories.TotalItems
+    };
+
+    return View(pagedViewModel);
+}
+    public async Task<IActionResult> Create()
+    {
+        
+        return View();
+    }
 
         // POST: /Category/Create
         [HttpPost]
@@ -98,6 +114,7 @@ namespace FinanceApp.Web.Controllers
 
             return View(model);
         }
+        
 
         // POST: /Category/Delete/{id}
         [HttpPost, ActionName("Delete")]

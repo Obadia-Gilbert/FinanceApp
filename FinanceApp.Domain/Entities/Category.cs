@@ -41,4 +41,6 @@ public class Category : BaseEntity
     {
         Description = description;
     }
+
+     public string UserId { get;  set; } = string.Empty;  // <-- new property for user association
 }

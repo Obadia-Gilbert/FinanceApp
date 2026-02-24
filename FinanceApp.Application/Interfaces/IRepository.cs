@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using FinanceApp.Domain.Common;
+using FinanceApp.Application.Common;
 
 namespace FinanceApp.Application.Interfaces
 {
@@ -32,5 +33,12 @@ namespace FinanceApp.Application.Interfaces
 
         // Commit all changes to the database
         Task SaveChangesAsync();
-    }
+
+        Task<PagedResult<T>> GetPagedAsync(
+        int pageNumber,
+        int pageSize,
+        Expression<Func<T, bool>>? filter = null,
+        Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
+        params Expression<Func<T, object>>[] includes);
+        }
 }
