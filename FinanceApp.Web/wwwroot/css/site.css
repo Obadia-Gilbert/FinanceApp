@@ -19,6 +19,12 @@ html {
 
 body {
   margin-bottom: 60px;
+  font-family:'Google Sans Flex', sans-serif;
+}
+
+.navbar .nav-link {
+  font-family: 'Google Sans Flex', sans-serif;
+  font-weight: 500;
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
@@ -28,4 +34,10 @@ body {
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
+}
+
+h1 {
+  font-family: 'Google Sans Flex', sans-serif;
+  font-weight: 300 ;
+  font-size: 16;
 }

@@ -6,7 +6,8 @@ using FinanceApp.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using FinanceApp.Application.Interfaces.Services; // for IExpenseService
-using FinanceApp.Application.Services;        // for ExpenseService
+using FinanceApp.Application.Services;
+using FinanceApp.Infrastructure.Services;       // for ExpenseService
 
 
 
@@ -20,14 +21,31 @@ builder.Services.AddDbContext<FinanceDbContext>(options =>
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddTransient<IEmailService, EmailService>();
+//builder.Services.AddTransient<IEmailSender, IdentityEmailSender>();
 
 builder.Services
     .AddDefaultIdentity<ApplicationUser>(options =>
     {
-        options.SignIn.RequireConfirmedAccount = false;
+        options.SignIn.RequireConfirmedAccount = true;
+        options.User.RequireUniqueEmail = true;
+
+        // Optional but recommended for FinanceApp
+        options.Password.RequireDigit = true;
+        options.Password.RequireUppercase = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequiredLength = 6;
     })
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<FinanceDbContext>();
+builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
+    options.TokenLifespan = TimeSpan.FromHours(2));
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
+
+builder.Services.AddTransient<IEmailService, EmailService>();
+builder.Services.AddTransient<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender, IdentityEmailSender>();
+
 builder.Services.AddRazorPages(); // For Identity UI
 
 var app = builder.Build();
@@ -57,15 +75,11 @@ app.UseRouting();
 app.UseAuthentication(); // Add this before UseAuthorization
 app.UseAuthorization();
 
-app.MapRazorPages(); // For Identity UI 
-
-//app.MapStaticAssets();
-
-
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+app.MapRazorPages(); // For Identity UI 
 
 app.Run();
