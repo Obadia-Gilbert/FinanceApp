@@ -35,5 +35,10 @@ namespace FinanceApp.Application.Interfaces.Services
             string userId,
             string description,
             string? receiptPath = null);
+        Task<PagedResult<Expense>> GetByCategoryIdAsync(
+            Guid categoryId,
+            string userId,
+            int pageNumber,
+            int pageSize);
     }
 }
