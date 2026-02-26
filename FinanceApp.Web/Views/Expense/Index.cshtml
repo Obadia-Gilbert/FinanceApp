@@ -1,0 +1,75 @@
+@model FinanceApp.Application.Common.PagedResult<FinanceApp.Domain.Entities.Expense>
+
+@{
+    ViewData["Title"] = "Expenses";
+    int totalPages = (int)Math.Ceiling((double)Model.TotalItems / Model.PageSize);
+}
+
+<h1>Expenses</h1>
+<p class=d-flex justify-content-between align-items-center>
+    <a class="btn btn-primary" asp-action="Create">Add New Expense</a>
+    <a class="btn btn-success ml-2" asp-action="DownloadExcel">Download Excel</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Description</th>
+            <th>Amount</th>
+            <th>Currency</th>
+            <th>Category</th>
+            <th>Expense Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var expense in Model.Items)
+        {
+            <tr>
+                <td>@expense.Description</td>
+                <td>@expense.Amount</td>
+                <td>@expense.Currency</td>
+                <td>@expense.Category.Name</td>
+                <td>@expense.ExpenseDate.ToString("yyyy-MM-dd")</td>
+                <td>
+                    <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@expense.Id">Edit</a>
+                    <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@expense.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (totalPages > 1)
+{
+    <nav aria-label="Expense pagination">
+        <ul class="pagination">
+
+            <!-- Previous button -->
+            <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-pageSize="@Model.PageSize">Previous</a>
+            </li>
+
+            <!-- Page numbers -->
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                    @if (i == Model.PageNumber)
+                    {
+                        <span class="page-link">@i <!-- <span class="sr-only">(current)</span>--></span>
+                    }
+                    else
+                    {
+                        <a class="page-link" asp-action="Index" asp-route-pageNumber="@i" asp-route-pageSize="@Model.PageSize">@i</a>
+                    }
+                </li>
+            }
+
+            <!-- Next button -->
+            <li class="page-item @(Model.PageNumber == totalPages ? "disabled" : "")">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-pageSize="@Model.PageSize">Next</a>
+            </li>
+
+        </ul>
+    </nav>
+}

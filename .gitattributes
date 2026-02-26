@@ -1,0 +1,5 @@
+# Tell GitHub what languages to count
+*.cs     linguist-language=C#
+*.cshtml linguist-language=Razor
+*.js     linguist-language=JavaScript
+*.css    linguist-language=CSS
