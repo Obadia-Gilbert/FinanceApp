@@ -105,5 +105,19 @@ namespace FinanceApp.Application.Services
 
             return expense;
         }
-    }
+        public async Task<PagedResult<Expense>> GetByCategoryIdAsync(
+            Guid categoryId,
+            string userId,
+            int pageNumber,
+            int pageSize)
+        {
+            return await _expenseRepository.GetPagedAsync(
+                pageNumber,
+                pageSize,
+                filter: e => e.CategoryId == categoryId && e.UserId == userId,
+                orderBy: q => q.OrderByDescending(e => e.ExpenseDate),
+                includes: e => e.Category
+            );
+        }
+   }
 }
