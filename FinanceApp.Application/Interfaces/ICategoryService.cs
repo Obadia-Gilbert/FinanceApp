@@ -23,5 +23,7 @@ namespace FinanceApp.Application.Interfaces.Services
         Task UpdateCategoryAsync(Guid id, string userId, string name, string? description = null);
         Task DeleteCategoryAsync(Guid id, string userId);
         Task AssignDefaultCategoriesToUserAsync(string userId);
+
+        Task<IEnumerable<Category>> GetCategoriesAsync(string userId, bool isAdmin);
     }
 }

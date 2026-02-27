@@ -42,7 +42,7 @@ namespace FinanceApp.Application.Services
         {
             if (string.IsNullOrWhiteSpace(userId))
                 throw new ArgumentException("UserId is required", nameof(userId));
-
+                
             return await _categoryRepository.FindAsync(c => c.UserId == userId);
         }
 
@@ -154,6 +154,18 @@ public async Task AssignDefaultCategoriesToUserAsync(string userId)
 
     // 4. Save all changes
     await _categoryRepository.SaveChangesAsync();
+}
+    public async Task<IEnumerable<Category>> GetCategoriesAsync(string userId, bool isAdmin)
+{
+    if (isAdmin)
+    {
+        return await _categoryRepository.GetAllAsync();
+    }
+
+    if (string.IsNullOrWhiteSpace(userId))
+        throw new ArgumentException("UserId is required", nameof(userId));
+
+    return await _categoryRepository.FindAsync(c => c.UserId == userId);
 }
      }
 }

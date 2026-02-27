@@ -27,7 +27,7 @@ builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services
     .AddDefaultIdentity<ApplicationUser>(options =>
     {
-        options.SignIn.RequireConfirmedAccount = true;
+        options.SignIn.RequireConfirmedAccount = false;
         options.User.RequireUniqueEmail = true;
 
         // Optional but recommended for FinanceApp
@@ -45,10 +45,18 @@ builder.Services.Configure<EmailSettings>(
 
 builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddTransient<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender, IdentityEmailSender>();
-
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddRazorPages(); // For Identity UI
 
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+    await RoleSeeder.SeedRolesAndAdminAsync(userManager, roleManager);
+}
 
 using (var scope = app.Services.CreateScope())
 {
@@ -75,6 +83,10 @@ app.UseRouting();
 app.UseAuthentication(); // Add this before UseAuthorization
 app.UseAuthorization();
 
+app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Admin}/{action=Users}/{id?}"
+);
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")

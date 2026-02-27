@@ -19,8 +19,8 @@ public static class RoleSeeder
         }
 
         // Seed admin user
-        string adminEmail = "admin@financeapp.com";
-        string adminPassword = "Admin123!"; // choose a strong password
+        string adminEmail = "obadia@midata-tech.com";
+        string adminPassword = "90Barclaysnew!"; // choose a strong password
 
         if (await userManager.FindByEmailAsync(adminEmail) == null)
         {
