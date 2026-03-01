@@ -2,79 +2,149 @@
 
 @{
     ViewData["Title"] = "Expenses";
-    int totalPages = (int)Math.Ceiling((double)Model.TotalItems / Model.PageSize);
 }
-<div class="d-flex align-items-center mb-4">
-    <p class="justify-content-between">
-        <h1 >Expenses</h1>
-        <i class="bi bi-cash bg-primary text-white rounded-circle p-2"></i>
-    </p>
+
+<div class="mb-4">
+    <h1 class="h2 mb-3">Expenses</h1>
+    <div class="d-flex gap-2 mb-3">
+        <button id="btnAddExpense" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Add New Expense
+        </button>
+        <a class="btn btn-success" asp-action="DownloadExcel">
+            <i class="bi bi-download"></i> Download Excel
+        </a>
+    </div>
+
+    <!-- Offcanvas container for create/edit forms -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="expenseOffcanvas" aria-labelledby="expenseOffcanvasLabel">
+        <div class="offcanvas-header">
+            <h5 id="expenseOffcanvasLabel">Expense</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body px-0">
+            <!-- content will be loaded here -->
+            <div class="p-3" id="expenseOffcanvasContent">Loading...</div>
+        </div>
+    </div>
 </div>
 
-<p class="d-flex  align-items-center">
-    <a class="btn btn-primary" asp-action="Create">Add New Expense</a>
-    <a class="btn btn-success ml-2" asp-action="DownloadExcel">Download Excel</a>
-</p>
-
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Description</th>
-            <th>Amount</th>
-            <th>Currency</th>
-            <th>Category</th>
-            <th>Expense Date</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var expense in Model.Items)
-        {
-            <tr>
-                <td>@expense.Description</td>
-                <td>@expense.Amount</td>
-                <td>@expense.Currency</td>
-                <td>@expense.Category.Name</td>
-                <td>@expense.ExpenseDate.ToString("yyyy-MM-dd")</td>
-                <td>
-                    <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@expense.Id">Edit</a>
-                    <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@expense.Id">Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-@if (totalPages > 1)
-{
-    <nav aria-label="Expense pagination">
-        <ul class="pagination">
-
-            <!-- Previous button -->
-            <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
-                <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-pageSize="@Model.PageSize">Previous</a>
-            </li>
-
-            <!-- Page numbers -->
-            @for (int i = 1; i <= totalPages; i++)
-            {
-                <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                    @if (i == Model.PageNumber)
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="expenseTable" class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Currency</th>
+                        <th>Category</th>
+                        <th>Expense Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var expense in Model.Items)
                     {
-                        <span class="page-link">@i <!-- <span class="sr-only">(current)</span>--></span>
+                        <tr>
+                            <td>@expense.Description</td>
+                            <td>@expense.Amount</td>
+                            <td>@expense.Currency</td>
+                            <td>@expense.Category.Name</td>
+                            <td>@expense.ExpenseDate.ToString("yyyy-MM-dd")</td>
+                            <td>
+                                <a class="btn btn-sm btn-warning btn-edit" href="@Url.Action("Edit", "Expense", new { id = expense.Id })">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </a>
+                                <a class="btn btn-sm btn-danger btn-delete" href="@Url.Action("Delete", "Expense", new { id = expense.Id })">
+                                    <i class="bi bi-trash"></i> Delete
+                                </a>
+                            </td>
+                        </tr>
                     }
-                    else
-                    {
-                        <a class="page-link" asp-action="Index" asp-route-pageNumber="@i" asp-route-pageSize="@Model.PageSize">@i</a>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function(){
+            $('#expenseTable').DataTable({
+                paging: true,
+                searching: true,
+                ordering: true,
+                pageLength: 10,
+                language: {
+                    search: "Filter:",
+                    paginate: {
+                        first: "First",
+                        last: "Last",
+                        next: "Next",
+                        previous: "Previous"
                     }
-                </li>
-            }
+                }
+            });
+        });
+    </script>
+    <script>
+        (function(){
+            const btn = document.getElementById('btnAddExpense');
+            if (!btn) return;
 
-            <!-- Next button -->
-            <li class="page-item @(Model.PageNumber == totalPages ? "disabled" : "")">
-                <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-pageSize="@Model.PageSize">Next</a>
-            </li>
+            btn.addEventListener('click', async function(e){
+                e.preventDefault();
+                const url = '@Url.Action("Create","Expense")?partial=true';
+                const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }});
+                if (!res.ok) {
+                    alert('Unable to load form.');
+                    return;
+                }
+                const html = await res.text();
+                const content = document.getElementById('expenseOffcanvasContent');
+                content.innerHTML = html;
 
-        </ul>
-    </nav>
+                const offcanvasEl = document.getElementById('expenseOffcanvas');
+                const bsOff = new bootstrap.Offcanvas(offcanvasEl);
+                bsOff.show();
+            });
+
+            // Delegate table actions (edit & delete) to load partials into the same offcanvas
+            document.querySelector('#expenseTable').addEventListener('click', async function(e){
+                const editBtn = e.target.closest('.btn-edit');
+                if (editBtn) {
+                    e.preventDefault();
+                    const href = editBtn.getAttribute('href');
+                    if (!href) return;
+                    const url = href + (href.indexOf('?') === -1 ? '?partial=true' : '&partial=true');
+                    const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }});
+                    if (!res.ok) { alert('Unable to load edit form.'); return; }
+                    const html = await res.text();
+                    const content = document.getElementById('expenseOffcanvasContent');
+                    content.innerHTML = html;
+                    const offcanvasEl = document.getElementById('expenseOffcanvas');
+                    const bsOff = new bootstrap.Offcanvas(offcanvasEl);
+                    bsOff.show();
+                    return;
+                }
+
+                const delBtn = e.target.closest('.btn-delete');
+                if (delBtn) {
+                    e.preventDefault();
+                    const href = delBtn.getAttribute('href');
+                    if (!href) return;
+                    const url = href + (href.indexOf('?') === -1 ? '?partial=true' : '&partial=true');
+                    const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }});
+                    if (!res.ok) { alert('Unable to load delete confirmation.'); return; }
+                    const html = await res.text();
+                    const content = document.getElementById('expenseOffcanvasContent');
+                    content.innerHTML = html;
+                    const offcanvasEl = document.getElementById('expenseOffcanvas');
+                    const bsOff = new bootstrap.Offcanvas(offcanvasEl);
+                    bsOff.show();
+                    return;
+                }
+            });
+        })();
+    </script>
 }

@@ -1,0 +1,27 @@
+@* Sidebar partial using Bootstrap 5 classes for a collapsible vertical navigation *@
+<nav id="sidebarMenu" class="d-md-block bg-light sidebar collapse">
+    <div class="position-sticky pt-3">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-area="" asp-controller="Expense" asp-action="Index">
+                    <i class="bi bi-cash"></i> Expenses
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-area="" asp-controller="Category" asp-action="Index">
+                    <i class="bi bi-tags"></i> Categories
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">
+                    <i class="bi bi-shield-lock"></i> Privacy
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>

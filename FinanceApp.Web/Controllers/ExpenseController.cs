@@ -46,11 +46,25 @@ public class ExpenseController : Controller
     }
 
     // GET: /Expense/Create
-    public async Task<IActionResult> Create()
+    // Accepts ?partial=true or AJAX requests to return a layout-less partial for offcanvas
+    public async Task<IActionResult> Create(bool partial = false)
     {
+        var model = new FinanceApp.Web.Models.ExpenseCreateViewModel
+        {
+            ExpenseDate = DateTime.Today
+        };
+
         ViewBag.Categories = await _categoryRepository.GetAllAsync();
         ViewBag.Currencies = Enum.GetValues(typeof(Currency));
-        return View();
+
+        bool isAjax = partial ||
+                     string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
+        if (isAjax)
+        {
+            return PartialView("_ExpenseCreatePartial", model);
+        }
+
+        return View(model);
     }
 
     // POST: /Expense/Create
@@ -58,10 +72,17 @@ public class ExpenseController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(ExpenseCreateViewModel model)
     {
+        bool isAjax = string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
+
         if (!ModelState.IsValid)
         {
             ViewBag.Categories = await _categoryRepository.GetAllAsync();
             ViewBag.Currencies = Enum.GetValues(typeof(Currency));
+            if (isAjax)
+            {
+                return PartialView("_ExpenseCreatePartial", model);
+            }
+
             return View(model);
         }
 
@@ -101,11 +122,17 @@ public class ExpenseController : Controller
             receiptPath
         );
 
+        if (isAjax)
+        {
+            return Json(new { success = true });
+        }
+
         return RedirectToAction(nameof(Index));
     }
 
     // GET: /Expense/Edit/{id}
-    public async Task<IActionResult> Edit(Guid id)
+    // Optional ?partial=true or AJAX header to return layout‑less form for offcanvas
+    public async Task<IActionResult> Edit(Guid id, bool partial = false)
     {
         var expense = await _expenseService.GetByIdAsync(id);
         if (expense == null) return NotFound();
@@ -124,6 +151,13 @@ public class ExpenseController : Controller
         ViewBag.Categories = await _categoryRepository.GetAllAsync();
         ViewBag.Currencies = Enum.GetValues(typeof(Currency));
 
+        bool isAjax = partial ||
+                     string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
+        if (isAjax)
+        {
+            return PartialView("_ExpenseEditPartial", model);
+        }
+
         return View(model);
     }
 
@@ -132,10 +166,17 @@ public class ExpenseController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(ExpenseEditViewModel model)
     {
+        bool isAjax = string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
+
         if (!ModelState.IsValid)
         {
             ViewBag.Categories = await _categoryRepository.GetAllAsync();
             ViewBag.Currencies = Enum.GetValues(typeof(Currency));
+            if (isAjax)
+            {
+                return PartialView("_ExpenseEditPartial", model);
+            }
+
             return View(model);
         }
 
@@ -151,11 +192,16 @@ public class ExpenseController : Controller
 
         await _expenseService.UpdateExpenseAsync(expense);
 
+        if (isAjax)
+        {
+            return Json(new { success = true });
+        }
+
         return RedirectToAction(nameof(Index));
     }
 
     // GET: /Expense/Delete/{id}
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid id, bool partial = false)
     {
         var expense = await _expenseService.GetByIdAsync(id);
         if (expense == null) return NotFound();
@@ -170,6 +216,12 @@ public class ExpenseController : Controller
             ExpenseDate = expense.ExpenseDate
         };
 
+        bool isAjax = partial || string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
+        if (isAjax)
+        {
+            return PartialView("_ExpenseDeletePartial", vm);
+        }
+
         return View(vm);
     }
 
@@ -178,7 +230,13 @@ public class ExpenseController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(Guid id)
     {
+        bool isAjax = string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
         await _expenseService.SoftDeleteExpenseAsync(id);
+        if (isAjax)
+        {
+            return Json(new { success = true });
+        }
+
         return RedirectToAction(nameof(Index));
     }
 

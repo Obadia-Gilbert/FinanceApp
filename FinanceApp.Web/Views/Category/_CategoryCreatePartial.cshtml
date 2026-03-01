@@ -1,0 +1,141 @@
+@model FinanceApp.Web.Models.CategoryCreateViewModel
+
+@* Shared form partial for category creation - used in modals/offcanvas *@
+
+<form asp-action="Create" method="post" class="p-4">
+    <!-- Category Name -->
+    <div class="mb-4">
+        <label asp-for="Name" class="form-label fw-600">Category Name</label>
+        <input asp-for="Name" class="form-control form-control-lg" placeholder="e.g. Groceries" />
+        <span asp-validation-for="Name" class="invalid-feedback d-block small"></span>
+    </div>
+
+    <!-- Icon Selection -->
+    <div class="mb-4">
+        <label class="form-label fw-600">Select Icon</label>
+        <div class="icon-picker-grid">
+            @{
+                var icons = new[] {
+                    ("shopping-cart", "bag"),
+                    ("utensils", "utensils"),
+                    ("car", "car"),
+                    ("home", "house"),
+                    ("briefcase", "briefcase"),
+                    ("tools", "wrench"),
+                    ("film", "film"),
+                    ("gamepad2", "gamepad2"),
+                    ("heart", "heart"),
+                    ("plane", "airplane"),
+                    ("dumbbell", "dumbbell"),
+                    ("hospital", "hospital")
+                };
+            }
+            @foreach (var (iconName, displayName) in icons)
+            {
+                <button type="button" class="icon-option @(Model?.Icon == iconName ? "active" : "")" 
+                        data-icon="@iconName" title="@displayName">
+                    <i class="bi bi-@iconName fs-4"></i>
+                </button>
+            }
+        </div>
+        <input type="hidden" asp-for="Icon" id="selectedIcon" />
+    </div>
+
+    <!-- Badge Color -->
+    <div class="mb-4">
+        <label asp-for="BadgeColor" class="form-label fw-600">Badge Color</label>
+        <div class="d-flex gap-2 align-items-center">
+            <input type="color" asp-for="BadgeColor" class="form-control form-control-color" style="width: 60px; height: 45px;" />
+            <input type="text" class="form-control" id="colorHex" placeholder="#137fec" value="@(Model?.BadgeColor ?? "#137fec")" style="max-width: 120px;" />
+        </div>
+        <small class="text-muted d-block mt-1">Choose a color for the category badge</small>
+    </div>
+
+    <!-- Description -->
+    <div class="mb-4">
+        <label asp-for="Description" class="form-label fw-600">Description</label>
+        <textarea asp-for="Description" class="form-control" rows="3" placeholder="Add a short description for this category..."></textarea>
+        <span asp-validation-for="Description" class="invalid-feedback d-block small"></span>
+    </div>
+
+    <!-- Buttons -->
+    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">Cancel</button>
+        <button type="submit" class="btn btn-success fw-600">
+            <i class="bi bi-plus-circle me-2"></i>
+            Create Category
+        </button>
+    </div>
+</form>
+
+<style>
+    .icon-picker-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .icon-option {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        aspect-ratio: 1;
+        border: 2px solid #ddd;
+        background: white;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: #666;
+    }
+
+    .icon-option:hover {
+        border-color: #0d6efd;
+        background-color: #f0f7ff;
+    }
+
+    .icon-option.active {
+        border-color: #0d6efd;
+        background-color: #0d6efd;
+        color: white;
+    }
+
+    @@media (max-width: 576px) {
+        .icon-picker-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const iconOptions = document.querySelectorAll('.icon-option');
+        const selectedIconInput = document.getElementById('selectedIcon');
+        const colorHexInput = document.getElementById('colorHex');
+        const colorInput = document.querySelector('input[type="color"]');
+
+        // Icon selection
+        iconOptions.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                iconOptions.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                selectedIconInput.value = this.getAttribute('data-icon');
+            });
+        });
+
+        // Color picker sync
+        if (colorInput && colorHexInput) {
+            colorInput.addEventListener('input', function() {
+                colorHexInput.value = this.value;
+            });
+            
+            colorHexInput.addEventListener('input', function() {
+                if (this.value.length === 7) {
+                    colorInput.value = this.value;
+                }
+            });
+        }
+    });
+</script>

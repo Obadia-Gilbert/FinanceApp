@@ -1,0 +1,8 @@
+@model FinanceApp.Web.Models.CategoryEditViewModel
+
+@* This partial is loaded via AJAX into the offcanvas modal from site.js *@
+@await Html.PartialAsync("_CategoryFormPartial", Model)
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

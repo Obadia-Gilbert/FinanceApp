@@ -77,7 +77,7 @@ namespace FinanceApp.Application.Services
         /// <summary>
         /// Create a new category for a user.
         /// </summary>
-        public async Task<Category> CreateCategoryAsync(string name, string userId, string? description = null)
+        public async Task<Category> CreateCategoryAsync(string name, string userId, string? description = null, string? icon = null, string? badgeColor = null)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Category name is required", nameof(name));
@@ -85,7 +85,7 @@ namespace FinanceApp.Application.Services
             if (string.IsNullOrWhiteSpace(userId))
                 throw new ArgumentException("UserId is required", nameof(userId));
 
-            var category = new Category(name, description)
+            var category = new Category(name, description, icon, badgeColor)
             {
                 UserId = userId
             };
@@ -99,7 +99,7 @@ namespace FinanceApp.Application.Services
         /// <summary>
         /// Update an existing category owned by the user.
         /// </summary>
-        public async Task UpdateCategoryAsync(Guid id, string userId, string name, string? description = null)
+        public async Task UpdateCategoryAsync(Guid id, string userId, string name, string? description = null, string? icon = null, string? badgeColor = null)
         {
             if (string.IsNullOrWhiteSpace(userId))
                 throw new ArgumentException("UserId is required", nameof(userId));
@@ -110,6 +110,9 @@ namespace FinanceApp.Application.Services
 
             category.UpdateName(name);
             category.UpdateDescription(description);
+            category.UpdateIcon(icon);
+            if (!string.IsNullOrWhiteSpace(badgeColor))
+                category.UpdateBadgeColor(badgeColor);
 
             _categoryRepository.Update(category);
             await _categoryRepository.SaveChangesAsync();

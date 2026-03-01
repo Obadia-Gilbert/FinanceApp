@@ -16,5 +16,9 @@ namespace FinanceApp.Web.Models
 
         [StringLength(250, ErrorMessage = "Description cannot exceed 250 characters")]
         public string? Description { get; set; }
+
+        // new fields for icon and color display
+        public string? Icon { get; set; }
+        public string? BadgeColor { get; set; }
     }
 }

@@ -36,7 +36,9 @@ namespace FinanceApp.Web.Controllers
         {
             Id = c.Id,
             Name = c.Name,
-            Description = c.Description
+            Description = c.Description,
+            Icon = c.Icon,
+            BadgeColor = c.BadgeColor
         }).ToList(),
         PageNumber = pagedCategories.PageNumber,
         PageSize = pagedCategories.PageSize,
@@ -60,13 +62,20 @@ namespace FinanceApp.Web.Controllers
                 return View(model);
 
             var userId = _userManager.GetUserId(User);
-            await _categoryService.CreateCategoryAsync(model.Name, userId!, model.Description);
+            await _categoryService.CreateCategoryAsync(
+                model.Name,
+                userId!,
+                model.Description,
+                model.Icon,
+                model.BadgeColor
+            );
 
             return RedirectToAction(nameof(Index));
         }
 
         // GET: /Category/Edit/{id}
-        public async Task<IActionResult> Edit(Guid id)
+        // Optional ?partial=true or AJAX header to return layout-less form for offcanvas
+        public async Task<IActionResult> Edit(Guid id, bool partial = false)
         {
             var userId = _userManager.GetUserId(User);
             var category = await _categoryService.GetByIdAsync(id, userId!);
@@ -77,8 +86,17 @@ namespace FinanceApp.Web.Controllers
             {
                 Id = category.Id,
                 Name = category.Name,
-                Description = category.Description
+                Description = category.Description,
+                Icon = category.Icon,
+                BadgeColor = category.BadgeColor
             };
+
+            bool isAjax = partial ||
+                         string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
+            if (isAjax)
+            {
+                return PartialView("_CategoryEditPartial", model);
+            }
 
             return View(model);
         }
@@ -92,13 +110,20 @@ namespace FinanceApp.Web.Controllers
                 return View(model);
 
             var userId = _userManager.GetUserId(User);
-            await _categoryService.UpdateCategoryAsync(model.Id, userId!, model.Name, model.Description);
+            await _categoryService.UpdateCategoryAsync(
+                model.Id,
+                userId!,
+                model.Name,
+                model.Description,
+                model.Icon,
+                model.BadgeColor
+            );
 
             return RedirectToAction(nameof(Index));
         }
 
         // GET: /Category/Delete/{id}
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id, bool partial = false)
         {
             var userId = _userManager.GetUserId(User);
             var category = await _categoryService.GetByIdAsync(id, userId!);
@@ -112,6 +137,12 @@ namespace FinanceApp.Web.Controllers
                 Description = category.Description
             };
 
+            bool isAjax = partial || string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
+            if (isAjax)
+            {
+                return PartialView("_CategoryDeletePartial", model);
+            }
+
             return View(model);
         }
         
@@ -123,6 +154,12 @@ namespace FinanceApp.Web.Controllers
         {
             var userId = _userManager.GetUserId(User);
             await _categoryService.DeleteCategoryAsync(id, userId!);
+
+            bool isAjax = string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
+            if (isAjax)
+            {
+                return Json(new { success = true });
+            }
 
             return RedirectToAction(nameof(Index));
         }

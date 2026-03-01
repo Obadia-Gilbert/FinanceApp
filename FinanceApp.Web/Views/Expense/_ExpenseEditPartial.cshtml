@@ -1,0 +1,98 @@
+@model FinanceApp.Web.Models.ExpenseEditViewModel
+
+@{
+    var categories = ViewBag.Categories as IEnumerable<FinanceApp.Domain.Entities.Category>;
+}
+
+<form asp-action="Edit" method="post" enctype="multipart/form-data" class="p-3">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label">Description</label>
+        <input asp-for="Description" class="form-control" />
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Amount" class="form-label">Amount</label>
+        <input asp-for="Amount" class="form-control" readonly />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Currency" class="form-label">Currency</label>
+        <select asp-for="Currency" class="form-select" >
+            @foreach (var currency in Enum.GetValues(typeof(FinanceApp.Domain.Enums.Currency)))
+            {
+                <option value="@currency">@currency</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ExpenseDate" class="form-label">Expense Date</label>
+        <input asp-for="ExpenseDate" type="date" class="form-control"  />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="CategoryId" class="form-label">Category</label>
+        <select asp-for="CategoryId" class="form-select">
+            @foreach (var cat in categories)
+            {
+                <option value="@cat.Id" selected="@(cat.Id == Model.CategoryId)">
+                    @cat.Name
+                </option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ReceiptPath" class="form-label">Receipt Path</label>
+        <input asp-for="ReceiptPath" class="form-control" readonly/>
+        <span asp-validation-for="ReceiptPath" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3 d-flex justify-content-end gap-2">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+
+<partial name="_ValidationScriptsPartial" />
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('#expenseOffcanvasContent form') || document.querySelector('form');
+        if (!form) return;
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const action = form.getAttribute('action') || window.location.href;
+            const res = await fetch(action, {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                body: formData
+            });
+
+            const contentType = res.headers.get('content-type') || '';
+            if (contentType.indexOf('application/json') !== -1) {
+                const json = await res.json();
+                if (json.success) {
+                    const offcanvasEl = document.getElementById('expenseOffcanvas');
+                    const bs = bootstrap.Offcanvas.getInstance(offcanvasEl) || new bootstrap.Offcanvas(offcanvasEl);
+                    bs.hide();
+                    window.location.reload();
+                }
+                return;
+            }
+
+            // HTML (validation errors) returned
+            const html = await res.text();
+            const content = document.getElementById('expenseOffcanvasContent');
+            content.innerHTML = html;
+            if (window.jQuery && jQuery.validator && jQuery.validator.unobtrusive) {
+                jQuery.validator.unobtrusive.parse(content);
+            }
+        });
+    });
+</script>

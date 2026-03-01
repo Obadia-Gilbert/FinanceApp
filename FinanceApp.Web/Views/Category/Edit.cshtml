@@ -4,26 +4,23 @@
     ViewData["Title"] = "Edit Category";
 }
 
-<h1>Edit Category</h1>
-
-<form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="Id" />
-
-    <div class="form-group mb-3">
-        <label asp-for="Name" class="form-label"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card shadow-sm border-0 rounded-lg">
+                <div class="card-header bg-white border-bottom p-4">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="bi bi-pencil-square me-2"></i>
+                        Edit Category
+                    </h4>
+                </div>
+                <div class="card-body p-0">
+                    @await Html.PartialAsync("_CategoryFormPartial", Model)
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div class="form-group mb-3">
-        <label asp-for="Description" class="form-label"></label>
-        <textarea asp-for="Description" class="form-control"></textarea>
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-success">Save</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-</form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

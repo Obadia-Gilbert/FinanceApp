@@ -22,6 +22,7 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddTransient<IEmailService, EmailService>();
+builder.Services.AddScoped<IUserService, UserService>();
 //builder.Services.AddTransient<IEmailSender, IdentityEmailSender>();
 
 builder.Services

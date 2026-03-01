@@ -19,8 +19,8 @@ namespace FinanceApp.Application.Interfaces.Services
             Func<IQueryable<Category>, IOrderedQueryable<Category>>? orderBy = null
         );
 
-        Task<Category> CreateCategoryAsync(string name, string userId, string? description = null);
-        Task UpdateCategoryAsync(Guid id, string userId, string name, string? description = null);
+        Task<Category> CreateCategoryAsync(string name, string userId, string? description = null, string? icon = null, string? badgeColor = null);
+        Task UpdateCategoryAsync(Guid id, string userId, string name, string? description = null, string? icon = null, string? badgeColor = null);
         Task DeleteCategoryAsync(Guid id, string userId);
         Task AssignDefaultCategoriesToUserAsync(string userId);
 
