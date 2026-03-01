@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using FinanceApp.Application.Interfaces.Services; // for IExpenseService
 using FinanceApp.Application.Services;
 using FinanceApp.Infrastructure.Services;       // for ExpenseService
+using FinanceApp.Web.Services;
 
 
 
@@ -23,6 +24,7 @@ builder.Services.AddScoped<IExpenseService, ExpenseService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddSingleton<ICurrencyConversionService, CurrencyConversionService>();
 //builder.Services.AddTransient<IEmailSender, IdentityEmailSender>();
 
 builder.Services

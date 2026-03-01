@@ -1,11 +1,13 @@
-﻿@{
+@{
     ViewData["Title"] = "Dashboard";
-    var totalSpend = ViewBag.TotalSpend ?? "$0.00";
+    var totalSpend = ViewBag.TotalSpend is decimal t ? t : 0m;
+    var displayCurrency = ViewBag.DisplayCurrency as string ?? "TZS";
     var expenseCount = ViewBag.ExpenseCount ?? 0;
     var categoryCount = ViewBag.CategoryCount ?? 0;
-    var thisMonthSpend = ViewBag.ThisMonthSpend ?? "$0.00";
+    var thisMonthSpend = ViewBag.ThisMonthSpend is decimal m ? m : 0m;
     var chartLabels = ViewBag.ChartLabels ?? "[]";
     var chartData = ViewBag.ChartData ?? "[]";
+    var chartCurrency = ViewBag.ChartCurrency as string ?? displayCurrency;
 }
 
 <div class="container-fluid">
@@ -22,7 +24,7 @@
                     <i class="bi bi-currency-dollar fs-1 me-3"></i>
                     <div>
                         <h5 class="card-title mb-0">Total Spend</h5>
-                        <p class="card-text display-6">$@totalSpend</p>
+                        <p class="card-text display-6">@totalSpend.ToString("N0") @displayCurrency</p>
                     </div>
                 </div>
             </div>
@@ -55,7 +57,7 @@
                     <i class="bi bi-bar-chart fs-1 me-3"></i>
                     <div>
                         <h5 class="card-title mb-0">This Month</h5>
-                        <p class="card-text display-6">$@thisMonthSpend</p>
+                        <p class="card-text display-6">@thisMonthSpend.ToString("N0") @displayCurrency</p>
                     </div>
                 </div>
             </div>
@@ -66,7 +68,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Expense Trend (Last 30 Days)</h5>
+                    <h5 class="card-title">Expense Trend (Last 30 Days) — @chartCurrency</h5>
                     <canvas id="expenseChart" height="100"></canvas>
                 </div>
             </div>
@@ -111,7 +113,7 @@
                         beginAtZero: true,
                         title: {
                             display: true,
-                            text: 'Amount'
+                            text: 'Amount (@chartCurrency)'
                         }
                     }
                 }

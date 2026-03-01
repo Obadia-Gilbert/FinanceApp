@@ -6,6 +6,7 @@ using FinanceApp.Web.Models;
 using FinanceApp.Infrastructure.Identity;
 using FinanceApp.Application.Interfaces.Services;
 using System.Text.Json;
+using FinanceApp.Domain.Enums;
 
 namespace FinanceApp.Web.Controllers;
 
@@ -45,31 +46,42 @@ public class HomeController : Controller
         var pagedCategories = await _categoryService.GetPagedCategoriesAsync(pageNumber: 1, pageSize: 100, userId: userId);
         var categoryCount = pagedCategories.TotalItems;
 
-        // Calculate dashboard metrics
-        var totalSpend = expenses.Sum(e => e.Amount);
+        // Display currency: most-used currency in user's expenses; default TZS if none
+        var displayCurrency = expenses
+            .GroupBy(e => e.Currency)
+            .OrderByDescending(g => g.Sum(x => x.Amount))
+            .Select(g => g.Key)
+            .FirstOrDefault();
+        if (expenses.Count == 0)
+            displayCurrency = Currency.TZS; // default label when no data
+
+        // Total spend: sum only amounts in the display currency (no mixing currencies)
+        var totalSpend = expenses.Where(e => e.Currency == displayCurrency).Sum(e => e.Amount);
         var expenseCount = expenses.Count;
         var currentMonth = DateTime.Now.Month;
         var currentYear = DateTime.Now.Year;
         var thisMonthExpense = expenses
-            .Where(e => e.ExpenseDate.Month == currentMonth && e.ExpenseDate.Year == currentYear)
+            .Where(e => e.Currency == displayCurrency && e.ExpenseDate.Month == currentMonth && e.ExpenseDate.Year == currentYear)
             .Sum(e => e.Amount);
 
-        // Group expenses by date for trend chart (last 30 days)
+        // Chart: last 30 days, only expenses in display currency, grouped by date
         var last30Days = DateTime.Now.AddDays(-30);
         var last30Expenses = expenses
-            .Where(e => e.ExpenseDate >= last30Days)
+            .Where(e => e.Currency == displayCurrency && e.ExpenseDate >= last30Days)
             .GroupBy(e => e.ExpenseDate.Date)
             .OrderBy(g => g.Key)
             .Select(g => new { Date = g.Key.ToString("MMM dd"), Amount = g.Sum(e => e.Amount) })
             .ToList();
 
-        // Pass data to view via ViewBag
-        ViewBag.TotalSpend = totalSpend.ToString("F2");
+        // Pass data to view: amounts in display currency, with currency code for label
+        ViewBag.TotalSpend = totalSpend;
+        ViewBag.DisplayCurrency = displayCurrency.ToString();
         ViewBag.ExpenseCount = expenseCount;
         ViewBag.CategoryCount = categoryCount;
-        ViewBag.ThisMonthSpend = thisMonthExpense.ToString("F2");
+        ViewBag.ThisMonthSpend = thisMonthExpense;
         ViewBag.ChartLabels = JsonSerializer.Serialize(last30Expenses.Select(x => x.Date).ToList());
         ViewBag.ChartData = JsonSerializer.Serialize(last30Expenses.Select(x => x.Amount).ToList());
+        ViewBag.ChartCurrency = displayCurrency.ToString();
 
         return View();
     }
