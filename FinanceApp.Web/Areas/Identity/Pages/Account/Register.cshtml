@@ -5,89 +5,117 @@
     ViewData["Title"] = "Register";
 }
 
-<div class="container-fluid">
-    <div class="row justify-content-center py-5">
+<div class="container-fluid auth-page">
+    <div class="row justify-content-center py-3 py-md-4">
         <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
-            <!-- Register Card -->
-            <div class="card shadow-lg border-0 rounded-lg">
-                <div class="card-body p-5">
-                    <h1 class="h3 fw-bold mb-4 text-center">Create Account</h1>
-                    <p class="text-muted text-center mb-4">Join FinanceApp today to manage your finances</p>
+            <div class="card shadow-lg border-0 rounded-lg auth-card">
+                <div class="card-body p-3 p-md-4 auth-card-body">
+                    <h1 class="h3 fw-bold mb-2 text-center">Create Account</h1>
+                    <p class="text-muted text-center mb-3">Join FinanceApp to manage your finances in one place.</p>
 
                     <!-- Register Form -->
                     <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" enctype="multipart/form-data">
                         <!-- Validation Summary -->
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show @(!Model.ModelState.IsValid ? "" : "d-none")" role="alert" id="validationAlert">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show mb-3 @(!Model.ModelState.IsValid ? "" : "d-none")" role="alert" id="validationAlert">
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
 
-                        <!-- First Name -->
                         <div class="mb-3">
                             <label asp-for="Input.FirstName" class="form-label fw-500">First Name</label>
-                            <input asp-for="Input.FirstName" class="form-control form-control-lg" autocomplete="given-name" placeholder="Your first name" />
+                            <input asp-for="Input.FirstName" class="form-control" autocomplete="given-name" placeholder="Your first name" />
                             <span asp-validation-for="Input.FirstName" class="invalid-feedback d-block small"></span>
                         </div>
 
-                        <!-- Last Name -->
                         <div class="mb-3">
                             <label asp-for="Input.LastName" class="form-label fw-500">Last Name</label>
-                            <input asp-for="Input.LastName" class="form-control form-control-lg" autocomplete="family-name" placeholder="Your last name" />
+                            <input asp-for="Input.LastName" class="form-control" autocomplete="family-name" placeholder="Your last name" />
                             <span asp-validation-for="Input.LastName" class="invalid-feedback d-block small"></span>
                         </div>
 
-                        <!-- Email Input -->
                         <div class="mb-3">
                             <label asp-for="Input.Email" class="form-label fw-500">Email Address</label>
-                            <input asp-for="Input.Email" class="form-control form-control-lg" 
+                            <input asp-for="Input.Email" class="form-control" 
                                    autocomplete="username" 
                                    aria-required="true" 
                                    placeholder="Enter your email" />
                             <span asp-validation-for="Input.Email" class="invalid-feedback d-block small"></span>
                         </div>
 
-                        <!-- Password Input -->
                         <div class="mb-3">
                             <label asp-for="Input.Password" class="form-label fw-500">Password</label>
-                            <input asp-for="Input.Password" class="form-control form-control-lg" 
+                            <input asp-for="Input.Password" class="form-control" 
                                    autocomplete="new-password" 
                                    aria-required="true" 
-                                   placeholder="Choose a strong password" />
-                            <small class="form-text text-muted d-block mt-1">
-                                <i class="bi bi-info-circle me-1"></i>
-                                At least 6 characters with uppercase, lowercase, numbers, and symbols
-                            </small>
+                                   placeholder="Choose password" />
                             <span asp-validation-for="Input.Password" class="invalid-feedback d-block small"></span>
                         </div>
 
-                        <!-- Confirm Password Input -->
                         <div class="mb-3">
                             <label asp-for="Input.ConfirmPassword" class="form-label fw-500">Confirm Password</label>
-                            <input asp-for="Input.ConfirmPassword" class="form-control form-control-lg" 
+                            <input asp-for="Input.ConfirmPassword" class="form-control" 
                                    autocomplete="new-password" 
                                    aria-required="true" 
-                                   placeholder="Re-enter your password" />
+                                   placeholder="Re-enter password" />
                             <span asp-validation-for="Input.ConfirmPassword" class="invalid-feedback d-block small"></span>
                         </div>
 
-                        <!-- Profile Photo -->
-                        <div class="mb-4">
-                            <label asp-for="Input.ProfileImage" class="form-label fw-500">Profile Photo (optional)</label>
-                            <input asp-for="Input.ProfileImage" type="file" class="form-control form-control-lg" accept=".jpg,.jpeg,.png,.gif,.webp" />
-                            <small class="text-muted">JPG, PNG, GIF or WebP. Optional.</small>
+                        <div class="mb-3">
+                            <button class="btn btn-link p-0 small text-decoration-none" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#optionalProfileFields"
+                                    aria-expanded="false" aria-controls="optionalProfileFields">
+                                <i class="bi bi-camera me-1"></i>Add profile photo (optional)
+                            </button>
+                            <div class="collapse mt-2" id="optionalProfileFields">
+                                <label asp-for="Input.ProfileImage" class="form-label fw-500">Profile Photo</label>
+                                <input asp-for="Input.ProfileImage" type="file" class="form-control" accept=".jpg,.jpeg,.png,.gif,.webp" />
+                                <small class="text-muted d-block mt-1">JPG, PNG, GIF or WebP.</small>
+                            </div>
                         </div>
 
                         <!-- Register Button -->
-                        <button type="submit" class="btn btn-primary btn-lg w-100 fw-600 mb-3">
+                        <button type="submit" class="btn btn-primary w-100 fw-600 mb-3 mt-1">
                             <i class="bi bi-person-plus me-2"></i>
                             Create Account
                         </button>
 
-                        <!-- Divider -->
-                        <div class="d-flex align-items-center my-4">
-                            <hr class="flex-grow-1" />
-                            <span class="px-3 text-muted small">OR</span>
-                            <hr class="flex-grow-1" />
-                        </div>
+                        @{
+                            if ((Model.ExternalLogins?.Count ?? 0) > 0)
+                            {
+                                <div class="d-flex align-items-center my-3 auth-divider">
+                                    <hr class="flex-grow-1" />
+                                    <span class="px-3 text-muted small">OR</span>
+                                    <hr class="flex-grow-1" />
+                                </div>
+
+                                <div class="d-grid gap-2 mb-3">
+                                    @foreach (var provider in Model.ExternalLogins!)
+                                    {
+                                        var providerName = provider.Name?.ToLowerInvariant() ?? string.Empty;
+                                        var providerClass = providerName switch
+                                        {
+                                            "google" => "btn-provider-google",
+                                            "facebook" => "btn-provider-facebook",
+                                            "twitter" => "btn-provider-twitter",
+                                            "x" => "btn-provider-twitter",
+                                            _ => "btn-provider-default"
+                                        };
+                                        var providerIcon = providerName switch
+                                        {
+                                            "google" => "bi-google",
+                                            "facebook" => "bi-facebook",
+                                            "twitter" => "bi-twitter-x",
+                                            "x" => "bi-twitter-x",
+                                            _ => "bi-box-arrow-in-right"
+                                        };
+
+                                        <button form="external-register-account" type="submit" class="btn btn-provider @providerClass w-100" name="provider" value="@provider.Name">
+                                            <i class="bi @providerIcon me-2" aria-hidden="true"></i>
+                                            Continue with @provider.DisplayName
+                                        </button>
+                                    }
+                                </div>
+                            }
+                        }
 
                         <!-- Already have account -->
                         <p class="text-center mb-0">
@@ -99,28 +127,7 @@
                     </form>
                 </div>
             </div>
-
-            <!-- External Providers Section (if configured) -->
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) > 0)
-                {
-                    <div class="card shadow-sm border-0 rounded-lg mt-4">
-                        <div class="card-body p-4">
-                            <h5 class="card-title text-center fw-bold mb-3">Register with</h5>
-                            <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-                                <div class="d-grid gap-2">
-                                    @foreach (var provider in Model.ExternalLogins!)
-                                    {
-                                        <button type="submit" class="btn btn-outline-secondary" name="provider" value="@provider.Name">
-                                            @provider.DisplayName
-                                        </button>
-                                    }
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                }
-            }
+            <form id="external-register-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post"></form>
         </div>
     </div>
 </div>

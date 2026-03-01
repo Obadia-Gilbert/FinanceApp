@@ -5,14 +5,13 @@
     ViewData["Title"] = "Log in";
 }
 
-<div class="container-fluid">
-    <div class="row justify-content-center py-5">
+<div class="container-fluid auth-page">
+    <div class="row justify-content-center py-3 py-md-4">
         <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
-            <!-- Login Card -->
-            <div class="card shadow-lg border-0 rounded-lg">
-                <div class="card-body p-5">
+            <div class="card shadow-lg border-0 rounded-lg auth-card">
+                <div class="card-body p-4 p-md-4 auth-card-body">
                     <h1 class="h3 fw-bold mb-4 text-center">Welcome Back</h1>
-                    <p class="text-muted text-center mb-4">Sign in to your FinanceApp account</p>
+                    <p class="text-muted text-center mb-3">Sign in to your FinanceApp account</p>
 
                     <!-- Login Form -->
                     <form id="account" method="post">
@@ -22,9 +21,9 @@
                         </div>
 
                         <!-- Email Input -->
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <label asp-for="Input.Email" class="form-label fw-500">Email Address</label>
-                            <input asp-for="Input.Email" class="form-control form-control-lg" 
+                            <input asp-for="Input.Email" class="form-control" 
                                    autocomplete="username" 
                                    aria-required="true" 
                                    placeholder="Enter your email" />
@@ -32,9 +31,9 @@
                         </div>
 
                         <!-- Password Input -->
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <label asp-for="Input.Password" class="form-label fw-500">Password</label>
-                            <input asp-for="Input.Password" class="form-control form-control-lg" 
+                            <input asp-for="Input.Password" class="form-control" 
                                    autocomplete="current-password" 
                                    aria-required="true" 
                                    placeholder="Enter your password" />
@@ -42,7 +41,7 @@
                         </div>
 
                         <!-- Remember Me Checkbox -->
-                        <div class="form-check mb-4">
+                        <div class="form-check mb-3">
                             <input class="form-check-input" type="checkbox" asp-for="Input.RememberMe" id="rememberMe" />
                             <label class="form-check-label" for="rememberMe">
                                 Remember me on this device
@@ -50,17 +49,49 @@
                         </div>
 
                         <!-- Login Button -->
-                        <button type="submit" class="btn btn-primary btn-lg w-100 fw-600 mb-3">
+                        <button type="submit" class="btn btn-primary w-100 fw-600 mb-3">
                             <i class="bi bi-box-arrow-in-right me-2"></i>
                             Sign In
                         </button>
 
-                        <!-- Divider -->
-                        <div class="d-flex align-items-center my-4">
-                            <hr class="flex-grow-1" />
-                            <span class="px-3 text-muted small">OR</span>
-                            <hr class="flex-grow-1" />
-                        </div>
+                        @{
+                            if ((Model.ExternalLogins?.Count ?? 0) > 0)
+                            {
+                                <div class="d-flex align-items-center my-3 auth-divider">
+                                    <hr class="flex-grow-1" />
+                                    <span class="px-3 text-muted small">OR</span>
+                                    <hr class="flex-grow-1" />
+                                </div>
+
+                                <div class="d-grid gap-2 mb-3">
+                                    @foreach (var provider in Model.ExternalLogins!)
+                                    {
+                                        var providerName = provider.Name?.ToLowerInvariant() ?? string.Empty;
+                                        var providerClass = providerName switch
+                                        {
+                                            "google" => "btn-provider-google",
+                                            "facebook" => "btn-provider-facebook",
+                                            "twitter" => "btn-provider-twitter",
+                                            "x" => "btn-provider-twitter",
+                                            _ => "btn-provider-default"
+                                        };
+                                        var providerIcon = providerName switch
+                                        {
+                                            "google" => "bi-google",
+                                            "facebook" => "bi-facebook",
+                                            "twitter" => "bi-twitter-x",
+                                            "x" => "bi-twitter-x",
+                                            _ => "bi-box-arrow-in-right"
+                                        };
+
+                                        <button form="external-account" type="submit" class="btn btn-provider @providerClass" name="provider" value="@provider.Name">
+                                            <i class="bi @providerIcon me-2" aria-hidden="true"></i>
+                                            Continue with @provider.DisplayName
+                                        </button>
+                                    }
+                                </div>
+                            }
+                        }
 
                         <!-- Helper Links -->
                         <div class="text-center">
@@ -80,28 +111,7 @@
                     </form>
                 </div>
             </div>
-
-            <!-- External Providers Section (if configured) -->
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) > 0)
-                {
-                    <div class="card shadow-sm border-0 rounded-lg mt-4">
-                        <div class="card-body p-4">
-                            <h5 class="card-title text-center fw-bold mb-3">Connect with</h5>
-                            <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-                                <div class="d-grid gap-2">
-                                    @foreach (var provider in Model.ExternalLogins!)
-                                    {
-                                        <button type="submit" class="btn btn-outline-secondary" name="provider" value="@provider.Name">
-                                            @provider.DisplayName
-                                        </button>
-                                    }
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                }
-            }
+            <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post"></form>
         </div>
     </div>
 </div>

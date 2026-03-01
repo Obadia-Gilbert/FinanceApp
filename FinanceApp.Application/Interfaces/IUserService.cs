@@ -12,6 +12,7 @@ namespace FinanceApp.Application.Interfaces
     Task<List<UserDto>> GetAllUsersAsync();
     Task DeleteUserAsync(string userId);
     Task AddUserToRoleAsync(string userId, string role);
+    Task RemoveUserFromRoleAsync(string userId, string role);
 
     }
 }

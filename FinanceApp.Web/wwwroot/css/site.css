@@ -306,3 +306,95 @@ body > .container-fluid {
   --bs-body-color: #e1e1e1;
   --bs-nav-link-color: #e1e1e1;
 }
+
+/* External auth provider buttons */
+.btn-provider {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  border-width: 1px;
+  border-radius: 0.5rem;
+  transition: transform 0.12s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+.btn-provider:hover {
+  transform: translateY(-1px);
+}
+.btn-provider:active {
+  transform: translateY(0);
+}
+
+.btn-provider-google {
+  background-color: #fff;
+  border-color: #d6d9de;
+  color: #202124;
+}
+.btn-provider-google:hover {
+  background-color: #f8f9fa;
+  border-color: #c9ccd1;
+  color: #202124;
+}
+
+.btn-provider-facebook {
+  background-color: #1877f2;
+  border-color: #1877f2;
+  color: #fff;
+}
+.btn-provider-facebook:hover {
+  background-color: #166fe5;
+  border-color: #166fe5;
+  color: #fff;
+}
+
+.btn-provider-twitter {
+  background-color: #111;
+  border-color: #111;
+  color: #fff;
+}
+.btn-provider-twitter:hover {
+  background-color: #000;
+  border-color: #000;
+  color: #fff;
+}
+
+.btn-provider-default {
+  background-color: #fff;
+  border-color: #ced4da;
+  color: #212529;
+}
+.btn-provider-default:hover {
+  background-color: #f8f9fa;
+  border-color: #adb5bd;
+  color: #212529;
+}
+
+/* Auth pages: compact layout to reduce scrolling */
+.auth-page .row {
+  min-height: calc(100vh - 90px);
+  align-items: center;
+}
+.auth-card {
+  max-width: 640px;
+  margin: 0 auto;
+}
+.auth-card-body .form-label {
+  margin-bottom: 0.25rem;
+}
+.auth-card-body .form-control,
+.auth-card-body .form-select,
+.auth-card-body .btn {
+  padding-top: 0.55rem;
+  padding-bottom: 0.55rem;
+}
+.auth-card-body .invalid-feedback {
+  margin-top: 0.2rem;
+}
+.auth-divider hr {
+  opacity: 0.16;
+}
+@media (max-width: 767.98px) {
+  .auth-page .row {
+    min-height: auto;
+    align-items: flex-start;
+  }
+}

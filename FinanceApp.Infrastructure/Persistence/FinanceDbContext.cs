@@ -1,5 +1,6 @@
 using FinanceApp.Domain.Entities;
 using FinanceApp.Domain.Common;
+using FinanceApp.Domain.Enums;
 using FinanceApp.Infrastructure.Identity; // <-- where ApplicationUser lives
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -48,6 +49,20 @@ public class FinanceDbContext
     {
         // 🔥 VERY IMPORTANT: call base FIRST for Identity tables
         base.OnModelCreating(modelBuilder);
+
+        // ==============================
+        // Identity user extensions
+        // ==============================
+        modelBuilder.Entity<ApplicationUser>(entity =>
+        {
+            entity.Property(u => u.SubscriptionPlan)
+                  .HasDefaultValue(SubscriptionPlan.Free)
+                  .IsRequired();
+
+            entity.Property(u => u.SubscriptionAssignedAt)
+                  .HasDefaultValueSql("GETUTCDATE()")
+                  .IsRequired();
+        });
 
         // ==============================
         // BaseEntity configuration

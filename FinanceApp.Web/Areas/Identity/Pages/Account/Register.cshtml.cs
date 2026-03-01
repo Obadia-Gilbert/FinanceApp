@@ -11,6 +11,7 @@ using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
 using FinanceApp.Infrastructure.Identity;
+using FinanceApp.Domain.Enums;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -122,6 +123,8 @@ namespace FinanceApp.Web.Areas.Identity.Pages.Account
                 var user = CreateUser();
                 user.FirstName = Input.FirstName?.Trim();
                 user.LastName = Input.LastName?.Trim();
+                user.SubscriptionPlan = SubscriptionPlan.Free;
+                user.SubscriptionAssignedAt = DateTimeOffset.UtcNow;
 
                 if (Input.ProfileImage != null && Input.ProfileImage.Length > 0)
                 {
@@ -161,8 +164,16 @@ namespace FinanceApp.Web.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    try
+                    {
+                        await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    }
+                    catch (Exception ex)
+                    {
+                        // Registration should not fail because SMTP is temporarily unavailable.
+                        _logger.LogWarning(ex, "Account created but confirmation email could not be sent for {Email}.", Input.Email);
+                    }
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {

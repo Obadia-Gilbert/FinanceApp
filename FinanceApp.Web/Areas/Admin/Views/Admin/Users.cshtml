@@ -1,6 +1,7 @@
 @model List<FinanceApp.Application.DTOs.UserDto>
 @{
     ViewData["Title"] = "Manage Users";
+    var currentUserId = ViewBag.CurrentUserId as string;
 }
 
 <div class="mb-4">
@@ -48,7 +49,14 @@
                                     {
                                         <form asp-action="AddToRole" method="post" class="d-inline" asp-route-id="@u.Id" asp-route-role="Admin">
                                             @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-sm btn-outline-primary" title="Grant Admin role">Make Admin</button>
+                                            <button type="submit" class="btn btn-sm btn-outline-primary" title="Grant admin rights">Make Admin</button>
+                                        </form>
+                                    }
+                                    else if (!string.Equals(currentUserId, u.Id, StringComparison.Ordinal))
+                                    {
+                                        <form asp-action="RemoveFromRole" method="post" class="d-inline" asp-route-id="@u.Id" asp-route-role="Admin" onsubmit="return confirm('Remove admin rights from this user?');">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-sm btn-outline-warning" title="Remove admin rights">Remove Admin</button>
                                         </form>
                                     }
                                     <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Delete this user?');" asp-route-id="@u.Id">

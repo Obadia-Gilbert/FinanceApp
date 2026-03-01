@@ -380,3 +380,48 @@ body[data-theme="dark"] .app-footer .footer-link {
 body[data-theme="dark"] .app-footer .footer-link:hover {
   color: #8cc4ff;
 }
+
+/* External auth provider buttons in dark mode */
+body[data-theme="dark"] .btn-provider-google {
+  background-color: #1f2328;
+  border-color: #3b4148;
+  color: #f1f3f5;
+}
+body[data-theme="dark"] .btn-provider-google:hover {
+  background-color: #262b31;
+  border-color: #4a525b;
+  color: #fff;
+}
+
+body[data-theme="dark"] .btn-provider-facebook {
+  background-color: #1e62c9;
+  border-color: #1e62c9;
+  color: #fff;
+}
+body[data-theme="dark"] .btn-provider-facebook:hover {
+  background-color: #1858bd;
+  border-color: #1858bd;
+  color: #fff;
+}
+
+body[data-theme="dark"] .btn-provider-twitter {
+  background-color: #0f1115;
+  border-color: #3a3f45;
+  color: #fff;
+}
+body[data-theme="dark"] .btn-provider-twitter:hover {
+  background-color: #0a0c0f;
+  border-color: #4a5057;
+  color: #fff;
+}
+
+body[data-theme="dark"] .btn-provider-default {
+  background-color: #2a2a2a;
+  border-color: #444;
+  color: #e1e1e1;
+}
+body[data-theme="dark"] .btn-provider-default:hover {
+  background-color: #333;
+  border-color: #555;
+  color: #fff;
+}

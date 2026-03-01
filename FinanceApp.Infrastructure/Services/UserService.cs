@@ -48,8 +48,15 @@ namespace FinanceApp.Infrastructure.Services
         public async Task AddUserToRoleAsync(string userId, string role)
         {
             var user = await _userManager.FindByIdAsync(userId);
-            if (user != null)
+            if (user != null && !await _userManager.IsInRoleAsync(user, role))
                 await _userManager.AddToRoleAsync(user, role);
+        }
+
+        public async Task RemoveUserFromRoleAsync(string userId, string role)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user != null && await _userManager.IsInRoleAsync(user, role))
+                await _userManager.RemoveFromRoleAsync(user, role);
         }
     }
 }
