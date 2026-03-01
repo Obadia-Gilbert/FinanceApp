@@ -1,0 +1,76 @@
+@model FinanceApp.Web.Models.ProfileEditViewModel
+@{
+    ViewData["Title"] = "Edit Profile";
+}
+
+<div class="mb-4">
+    <h1 class="visually-hidden">Edit Profile</h1>
+    <p class="page-subtitle mb-0">Update your name and profile photo.</p>
+</div>
+
+@if (TempData["ProfileUpdated"] as bool? == true)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i>Profile updated successfully.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="card shadow-sm">
+    <div class="card-body p-4">
+        <form asp-area="" asp-controller="Profile" asp-action="Edit" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+            <div class="row">
+                <div class="col-md-4 text-center mb-4 mb-md-0">
+                    <label class="form-label fw-600">Current Photo</label>
+                    <div class="mb-2">
+                        @if (!string.IsNullOrEmpty(Model.CurrentProfileImagePath))
+                        {
+                            <img src="@Model.CurrentProfileImagePath" alt="Profile" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover;" />
+                        }
+                        else
+                        {
+                            var initial = string.IsNullOrWhiteSpace(Model.FirstName) && string.IsNullOrWhiteSpace(Model.LastName)
+                                ? (Model.Email?.Length > 0 ? Model.Email[0].ToString().ToUpperInvariant() : "?")
+                                : (Model.FirstName?.Trim().Length > 0 ? Model.FirstName.Trim()[0].ToString().ToUpperInvariant() : (Model.LastName?.Trim().Length > 0 ? Model.LastName.Trim()[0].ToString().ToUpperInvariant() : "?"));
+                            <span class="rounded-circle d-inline-flex align-items-center justify-content-center bg-primary text-white" style="width: 120px; height: 120px; font-size: 3rem;">@initial</span>
+                        }
+                    </div>
+                    <div>
+                        <label asp-for="ProfileImage" class="form-label small">Change photo</label>
+                        <input asp-for="ProfileImage" type="file" class="form-control form-control-sm" accept=".jpg,.jpeg,.png,.gif,.webp" />
+                        <small class="text-muted">JPG, PNG, GIF or WebP. Leave empty to keep current.</small>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label fw-600">Email</label>
+                        <input asp-for="Email" class="form-control" readonly disabled />
+                        <small class="text-muted">Email cannot be changed here.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="FirstName" class="form-label fw-600">First Name</label>
+                        <input asp-for="FirstName" class="form-control" placeholder="First name" />
+                        <span asp-validation-for="FirstName" class="invalid-feedback d-block small"></span>
+                    </div>
+                    <div class="mb-4">
+                        <label asp-for="LastName" class="form-label fw-600">Last Name</label>
+                        <input asp-for="LastName" class="form-control" placeholder="Last name" />
+                        <span asp-validation-for="LastName" class="invalid-feedback d-block small"></span>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i> Save changes
+                        </button>
+                        <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

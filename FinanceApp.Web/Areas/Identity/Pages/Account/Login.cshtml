@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model LoginModel
 
 @{
@@ -17,7 +17,7 @@
                     <!-- Login Form -->
                     <form id="account" method="post">
                         <!-- Validation Summary -->
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show d-none" role="alert" id="validationAlert">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show @(!Model.ModelState.IsValid ? "" : "d-none")" role="alert" id="validationAlert">
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
 

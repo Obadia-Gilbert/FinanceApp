@@ -18,24 +18,26 @@ public static class RoleSeeder
             }
         }
 
-        // Seed admin user
+        // Ensure obadia@midata-tech.com is Admin (create if missing, or add to role if existing)
         string adminEmail = "obadia@midata-tech.com";
-        string adminPassword = "90Barclaysnew!"; // choose a strong password
+        string adminPassword = "90Barclaysnew!";
 
-        if (await userManager.FindByEmailAsync(adminEmail) == null)
+        var adminUser = await userManager.FindByEmailAsync(adminEmail);
+        if (adminUser == null)
         {
-            var adminUser = new ApplicationUser
+            adminUser = new ApplicationUser
             {
                 UserName = adminEmail,
                 Email = adminEmail,
                 EmailConfirmed = true
             };
-
             var result = await userManager.CreateAsync(adminUser, adminPassword);
             if (result.Succeeded)
-            {
                 await userManager.AddToRoleAsync(adminUser, "Admin");
-            }
+        }
+        else if (!await userManager.IsInRoleAsync(adminUser, "Admin"))
+        {
+            await userManager.AddToRoleAsync(adminUser, "Admin");
         }
     }
 }

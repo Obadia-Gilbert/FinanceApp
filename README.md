@@ -32,12 +32,14 @@ This ensures separation of concerns, scalability, and maintainability.
 
 ## 📌 Features (Phase 1)
 
-- Expense tracking
-- Earnings tracking
-- Receipt uploads
-- Budget management
-- Multi-user ready structure
-- Dashboard analytics
+| Feature | Status |
+|--------|--------|
+| Expense tracking | ✅ Implemented |
+| Receipt uploads | ✅ Implemented |
+| **Budget management** | ✅ **Implemented** — set monthly budget; alert when expenses reach limit |
+| Multi-user ready structure | ✅ Implemented (Identity, roles, per-user data) |
+| Dashboard analytics | ✅ Implemented (totals, charts, budget vs spend) |
+| Earnings tracking | ⏳ Not yet implemented |
 
 ---
 

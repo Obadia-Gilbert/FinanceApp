@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model RegisterModel
 
 @{
@@ -15,10 +15,24 @@
                     <p class="text-muted text-center mb-4">Join FinanceApp today to manage your finances</p>
 
                     <!-- Register Form -->
-                    <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                    <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" enctype="multipart/form-data">
                         <!-- Validation Summary -->
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show d-none" role="alert" id="validationAlert">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show @(!Model.ModelState.IsValid ? "" : "d-none")" role="alert" id="validationAlert">
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+
+                        <!-- First Name -->
+                        <div class="mb-3">
+                            <label asp-for="Input.FirstName" class="form-label fw-500">First Name</label>
+                            <input asp-for="Input.FirstName" class="form-control form-control-lg" autocomplete="given-name" placeholder="Your first name" />
+                            <span asp-validation-for="Input.FirstName" class="invalid-feedback d-block small"></span>
+                        </div>
+
+                        <!-- Last Name -->
+                        <div class="mb-3">
+                            <label asp-for="Input.LastName" class="form-label fw-500">Last Name</label>
+                            <input asp-for="Input.LastName" class="form-control form-control-lg" autocomplete="family-name" placeholder="Your last name" />
+                            <span asp-validation-for="Input.LastName" class="invalid-feedback d-block small"></span>
                         </div>
 
                         <!-- Email Input -->
@@ -46,13 +60,20 @@
                         </div>
 
                         <!-- Confirm Password Input -->
-                        <div class="mb-4">
+                        <div class="mb-3">
                             <label asp-for="Input.ConfirmPassword" class="form-label fw-500">Confirm Password</label>
                             <input asp-for="Input.ConfirmPassword" class="form-control form-control-lg" 
                                    autocomplete="new-password" 
                                    aria-required="true" 
                                    placeholder="Re-enter your password" />
                             <span asp-validation-for="Input.ConfirmPassword" class="invalid-feedback d-block small"></span>
+                        </div>
+
+                        <!-- Profile Photo -->
+                        <div class="mb-4">
+                            <label asp-for="Input.ProfileImage" class="form-label fw-500">Profile Photo (optional)</label>
+                            <input asp-for="Input.ProfileImage" type="file" class="form-control form-control-lg" accept=".jpg,.jpeg,.png,.gif,.webp" />
+                            <small class="text-muted">JPG, PNG, GIF or WebP. Optional.</small>
                         </div>
 
                         <!-- Register Button -->

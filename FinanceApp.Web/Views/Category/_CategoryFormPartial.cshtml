@@ -1,8 +1,8 @@
 @model FinanceApp.Web.Models.CategoryEditViewModel
 
-@* Shared form partial for Create and Edit views - used in modals/offcanvas *@
+@* Shared form partial for Edit - used in offcanvas (same UI as Create / mockup). *@
 
-<form asp-action="Edit" method="post" class="p-4">
+<form asp-action="Edit" method="post" class="category-form-offcanvas p-4" id="categoryEditForm">
     @if (Model?.Id != Guid.Empty)
     {
         <input type="hidden" asp-for="Id" />
@@ -13,6 +13,12 @@
         <label asp-for="Name" class="form-label fw-600">Category Name</label>
         <input asp-for="Name" class="form-control form-control-lg" placeholder="e.g. Groceries" />
         <span asp-validation-for="Name" class="invalid-feedback d-block small"></span>
+    </div>
+
+    <!-- Type (mockup-style) -->
+    <div class="mb-4">
+        <label class="form-label fw-600">Type</label>
+        <div class="form-control form-control-lg bg-light text-muted">Expense</div>
     </div>
 
     <!-- Icon Selection -->
@@ -49,9 +55,9 @@
     <!-- Badge Color -->
     <div class="mb-4">
         <label asp-for="BadgeColor" class="form-label fw-600">Badge Color</label>
-        <div class="d-flex gap-2 align-items-center">
-            <input type="color" asp-for="BadgeColor" class="form-control form-control-color" style="width: 60px; height: 45px;" />
-            <input type="text" class="form-control" id="colorHex" placeholder="#137fec" value="@(Model?.BadgeColor ?? "#137fec")" style="max-width: 120px;" />
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <input type="color" asp-for="BadgeColor" class="form-control form-control-color category-color-picker" style="width: 56px; height: 40px; padding: 2px;" />
+            <input type="text" class="form-control" id="colorHex" placeholder="#137fec" value="@(Model?.BadgeColor ?? "#137fec")" style="max-width: 120px;" aria-label="Hex color" />
         </div>
         <small class="text-muted d-block mt-1">Choose a color for the category badge</small>
     </div>
@@ -65,82 +71,39 @@
 
     <!-- Buttons -->
     <div class="d-flex justify-content-end gap-2 pt-3 border-top">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">Cancel</button>
-        <button type="submit" class="btn btn-primary fw-600">
-            <i class="bi bi-check-circle me-2"></i>
-            Save Category
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="offcanvas">Cancel</button>
+        <button type="submit" class="btn btn-primary fw-600" id="categoryEditSubmit">
+            <span class="btn-text"><i class="bi bi-check-circle me-2"></i>Save Category</span>
+            <span class="btn-loading d-none"><span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Saving…</span>
         </button>
     </div>
 </form>
-
-<style>
-    .icon-picker-grid {
-        display: grid;
-        grid-template-columns: repeat(6, 1fr);
-        gap: 10px;
-        margin-bottom: 15px;
-    }
-
-    .icon-option {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        aspect-ratio: 1;
-        border: 2px solid #ddd;
-        background: white;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.2s;
-        color: #666;
-    }
-
-    .icon-option:hover {
-        border-color: #0d6efd;
-        background-color: #f0f7ff;
-    }
-
-    .icon-option.active {
-        border-color: #0d6efd;
-        background-color: #0d6efd;
-        color: white;
-    }
-
-    @@media (max-width: 576px) {
-        .icon-picker-grid {
-            grid-template-columns: repeat(4, 1fr);
-        }
-    }
-</style>
-
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const iconOptions = document.querySelectorAll('.icon-option');
-        const selectedIconInput = document.getElementById('selectedIcon');
-        const colorHexInput = document.getElementById('colorHex');
-        const colorInput = document.querySelector('input[type="color"]');
-
-        // Icon selection
-        iconOptions.forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                iconOptions.forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                selectedIconInput.value = this.getAttribute('data-icon');
-            });
-        });
-
-        // Color picker sync
-        if (colorInput && colorHexInput) {
-            colorInput.addEventListener('input', function() {
-                colorHexInput.value = this.value;
-            });
-            
-            colorHexInput.addEventListener('input', function() {
-                if (this.value.length === 7) {
-                    colorInput.value = this.value;
-                }
-            });
+(function(){
+    var container = document.getElementById('categoryOffcanvasContent') || document;
+    if (typeof initCategoryForm === 'function') initCategoryForm(container);
+    var form = container.querySelector('form.category-form-offcanvas');
+    if (!form) return;
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var submitBtn = document.getElementById('categoryEditSubmit');
+        if (submitBtn) { submitBtn.querySelector('.btn-text')?.classList.add('d-none'); submitBtn.querySelector('.btn-loading')?.classList.remove('d-none'); submitBtn.disabled = true; }
+        var formData = new FormData(form);
+        var res = await fetch(form.getAttribute('action') || form.action, { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' }, body: formData });
+        var contentType = res.headers.get('content-type') || '';
+        if (contentType.indexOf('application/json') !== -1) {
+            var json = await res.json();
+            if (json.success) {
+                var offcanvasEl = document.getElementById('categoryOffcanvas');
+                if (offcanvasEl) { var bs = bootstrap.Offcanvas.getInstance(offcanvasEl) || new bootstrap.Offcanvas(offcanvasEl); bs.hide(); }
+                window.location.reload();
+            }
+            return;
         }
+        var html = await res.text();
+        var content = document.getElementById('categoryOffcanvasContent');
+        if (content) { content.innerHTML = html; if (window.jQuery && jQuery.validator && jQuery.validator.unobtrusive) jQuery.validator.unobtrusive.parse(content); if (typeof initCategoryForm === 'function') initCategoryForm(content); }
+        if (submitBtn) { submitBtn.querySelector('.btn-text')?.classList.remove('d-none'); submitBtn.querySelector('.btn-loading')?.classList.add('d-none'); submitBtn.disabled = false; }
     });
+})();
 </script>

@@ -49,12 +49,15 @@ public class ExpenseController : Controller
     // Accepts ?partial=true or AJAX requests to return a layout-less partial for offcanvas
     public async Task<IActionResult> Create(bool partial = false)
     {
+        var userId = _userManager.GetUserId(User);
+        if (userId == null) return Unauthorized();
+
         var model = new FinanceApp.Web.Models.ExpenseCreateViewModel
         {
             ExpenseDate = DateTime.Today
         };
 
-        ViewBag.Categories = await _categoryRepository.GetAllAsync();
+        ViewBag.Categories = await GetUserCategoriesDistinctByNameAsync(userId);
         ViewBag.Currencies = Enum.GetValues(typeof(Currency));
 
         bool isAjax = partial ||
@@ -73,10 +76,12 @@ public class ExpenseController : Controller
     public async Task<IActionResult> Create(ExpenseCreateViewModel model)
     {
         bool isAjax = string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
+        var userId = _userManager.GetUserId(User);
+        if (userId == null) return Unauthorized();
 
         if (!ModelState.IsValid)
         {
-            ViewBag.Categories = await _categoryRepository.GetAllAsync();
+            ViewBag.Categories = await GetUserCategoriesDistinctByNameAsync(userId);
             ViewBag.Currencies = Enum.GetValues(typeof(Currency));
             if (isAjax)
             {
@@ -85,9 +90,6 @@ public class ExpenseController : Controller
 
             return View(model);
         }
-
-        var userId = _userManager.GetUserId(User);
-        if (userId == null) return Unauthorized();
 
         // Handle file upload
         string? receiptPath = null;
@@ -136,6 +138,8 @@ public class ExpenseController : Controller
     {
         var expense = await _expenseService.GetByIdAsync(id);
         if (expense == null) return NotFound();
+        var userId = _userManager.GetUserId(User);
+        if (userId == null) return Unauthorized();
 
         var model = new ExpenseEditViewModel
         {
@@ -148,7 +152,7 @@ public class ExpenseController : Controller
             ReceiptPath = expense.ReceiptPath
         };
 
-        ViewBag.Categories = await _categoryRepository.GetAllAsync();
+        ViewBag.Categories = await GetUserCategoriesDistinctByNameAsync(userId);
         ViewBag.Currencies = Enum.GetValues(typeof(Currency));
 
         bool isAjax = partial ||
@@ -167,10 +171,12 @@ public class ExpenseController : Controller
     public async Task<IActionResult> Edit(ExpenseEditViewModel model)
     {
         bool isAjax = string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
+        var userId = _userManager.GetUserId(User);
+        if (userId == null) return Unauthorized();
 
         if (!ModelState.IsValid)
         {
-            ViewBag.Categories = await _categoryRepository.GetAllAsync();
+            ViewBag.Categories = await GetUserCategoriesDistinctByNameAsync(userId);
             ViewBag.Currencies = Enum.GetValues(typeof(Currency));
             if (isAjax)
             {
@@ -293,6 +299,17 @@ public class ExpenseController : Controller
             pageSize);
 
         return View("Index", expenses);
+    }
+
+    private async Task<IEnumerable<Category>> GetUserCategoriesDistinctByNameAsync(string userId)
+    {
+        var categories = await _categoryRepository.FindAsync(c => c.UserId == userId);
+        return categories
+            .Where(c => !string.IsNullOrWhiteSpace(c.Name))
+            .GroupBy(c => c.Name.Trim(), StringComparer.OrdinalIgnoreCase)
+            .Select(g => g.OrderBy(c => c.Name).First())
+            .OrderBy(c => c.Name)
+            .ToList();
     }
 
 }

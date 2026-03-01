@@ -8,14 +8,52 @@
     var chartLabels = ViewBag.ChartLabels ?? "[]";
     var chartData = ViewBag.ChartData ?? "[]";
     var chartCurrency = ViewBag.ChartCurrency as string ?? displayCurrency;
+    var budgetAmount = ViewBag.BudgetAmount as decimal?;
+    var budgetCurrency = ViewBag.BudgetCurrency as string ?? displayCurrency;
+    var thisMonthSpendInBudgetCurrency = ViewBag.ThisMonthSpendInBudgetCurrency is decimal b ? b : 0m;
+    var isOverBudget = ViewBag.IsOverBudget as bool? == true;
 }
 
 <div class="container-fluid">
     <div class="row mb-4">
         <div class="col-12">
-            <h1 class="h2">Dashboard</h1>
+            <h1 class="visually-hidden">Dashboard</h1>
+            <p class="page-subtitle mb-0">A quick overview of your spending, categories, and monthly budget progress.</p>
         </div>
     </div>
+
+    @if (expenseCount == 0)
+    {
+        <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
+            <i class="bi bi-info-circle fs-4 me-3"></i>
+            <div>
+                <strong>No expenses yet.</strong>
+                <a asp-controller="Expense" asp-action="Index" class="alert-link">Add your first expense</a> to see your spending summary and trends here.
+            </div>
+        </div>
+    }
+
+    @if (isOverBudget)
+    {
+        <div class="alert alert-danger d-flex align-items-center mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+            <div class="flex-grow-1">
+                <strong>Budget limit reached.</strong>
+                This month you have spent <strong>@thisMonthSpendInBudgetCurrency.ToString("N0") @budgetCurrency</strong> against your budget of <strong>@(budgetAmount?.ToString("N0")) @budgetCurrency</strong>.
+                <a asp-controller="Budget" asp-action="Index" class="alert-link">Update your budget</a> or reduce spending.
+            </div>
+        </div>
+    }
+    @if (!budgetAmount.HasValue || budgetAmount == 0)
+    {
+        <div class="alert alert-secondary d-flex align-items-center mb-4" role="alert">
+            <i class="bi bi-wallet2 fs-4 me-3"></i>
+            <div>
+                <strong>Set a monthly budget</strong> to get an alert when your expenses reach your limit.
+                <a asp-controller="Budget" asp-action="Index" class="alert-link">Set budget</a>
+            </div>
+        </div>
+    }
 
     <div class="row g-3">
         <div class="col-sm-6 col-lg-3">
@@ -62,14 +100,43 @@
                 </div>
             </div>
         </div>
+        @if (budgetAmount.HasValue && budgetAmount > 0)
+        {
+            <div class="col-sm-6 col-lg-3">
+                <div class="card h-100 @(isOverBudget ? "border-danger border-2" : "border-primary")">
+                    <div class="card-body d-flex align-items-center">
+                        <i class="bi bi-wallet2 fs-1 me-3 @(isOverBudget ? "text-danger" : "text-primary")"></i>
+                        <div>
+                            <h5 class="card-title mb-0">Monthly budget</h5>
+                            <p class="card-text mb-0">
+                                <span class="fw-bold">@thisMonthSpendInBudgetCurrency.ToString("N0")</span> / @budgetAmount.Value.ToString("N0") @budgetCurrency
+                            </p>
+                            <small class="@(isOverBudget ? "text-danger" : "text-muted")">@(isOverBudget ? "Over limit" : "On track")</small>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 py-1">
+                        <a asp-controller="Budget" asp-action="Index" class="btn btn-sm btn-outline-primary">Edit budget</a>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
 
-    <div class="row mt-5">
+    <div class="row mt-4 mb-4">
         <div class="col-12">
-            <div class="card">
+            <div class="card expense-trend-card">
                 <div class="card-body">
-                    <h5 class="card-title">Expense Trend (Last 30 Days) — @chartCurrency</h5>
-                    <canvas id="expenseChart" height="100"></canvas>
+                    <h5 class="card-title mb-3">Expense Trend (Last 30 Days) — @chartCurrency</h5>
+                    @if (expenseCount == 0)
+                    {
+                        <p class="text-muted mb-0">Add expenses to see your trend chart.</p>
+                    }
+                    else
+                    {
+                        <div class="expense-chart-wrap">
+                            <canvas id="expenseChart" height="100"></canvas>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
@@ -79,45 +146,72 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        var ctx = document.getElementById('expenseChart').getContext('2d');
-        var labels = @Html.Raw(chartLabels);
-        var data = @Html.Raw(chartData);
-        
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Daily Expenses',
-                    data: data,
-                    borderColor: '#0d6efd',
-                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    fill: true,
-                    pointBackgroundColor: '#0d6efd',
-                    pointRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top'
-                    }
+        (function() {
+            var canvas = document.getElementById('expenseChart');
+            if (!canvas) return;
+            var ctx = canvas.getContext('2d');
+            var labels = @Html.Raw(chartLabels);
+            var data = @Html.Raw(chartData);
+            var chartCurrency = '@chartCurrency';
+
+            function isDark() { return document.body.getAttribute('data-theme') === 'dark'; }
+            function chartColors() {
+                if (isDark()) {
+                    return { border: '#4da6ff', fill: 'rgba(77, 166, 255, 0.15)', grid: 'rgba(255,255,255,0.1)', text: '#e1e1e1' };
+                }
+                return { border: '#0d6efd', fill: 'rgba(13, 110, 253, 0.1)', grid: 'rgba(0,0,0,0.1)', text: '#212529' };
+            }
+
+            var colors = chartColors();
+            var chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Daily Expenses',
+                        data: data,
+                        borderColor: colors.border,
+                        backgroundColor: colors.fill,
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: colors.border,
+                        pointRadius: 4
+                    }]
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Amount (@chartCurrency)'
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: true, position: 'top', labels: { color: colors.text } }
+                    },
+                    scales: {
+                        x: { ticks: { color: colors.text }, grid: { color: colors.grid } },
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: colors.text },
+                            grid: { color: colors.grid },
+                            title: { display: true, text: 'Amount (' + chartCurrency + ')', color: colors.text }
                         }
                     }
                 }
-            }
-        });
+            });
+
+            document.getElementById('themeToggle')?.addEventListener('click', function() {
+                setTimeout(function() {
+                    var c = chartColors();
+                    chart.options.plugins.legend.labels.color = c.text;
+                    chart.options.scales.x.ticks.color = c.text;
+                    chart.options.scales.x.grid.color = c.grid;
+                    chart.options.scales.y.ticks.color = c.text;
+                    chart.options.scales.y.grid.color = c.grid;
+                    chart.options.scales.y.title.color = c.text;
+                    chart.data.datasets[0].borderColor = c.border;
+                    chart.data.datasets[0].backgroundColor = c.fill;
+                    chart.data.datasets[0].pointBackgroundColor = c.border;
+                    chart.update();
+                }, 50);
+            });
+        })();
     </script>
 }

@@ -166,5 +166,45 @@ This document summarizes findings from reviewing the ASP.NET Core MVC FinanceApp
 | Low      | Empty states      | Add “no expenses yet” on dashboard. |
 | Low      | Auth              | Ensure validation summary visible without JS; improve logout/toggle accessibility. |
 | Low      | Error/Privacy     | Polish content and hide dev-only content in production. |
+| **Done** | **User profile**  | First/Last name and profile image at registration; profile photo + display name in navbar (UserProfileViewComponent). |
+| **Done** | **Admin**          | Admin area with Manage Users page (list, Make Admin, Delete); sidebar link for Admin role. |
+| **Done** | **Budget**         | Monthly budget: set budget per month/currency; dashboard shows budget vs spend and alert when expenses reach or exceed limit. |
 
 Implementing the high-priority items first will improve correctness, consistency, and perceived performance; the rest will refine polish, accessibility, and maintainability.
+
+---
+
+## 11. **User profile & Admin (implemented)**
+
+### 11.1 Registration: First Name, Last Name, Profile image
+- **Done:** Register page now collects **First Name**, **Last Name**, and optional **Profile Photo** (file upload). Profile image is stored under `wwwroot/uploads/profiles/` with allowed extensions: `.jpg`, `.jpeg`, `.png`, `.gif`, `.webp`. Values are stored on `ApplicationUser` (FirstName, LastName, ProfileImagePath) and persisted via Identity.
+
+### 11.2 Navbar: profile photo and display name
+- **Done:** Logged-in user sees a **profile photo** (or initial letter avatar if no photo) on the **right side of the navbar**, plus a **display name** (“Hello, FirstName LastName!” or email if name is missing). Implemented via `UserProfileViewComponent` that loads the current user and passes display name and profile image path to the view. Layout invokes this component instead of the old login partial.
+
+### 11.3 Domain & services
+- **Domain:** `ApplicationUser` (Infrastructure/Identity) extended with `FirstName`, `LastName`, `ProfileImagePath`. Domain entities (Category, Expense, BaseEntity) unchanged.
+- **Application:** `UserDto` extended with `FirstName`, `LastName`, `ProfileImagePath`. `IUserService` unchanged; used by Admin.
+- **Infrastructure:** `UserService.GetAllUsersAsync()` now returns `List<UserDto>` with roles (via `UserManager.GetRolesAsync`). Migration `AddUserProfileFields` adds the three columns to `AspNetUsers`.
+
+### 11.4 Admin: manage users
+- **Done:** Admin-only area **Admin** with **Manage Users** page:
+  - **Route:** `/Admin/Admin/Users` (area `Admin`, controller `Admin`, action `Users`).
+  - **Content:** Table of users with Photo, Name, Email, Role, and actions: **Make Admin** (POST AddToRole), **Delete** (POST Delete with confirmation).
+  - **Security:** Controller has `[Authorize(Roles = "Admin")]`. Delete and AddToRole are POST with `[ValidateAntiForgeryToken]`.
+  - **Sidebar:** “Manage Users” link with people icon shown only when `User.IsInRole("Admin")`.
+
+### 11.5 Optional follow-ups
+- Allow users to **edit profile** (update First/Last name, change profile photo) e.g. via Identity “Manage” or a custom profile page.
+- **Remove user from role** (e.g. “Remove Admin”) in Admin user list.
+- **Pagination or search** on Admin Users table if the list grows large.
+
+---
+
+## 12. **Budget management (implemented)**
+
+### 12.1 Monthly budget
+- **Done:** Users can set a **monthly budget** (amount + currency) via **Budget** in the sidebar → **Monthly Budget** page. One budget per user per month (stored in `Budgets` table).
+- **Done:** **Dashboard** shows a **budget card** when a budget is set: "Spent / Budget" in the budget currency, with "On track" or "Over limit" and a link to edit budget.
+- **Done:** When expenses in that month and currency **reach or exceed** the budget, a **danger alert** is shown at the top of the dashboard: "Budget limit reached" with spent vs budget and link to update budget.
+- **Done:** If no budget is set, a secondary alert invites the user to "Set a monthly budget" with a link to the Budget page.

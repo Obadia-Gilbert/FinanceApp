@@ -65,6 +65,12 @@ namespace FinanceApp.Infrastructure.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("FirstName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -87,6 +93,9 @@ namespace FinanceApp.Infrastructure.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("ProfileImagePath")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -248,13 +257,47 @@ namespace FinanceApp.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("FinanceApp.Domain.Entities.Budget", b =>
+                {
+                    b.HasBaseType("FinanceApp.Domain.Common.BaseEntity");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Currency")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Month")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasIndex("UserId", "Month", "Year")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL AND [Month] IS NOT NULL AND [Year] IS NOT NULL");
+
+                    b.ToTable("Budgets", (string)null);
+                });
+
             modelBuilder.Entity("FinanceApp.Domain.Entities.Category", b =>
                 {
                     b.HasBaseType("FinanceApp.Domain.Common.BaseEntity");
 
+                    b.Property<string>("BadgeColor")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Description")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Icon")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -348,6 +391,15 @@ namespace FinanceApp.Infrastructure.Migrations
                     b.HasOne("FinanceApp.Infrastructure.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FinanceApp.Domain.Entities.Budget", b =>
+                {
+                    b.HasOne("FinanceApp.Domain.Common.BaseEntity", null)
+                        .WithOne()
+                        .HasForeignKey("FinanceApp.Domain.Entities.Budget", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

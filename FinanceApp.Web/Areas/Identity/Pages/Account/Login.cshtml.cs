@@ -109,8 +109,6 @@ namespace FinanceApp.Web.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
@@ -126,11 +124,10 @@ namespace FinanceApp.Web.Areas.Identity.Pages.Account
                     _logger.LogWarning("User account locked out.");
                     return RedirectToPage("./Lockout");
                 }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    return Page();
-                }
+                // Generic message for any failed login (wrong email, unregistered email, or wrong password)
+                // to avoid user enumeration (OWASP best practice).
+                ModelState.AddModelError(string.Empty, "Invalid email or password. Please try again.");
+                return Page();
             }
 
             // If we got this far, something failed, redisplay form

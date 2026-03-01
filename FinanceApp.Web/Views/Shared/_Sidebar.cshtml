@@ -1,27 +1,64 @@
-@* Sidebar partial using Bootstrap 5 classes for a collapsible vertical navigation *@
-<nav id="sidebarMenu" class="d-md-block bg-light sidebar collapse">
-    <div class="position-sticky pt-3">
-        <ul class="nav flex-column">
+@* Sidebar partial – active state from current controller/action *@
+@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    var action = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+    bool IsActive(string c, string a = null) => string.Equals(controller, c, StringComparison.OrdinalIgnoreCase) && (a == null || string.Equals(action, a, StringComparison.OrdinalIgnoreCase));
+}
+<nav class="d-md-block bg-light sidebar">
+    <div class="position-sticky pt-1 px-2">
+        <div class="sidebar-heading text-uppercase small fw-semibold px-2 mb-2 ">Navigation</div>
+        <ul class="nav flex-column app-sidebar-nav">
             <li class="nav-item">
-                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
-                    <i class="bi bi-speedometer2"></i> Dashboard
+                <a class="nav-link @(IsActive("Home", "Index") ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index">
+                    <span class="nav-icon"><i class="bi bi-speedometer2"></i></span>
+                    <span class="nav-label">Dashboard</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" asp-area="" asp-controller="Expense" asp-action="Index">
-                    <i class="bi bi-cash"></i> Expenses
+                <a class="nav-link @(IsActive("Expense") ? "active" : "")" asp-area="" asp-controller="Expense" asp-action="Index">
+                    <span class="nav-icon"><i class="bi bi-cash"></i></span>
+                    <span class="nav-label">Expenses</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" asp-area="" asp-controller="Category" asp-action="Index">
-                    <i class="bi bi-tags"></i> Categories
+                <a class="nav-link @(IsActive("Category") ? "active" : "")" asp-area="" asp-controller="Category" asp-action="Index">
+                    <span class="nav-icon"><i class="bi bi-tags"></i></span>
+                    <span class="nav-label">Categories</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">
-                    <i class="bi bi-shield-lock"></i> Privacy
+                <a class="nav-link @(IsActive("Budget") ? "active" : "")" asp-area="" asp-controller="Budget" asp-action="Index">
+                    <span class="nav-icon"><i class="bi bi-wallet2"></i></span>
+                    <span class="nav-label">Budget</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link @(IsActive("Profile", "Edit") ? "active" : "")" asp-area="" asp-controller="Profile" asp-action="Edit">
+                    <span class="nav-icon"><i class="bi bi-person-circle"></i></span>
+                    <span class="nav-label">Profile</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(IsActive("Home", "Privacy") ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Privacy">
+                    <span class="nav-icon"><i class="bi bi-shield-lock"></i></span>
+                    <span class="nav-label">Privacy</span>
+                </a>
+            </li>
+            @if (User.IsInRole("Admin"))
+            {
+                <li class="nav-item">
+                    <a class="nav-link @(controller == "Admin" && action == "Users" ? "active" : "")" asp-area="Admin" asp-controller="Admin" asp-action="Users">
+                        <span class="nav-icon"><i class="bi bi-people"></i></span>
+                        <span class="nav-label">Manage Users</span>
+                    </a>
+                </li>
+            }
         </ul>
+        @* Mobile only: theme toggle (navbar shows only logo + hamburger) *@
+        <div class="d-md-none mt-3 pt-3 border-top border-secondary border-opacity-25">
+            <button type="button" class="theme-toggle btn btn-sm btn-outline-secondary w-100" title="Toggle dark/light mode" aria-label="Toggle dark mode">
+                <i class="bi bi-moon"></i> Dark mode
+            </button>
+        </div>
     </div>
 </nav>

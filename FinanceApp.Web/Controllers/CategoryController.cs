@@ -47,10 +47,15 @@ namespace FinanceApp.Web.Controllers
 
     return View(pagedViewModel);
 }
-    public async Task<IActionResult> Create()
+    // GET: /Category/Create (optional ?partial=true or AJAX for offcanvas)
+    public IActionResult Create(bool partial = false)
     {
-        
-        return View();
+        bool isAjax = partial ||
+                     string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
+        if (isAjax)
+            return PartialView("_CategoryCreatePartial", new CategoryCreateViewModel());
+
+        return View(new CategoryCreateViewModel());
     }
 
         // POST: /Category/Create
@@ -58,10 +63,16 @@ namespace FinanceApp.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CategoryCreateViewModel model)
         {
-            if (!ModelState.IsValid)
-                return View(model);
-
             var userId = _userManager.GetUserId(User);
+            bool isAjax = string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
+
+            if (!ModelState.IsValid)
+            {
+                if (isAjax)
+                    return PartialView("_CategoryCreatePartial", model);
+                return View(model);
+            }
+
             await _categoryService.CreateCategoryAsync(
                 model.Name,
                 userId!,
@@ -69,6 +80,9 @@ namespace FinanceApp.Web.Controllers
                 model.Icon,
                 model.BadgeColor
             );
+
+            if (isAjax)
+                return Json(new { success = true });
 
             return RedirectToAction(nameof(Index));
         }
@@ -106,8 +120,14 @@ namespace FinanceApp.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(CategoryEditViewModel model)
         {
+            bool isAjax = string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
+
             if (!ModelState.IsValid)
+            {
+                if (isAjax)
+                    return PartialView("_CategoryEditPartial", model);
                 return View(model);
+            }
 
             var userId = _userManager.GetUserId(User);
             await _categoryService.UpdateCategoryAsync(
@@ -118,6 +138,9 @@ namespace FinanceApp.Web.Controllers
                 model.Icon,
                 model.BadgeColor
             );
+
+            if (isAjax)
+                return Json(new { success = true });
 
             return RedirectToAction(nameof(Index));
         }

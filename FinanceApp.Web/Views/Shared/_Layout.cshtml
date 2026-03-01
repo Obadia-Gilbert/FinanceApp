@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - FinanceApp</title>
-    <link rel="icon" type="image/png" href="~/favicon.png" />
+    <link rel="icon" type="image/png" href="@Url.Content("~/Lime and Black Modern Finance Logo.png")" />
     <script type="importmap"></script>
     <!-- Antiforgery token for AJAX POSTs - retrieved by JS for security -->
     <meta name="request-verification-token" content="@Antiforgery.GetAndStoreTokens(Context).RequestToken" />
@@ -23,72 +23,40 @@
 <body data-theme="light">
     <header>
         <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm navbar-modern">
-            <div class="container-fluid">
-                <!-- Sidebar Toggle (hidden on auth pages) -->
-                @{ var path = Context.Request.Path.Value?.ToLowerInvariant() ?? string.Empty; }
-                @if (!path.Contains("/identity/account/login") && !path.Contains("/identity/account/register"))
-                {
-                    <button class="btn btn-sm btn-outline-secondary me-3 d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="#sidebarMenu" aria-expanded="false" aria-label="Toggle sidebar" title="Toggle menu">
-                        <i class="bi bi-list"></i>
-                    </button>
-                }
-                
-                <!-- Brand/Logo -->
+            @{ var path = Context.Request.Path.Value?.ToLowerInvariant() ?? string.Empty; }
+            <div class="container-fluid px-2 px-sm-3">
+                <!-- Brand/Logo (left) -->
                 <a class="navbar-brand fw-bold d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
                     <img src="~/Lime and Black Modern Finance Logo.png" alt="FinanceApp Logo" class="img-fluid me-2" width="40" height="20"/>
                     <span class="d-none d-sm-inline">FinanceApp</span>
                 </a>
                 
-                <!-- Right Side Controls -->
+                <!-- Right: on desktop = theme + profile; on mobile = hamburger only -->
                 <div class="d-flex align-items-center gap-2 ms-auto">
-                    <!-- Theme Toggle -->
-                    <button id="themeToggle" class="btn btn-sm btn-outline-secondary" title="Toggle dark/light mode">
+                    <!-- Theme toggle: desktop only (mobile: use sidebar) -->
+                    <button id="themeToggle" class="theme-toggle btn btn-sm btn-outline-secondary d-none d-md-inline-flex" title="Toggle dark/light mode" aria-label="Toggle dark mode">
                         <i class="bi bi-moon"></i>
                     </button>
-                    
-                    <!-- User Profile Dropdown (hide login/register links on auth pages) -->
                     @if (!path.Contains("/identity/account/login") && !path.Contains("/identity/account/register"))
                     {
-                        <partial name="_LoginPartial" />
+                        <!-- User profile: desktop only (mobile: use sidebar Profile link) -->
+                        <div class="d-none d-md-block">
+                            @await Component.InvokeAsync("UserProfile")
+                        </div>
+                        <!-- Hamburger: mobile only -->
+                        <button class="btn btn-sm btn-outline-secondary d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarCollapse" aria-controls="sidebarCollapse" aria-expanded="false" aria-label="Menu" title="Menu">
+                            <i class="bi bi-list"></i>
+                        </button>
                     }
                 </div>
             </div>
         </nav>
     </header>
-        <!-- Offcanvas container for loading edit/create forms -->
-        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasForm" aria-labelledby="offcanvasFormLabel">
-                <div class="offcanvas-header">
-                        <h5 id="offcanvasFormLabel">Edit</h5>
-                        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                </div>
-                <div class="offcanvas-body" id="offcanvasFormBody">
-                        <!-- content loaded via AJAX -->
-                </div>
-        </div>
-
-        <!-- Delete confirmation modal -->
-        <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm delete</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        Are you sure you want to delete this item? This action cannot be undone.
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <a id="confirmDeleteBtn" class="btn btn-danger" href="#">Delete</a>
-                    </div>
-                </div>
-            </div>
-        </div>
     <div class="container-fluid">
         <div class="row">
             @if (!path.Contains("/identity/account/login") && !path.Contains("/identity/account/register"))
             {
-                <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse" id="sidebarMenu">
+                <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse" id="sidebarCollapse">
                     @await Html.PartialAsync("_Sidebar")
                 </div>
                 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
@@ -104,9 +72,22 @@
         </div>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - FinanceApp - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <!-- Toast container for non-blocking messages -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer"></div>
+
+    <footer class="footer app-footer border-top">
+        <div class="container-fluid px-3 px-md-4 py-3">
+            <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <img src="~/Lime and Black Modern Finance Logo.png" alt="FinanceApp" width="22" height="22" class="rounded-1" />
+                    <span class="fw-semibold">FinanceApp</span>
+                </div>
+                <div class="d-flex flex-wrap align-items-center gap-3 small">
+                    <a asp-area="" asp-controller="Home" asp-action="Privacy" class="footer-link">Privacy</a>
+                    <a asp-area="" asp-controller="Home" asp-action="Index" class="footer-link">Dashboard</a>
+                    <span class="text-muted">&copy; @DateTime.Now.Year FinanceApp</span>
+                </div>
+            </div>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -115,24 +96,27 @@
     <script src="https://cdn.jsdelivr.net/npm/datatables.net-bs5@1.13.8/js/dataTables.bootstrap5.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script>
-        // theme toggle logic
+        // Theme toggle (navbar + sidebar on mobile)
         (function(){
-            const toggle = document.getElementById('themeToggle');
             const body = document.body;
-            
+            const toggles = document.querySelectorAll('.theme-toggle');
+            const iconClass = (theme) => theme === 'dark' ? 'bi bi-sun' : 'bi bi-moon';
+
             function setTheme(theme){
                 body.setAttribute('data-theme', theme);
                 localStorage.setItem('theme', theme);
-                toggle.innerHTML = theme === 'dark' ? '<i class="bi bi-sun"></i>' : '<i class="bi bi-moon"></i>';
+                toggles.forEach(t => {
+                    const icon = t.querySelector('i');
+                    if (icon) icon.className = iconClass(theme);
+                });
             }
-            
+
             const saved = localStorage.getItem('theme') || 'light';
             setTheme(saved);
-            
-            toggle.addEventListener('click', ()=>{
-                const currentTheme = body.getAttribute('data-theme');
-                setTheme(currentTheme === 'dark' ? 'light' : 'dark');
-            });
+
+            toggles.forEach(t => t.addEventListener('click', function(){
+                setTheme(body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+            }));
         })();
     </script>
     @await RenderSectionAsync("Scripts", required: false)

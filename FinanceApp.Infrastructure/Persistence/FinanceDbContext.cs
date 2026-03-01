@@ -20,6 +20,7 @@ public class FinanceDbContext
 
     public DbSet<Expense> Expenses { get; set; } = null!;
     public DbSet<Category> Categories { get; set; } = null!;
+    public DbSet<Budget> Budgets { get; set; } = null!;
 
     // ==============================
     // Automatically handle CreatedAt and UpdatedAt
@@ -98,6 +99,17 @@ public class FinanceDbContext
                   .WithMany(c => c.Expenses)
                   .HasForeignKey(e => e.CategoryId)
                   .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ==============================
+        // Budget configuration
+        // ==============================
+        modelBuilder.Entity<Budget>(entity =>
+        {
+            entity.ToTable("Budgets");
+            entity.Property(b => b.Amount).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(b => b.UserId).IsRequired();
+            entity.HasIndex(b => new { b.UserId, b.Month, b.Year }).IsUnique();
         });
     }
 }

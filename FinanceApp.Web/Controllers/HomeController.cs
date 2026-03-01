@@ -15,15 +15,18 @@ public class HomeController : Controller
 {
     private readonly IExpenseService _expenseService;
     private readonly ICategoryService _categoryService;
+    private readonly IBudgetService _budgetService;
     private readonly UserManager<ApplicationUser> _userManager;
 
     public HomeController(
         IExpenseService expenseService,
         ICategoryService categoryService,
+        IBudgetService budgetService,
         UserManager<ApplicationUser> userManager)
     {
         _expenseService = expenseService;
         _categoryService = categoryService;
+        _budgetService = budgetService;
         _userManager = userManager;
     }
 
@@ -73,6 +76,15 @@ public class HomeController : Controller
             .Select(g => new { Date = g.Key.ToString("MMM dd"), Amount = g.Sum(e => e.Amount) })
             .ToList();
 
+        // Budget: current month budget and spend in same currency for alert
+        var currentMonthBudget = await _budgetService.GetBudgetForMonthAsync(userId, currentMonth, currentYear);
+        decimal? budgetAmount = currentMonthBudget?.Amount;
+        var budgetCurrency = currentMonthBudget?.Currency ?? displayCurrency;
+        var thisMonthSpendInBudgetCurrency = expenses
+            .Where(e => e.Currency == budgetCurrency && e.ExpenseDate.Month == currentMonth && e.ExpenseDate.Year == currentYear)
+            .Sum(e => e.Amount);
+        var isOverBudget = budgetAmount.HasValue && budgetAmount.Value > 0 && thisMonthSpendInBudgetCurrency >= budgetAmount.Value;
+
         // Pass data to view: amounts in display currency, with currency code for label
         ViewBag.TotalSpend = totalSpend;
         ViewBag.DisplayCurrency = displayCurrency.ToString();
@@ -82,6 +94,10 @@ public class HomeController : Controller
         ViewBag.ChartLabels = JsonSerializer.Serialize(last30Expenses.Select(x => x.Date).ToList());
         ViewBag.ChartData = JsonSerializer.Serialize(last30Expenses.Select(x => x.Amount).ToList());
         ViewBag.ChartCurrency = displayCurrency.ToString();
+        ViewBag.BudgetAmount = budgetAmount;
+        ViewBag.BudgetCurrency = budgetCurrency.ToString();
+        ViewBag.ThisMonthSpendInBudgetCurrency = thisMonthSpendInBudgetCurrency;
+        ViewBag.IsOverBudget = isOverBudget;
 
         return View();
     }
