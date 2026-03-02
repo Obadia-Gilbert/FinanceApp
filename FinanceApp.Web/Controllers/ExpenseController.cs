@@ -91,27 +91,46 @@ public class ExpenseController : Controller
             return View(model);
         }
 
-        // Handle file upload
+        // Handle optional receipt upload (images + PDF, max 5MB)
         string? receiptPath = null;
         if (model.ReceiptFile != null && model.ReceiptFile.Length > 0)
         {
-            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads/receipts");
-            if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
-
-            var category = await _categoryRepository.GetByIdAsync(model.CategoryId);
-            var categoryName = category?.Name.Replace(" ", "-") ?? "Unknown";
-            var dateString = model.ExpenseDate.ToString("yyyy-MM-dd");
-            var expenseId = Guid.NewGuid();
-            var fileExtension = Path.GetExtension(model.ReceiptFile.FileName);
-            var fileName = $"Expense-{categoryName}-{dateString}-{expenseId}{fileExtension}";
-            var filePath = Path.Combine(uploadsFolder, fileName);
-
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp", ".pdf" };
+            var ext = Path.GetExtension(model.ReceiptFile.FileName)?.ToLowerInvariant();
+            if (string.IsNullOrEmpty(ext) || !allowedExtensions.Contains(ext))
             {
-                await model.ReceiptFile.CopyToAsync(fileStream);
+                ModelState.AddModelError(nameof(model.ReceiptFile), "Receipt must be JPG, PNG, GIF, WebP or PDF.");
             }
+            else if (model.ReceiptFile.Length > 5 * 1024 * 1024) // 5MB
+            {
+                ModelState.AddModelError(nameof(model.ReceiptFile), "Receipt must be 5MB or less.");
+            }
+            else
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads/receipts");
+                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
 
-            receiptPath = $"/uploads/receipts/{fileName}";
+                var category = await _categoryRepository.GetByIdAsync(model.CategoryId);
+                var categoryName = category?.Name.Replace(" ", "-") ?? "Unknown";
+                var dateString = model.ExpenseDate.ToString("yyyy-MM-dd");
+                var expenseId = Guid.NewGuid();
+                var fileName = $"Expense-{categoryName}-{dateString}-{expenseId}{ext}";
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await model.ReceiptFile.CopyToAsync(fileStream);
+                }
+
+                receiptPath = $"/uploads/receipts/{fileName}";
+            }
+        }
+        if (!ModelState.IsValid)
+        {
+            ViewBag.Categories = await GetUserCategoriesDistinctByNameAsync(userId);
+            ViewBag.Currencies = Enum.GetValues(typeof(Currency));
+            if (isAjax) return PartialView("_ExpenseCreatePartial", model);
+            return View(model);
         }
 
         var expense = await _expenseService.CreateExpenseAsync(
@@ -188,9 +207,34 @@ public class ExpenseController : Controller
 
         var expense = await _expenseService.GetByIdAsync(model.Id);
         if (expense == null) return NotFound();
+        var userIdCheck = _userManager.GetUserId(User);
+        if (userIdCheck == null || expense.UserId != userIdCheck) return Forbid();
+
+        // Handle optional receipt replacement
+        var receiptPath = expense.ReceiptPath;
+        if (model.ReceiptFile != null && model.ReceiptFile.Length > 0)
+        {
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp", ".pdf" };
+            var ext = Path.GetExtension(model.ReceiptFile.FileName)?.ToLowerInvariant();
+            if (!string.IsNullOrEmpty(ext) && allowedExtensions.Contains(ext) && model.ReceiptFile.Length <= 5 * 1024 * 1024)
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads/receipts");
+                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+                var category = await _categoryRepository.GetByIdAsync(model.CategoryId);
+                var categoryName = category?.Name.Replace(" ", "-") ?? "Unknown";
+                var dateString = model.ExpenseDate.ToString("yyyy-MM-dd");
+                var fileName = $"Expense-{categoryName}-{dateString}-{expense.Id}{ext}";
+                var filePath = Path.Combine(uploadsFolder, fileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await model.ReceiptFile.CopyToAsync(fileStream);
+                }
+                receiptPath = $"/uploads/receipts/{fileName}";
+            }
+        }
 
         expense.UpdateDescription(model.Description ?? "");
-        expense.UpdateReceipt(model.ReceiptPath ?? "");
+        expense.UpdateReceipt(receiptPath ?? "");
         expense.UpdateCategory(model.CategoryId);
         expense.UpdateCurrency(model.Currency);
         expense.UpdateExpenseDate(model.ExpenseDate);
@@ -244,6 +288,34 @@ public class ExpenseController : Controller
         }
 
         return RedirectToAction(nameof(Index));
+    }
+
+    // GET: /Expense/Receipt/{id} — serve receipt with ownership check
+    [HttpGet]
+    public async Task<IActionResult> Receipt(Guid id)
+    {
+        var expense = await _expenseService.GetByIdAsync(id);
+        if (expense == null) return NotFound();
+        var userId = _userManager.GetUserId(User);
+        if (userId == null || expense.UserId != userId) return Forbid();
+
+        if (string.IsNullOrEmpty(expense.ReceiptPath)) return NotFound();
+
+        var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", expense.ReceiptPath.TrimStart('/'));
+        if (!System.IO.File.Exists(fullPath)) return NotFound();
+
+        var ext = Path.GetExtension(fullPath)?.ToLowerInvariant();
+        var contentType = ext switch
+        {
+            ".jpg" or ".jpeg" => "image/jpeg",
+            ".png" => "image/png",
+            ".gif" => "image/gif",
+            ".webp" => "image/webp",
+            ".pdf" => "application/pdf",
+            _ => "application/octet-stream"
+        };
+
+        return PhysicalFile(fullPath, contentType, Path.GetFileName(fullPath));
     }
 
     // GET: /Expense/DownloadExcel

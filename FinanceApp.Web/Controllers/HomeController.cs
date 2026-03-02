@@ -16,17 +16,20 @@ public class HomeController : Controller
     private readonly IExpenseService _expenseService;
     private readonly ICategoryService _categoryService;
     private readonly IBudgetService _budgetService;
+    private readonly ICategoryBudgetService _categoryBudgetService;
     private readonly UserManager<ApplicationUser> _userManager;
 
     public HomeController(
         IExpenseService expenseService,
         ICategoryService categoryService,
         IBudgetService budgetService,
+        ICategoryBudgetService categoryBudgetService,
         UserManager<ApplicationUser> userManager)
     {
         _expenseService = expenseService;
         _categoryService = categoryService;
         _budgetService = budgetService;
+        _categoryBudgetService = categoryBudgetService;
         _userManager = userManager;
     }
 
@@ -84,6 +87,19 @@ public class HomeController : Controller
             .Where(e => e.Currency == budgetCurrency && e.ExpenseDate.Month == currentMonth && e.ExpenseDate.Year == currentYear)
             .Sum(e => e.Amount);
         var isOverBudget = budgetAmount.HasValue && budgetAmount.Value > 0 && thisMonthSpendInBudgetCurrency >= budgetAmount.Value;
+
+        // Category budgets: which are over or near limit
+        var categoryBudgets = await _categoryBudgetService.GetForMonthAsync(userId, currentMonth, currentYear);
+        var categoryBudgetAlerts = new List<CategoryBudgetAlertViewModel>();
+        foreach (var cb in categoryBudgets)
+        {
+            var spent = await _categoryBudgetService.GetCategorySpendAsync(userId, cb.CategoryId, currentMonth, currentYear, cb.Currency);
+            if (spent >= cb.Amount)
+                categoryBudgetAlerts.Add(new CategoryBudgetAlertViewModel { CategoryName = cb.Category?.Name ?? "Unknown", Spent = spent, Budget = cb.Amount, Currency = cb.Currency.ToString(), IsOver = true });
+            else if (cb.Amount > 0 && spent >= cb.Amount * 0.8m)
+                categoryBudgetAlerts.Add(new CategoryBudgetAlertViewModel { CategoryName = cb.Category?.Name ?? "Unknown", Spent = spent, Budget = cb.Amount, Currency = cb.Currency.ToString(), IsOver = false });
+        }
+        ViewBag.CategoryBudgetAlerts = categoryBudgetAlerts;
 
         // Pass data to view: amounts in display currency, with currency code for label
         ViewBag.TotalSpend = totalSpend;

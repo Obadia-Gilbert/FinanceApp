@@ -46,9 +46,22 @@
     </div>
 
     <div class="mb-3">
-        <label asp-for="ReceiptPath" class="form-label">Receipt Path</label>
-        <input asp-for="ReceiptPath" class="form-control" readonly/>
-        <span asp-validation-for="ReceiptPath" class="text-danger"></span>
+        <label class="form-label">Receipt / supporting document</label>
+        @if (!string.IsNullOrEmpty(Model.ReceiptPath))
+        {
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <a href="@Url.Action("Receipt", "Expense", new { id = Model.Id })" target="_blank" class="btn btn-sm btn-outline-primary" title="View receipt">
+                    <i class="bi bi-eye me-1"></i>View receipt
+                </a>
+                <button type="button" class="btn btn-sm btn-outline-secondary btn-preview-receipt" data-expense-id="@Model.Id" title="Preview in modal">
+                    <i class="bi bi-zoom-in me-1"></i>Preview
+                </button>
+            </div>
+        }
+        <label asp-for="ReceiptFile" class="form-label small text-muted">@(string.IsNullOrEmpty(Model.ReceiptPath) ? "Upload receipt (optional)" : "Replace receipt (optional)")</label>
+        <input asp-for="ReceiptFile" type="file" class="form-control form-control-sm receipt-file-input" accept=".jpg,.jpeg,.png,.gif,.webp,.pdf" />
+        <small class="text-muted">JPG, PNG, GIF, WebP or PDF. Max 5MB.</small>
+        <input type="hidden" asp-for="ReceiptPath" />
     </div>
 
     <div class="mb-3 d-flex justify-content-end gap-2">

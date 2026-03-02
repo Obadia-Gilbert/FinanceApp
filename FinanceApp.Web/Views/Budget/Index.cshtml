@@ -3,6 +3,11 @@
     ViewData["Title"] = "Monthly Budget";
     var monthName = ViewBag.MonthName as string ?? new DateTime(Model.Year, Model.Month, 1).ToString("MMMM yyyy");
     var saved = TempData["BudgetSaved"] as bool? == true;
+    var categoryBudgetSaved = TempData["CategoryBudgetSaved"] as bool? == true;
+    var categoryBudgetDeleted = TempData["CategoryBudgetDeleted"] as bool? == true;
+    var categoryBudgetError = TempData["CategoryBudgetError"] as string;
+    var categoryBudgets = ViewBag.CategoryBudgets as IEnumerable<FinanceApp.Web.Models.CategoryBudgetItemViewModel> ?? Enumerable.Empty<FinanceApp.Web.Models.CategoryBudgetItemViewModel>();
+    var exceededCategories = ViewBag.CategoryBudgetExceeded as IEnumerable<string> ?? Enumerable.Empty<string>();
 }
 
 <div class="container-fluid">
@@ -18,6 +23,43 @@
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <i class="bi bi-check-circle me-2"></i>Budget for @monthName has been saved.
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (categoryBudgetSaved)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-2"></i>Category budget has been saved.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (categoryBudgetDeleted)
+    {
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <i class="bi bi-info-circle me-2"></i>Category budget has been removed.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (!string.IsNullOrEmpty(categoryBudgetError))
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>@categoryBudgetError
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (exceededCategories.Any())
+    {
+        <div class="alert alert-danger d-flex align-items-start mb-3" role="alert">
+            <i class="bi bi-exclamation-triangle-fill fs-5 me-3 mt-1"></i>
+            <div class="flex-grow-1">
+                <strong>Category budget exceeded for @monthName</strong>
+                <p class="mb-0 mt-1">The following categories have exceeded their budget this month:</p>
+                <ul class="mb-0 mt-2">
+                    @foreach (var cat in exceededCategories)
+                    {
+                        <li>@cat</li>
+                    }
+                </ul>
+            </div>
         </div>
     }
 
@@ -55,9 +97,124 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">Category budgets for @monthName</h5>
+                        <button type="button" id="btnAddCategoryBudget" class="btn btn-sm btn-primary">
+                            <i class="bi bi-plus-circle"></i> Add category budget
+                        </button>
+                    </div>
+                    <p class="text-muted small">Set optional spending limits per category. You'll see alerts when a category reaches its limit.</p>
+                    @if (categoryBudgets.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Category</th>
+                                        <th>Spent / Budget</th>
+                                        <th>Status</th>
+                                        <th style="width: 80px;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var cb in categoryBudgets)
+                                    {
+                                        var currency = cb.Currency ?? "TZS";
+                                        var isOver = cb.IsOver;
+                                        var isWarning = cb.IsWarning;
+                                        <tr>
+                                            <td>@cb.CategoryName</td>
+                                            <td>@cb.Spent.ToString("N0") / @cb.Amount.ToString("N0") @currency</td>
+                                            <td>
+                                                @if (isOver)
+                                                { <span class="badge bg-danger">Over limit</span> }
+                                                else if (isWarning)
+                                                { <span class="badge bg-warning text-dark">Near limit</span> }
+                                                else
+                                                { <span class="badge bg-success">On track</span> }
+                                            </td>
+                                            <td>
+                                                <form asp-action="DeleteCategoryBudget" method="post" class="d-inline" onsubmit="return confirm('Remove this category budget?');">
+                                                    <input type="hidden" name="id" value="@cb.Id" />
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove" aria-label="Remove category budget">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">No category budgets set. Click "Add category budget" to set limits for specific categories.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Offcanvas for add category budget -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="categoryBudgetOffcanvas" aria-labelledby="categoryBudgetOffcanvasLabel">
+    <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title fw-600" id="categoryBudgetOffcanvasLabel">Add category budget</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body px-0" id="categoryBudgetOffcanvasContent">
+        <div class="p-3 text-center text-muted">Click "Add category budget" to set a limit for a category.</div>
     </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function() {
+            var btn = document.getElementById('btnAddCategoryBudget');
+            var content = document.getElementById('categoryBudgetOffcanvasContent');
+            var label = document.getElementById('categoryBudgetOffcanvasLabel');
+            var offcanvasEl = document.getElementById('categoryBudgetOffcanvas');
+            if (!btn || !content) return;
+
+            btn.addEventListener('click', async function() {
+                label.textContent = 'Add category budget';
+                content.innerHTML = '<div class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Loading…</div>';
+                if (offcanvasEl) { var o = new bootstrap.Offcanvas(offcanvasEl); o.show(); }
+                var url = '@Url.Action("AddCategoryBudget", "Budget")?partial=true';
+                var res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                if (!res.ok) { content.innerHTML = '<div class="p-3 text-danger">Unable to load form.</div>'; return; }
+                var html = await res.text();
+                content.innerHTML = html;
+
+                var form = content.querySelector('#categoryBudgetForm');
+                if (form) {
+                    form.addEventListener('submit', async function(e) {
+                        e.preventDefault();
+                        var submitBtn = form.querySelector('button[type="submit"]');
+                        if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>Saving…'; }
+                        var formData = new FormData(form);
+                        var postRes = await fetch(form.action, {
+                            method: 'POST',
+                            body: formData,
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        });
+                        if (postRes.ok) {
+                            var data = await postRes.json();
+                            if (data && data.redirect) { window.location.href = data.redirect; return; }
+                        }
+                        var errHtml = await postRes.text();
+                        content.innerHTML = errHtml;
+                        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = 'Save category budget'; }
+                    });
+                }
+            });
+        })();
+    </script>
 }

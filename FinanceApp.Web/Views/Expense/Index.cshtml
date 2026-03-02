@@ -41,7 +41,8 @@
                         <th>Amount</th>
                         <th>Currency</th>
                         <th>Category</th>
-                        <th>Expense Date</th>
+                        <th>Date</th>
+                        <th>Receipt</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -55,6 +56,21 @@
                             <td>@expense.Category.Name</td>
                             <td>@expense.ExpenseDate.ToString("yyyy-MM-dd")</td>
                             <td>
+                                @if (!string.IsNullOrEmpty(expense.ReceiptPath))
+                                {
+                                    <a href="@Url.Action("Receipt", "Expense", new { id = expense.Id })" target="_blank" class="btn btn-sm btn-outline-primary btn-receipt-view" data-expense-id="@expense.Id" title="View receipt">
+                                        <i class="bi bi-receipt"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary btn-receipt-preview ms-1" data-expense-id="@expense.Id" title="Preview receipt">
+                                        <i class="bi bi-zoom-in"></i>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">—</span>
+                                }
+                            </td>
+                            <td>
                                 <a class="btn btn-sm btn-warning btn-edit" href="@Url.Action("Edit", "Expense", new { id = expense.Id })" title="Edit" aria-label="Edit expense">
                                     <i class="bi bi-pencil" aria-hidden="true"></i>
                                 </a>
@@ -66,6 +82,31 @@
                     }
                 </tbody>
             </table>
+        </div>
+    </div>
+</div>
+
+<!-- Receipt preview modal -->
+<div class="modal fade" id="receiptPreviewModal" tabindex="-1" aria-labelledby="receiptPreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="receiptPreviewModalLabel">Receipt / supporting document</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0 text-center bg-dark">
+                <div id="receiptPreviewContent" style="min-height: 400px;">
+                    <div class="d-flex align-items-center justify-content-center py-5">
+                        <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading…</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a id="receiptPreviewDownload" href="#" target="_blank" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-download me-1"></i>Open in new tab
+                </a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
         </div>
     </div>
 </div>
@@ -103,9 +144,10 @@
                 content.innerHTML = loadingHtml;
                 if (offcanvasEl) { var o = new bootstrap.Offcanvas(offcanvasEl); o.show(); }
                 const url = '@Url.Action("Create","Expense")?partial=true';
-                const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }});
+                const res = await fetch(url, { credentials: 'include', headers: { 'X-Requested-With': 'XMLHttpRequest' }});
                 if (!res.ok) {
-                    if (typeof showToast === 'function') showToast('Unable to load form.'); else alert('Unable to load form.');
+                    var msg = 'Unable to load form. (' + res.status + ')';
+                    if (typeof showToast === 'function') showToast(msg); else alert(msg);
                     return;
                 }
                 const html = await res.text();
@@ -120,7 +162,7 @@
                     const href = editBtn.getAttribute('href');
                     if (!href) return;
                     const url = href + (href.indexOf('?') === -1 ? '?partial=true' : '&partial=true');
-                    const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }});
+                    const res = await fetch(url, { credentials: 'include', headers: { 'X-Requested-With': 'XMLHttpRequest' }});
                     if (!res.ok) { if (typeof showToast === 'function') showToast('Unable to load edit form.'); else alert('Unable to load edit form.'); return; }
                     const html = await res.text();
                     const content = document.getElementById('expenseOffcanvasContent');
@@ -137,7 +179,7 @@
                     const href = delBtn.getAttribute('href');
                     if (!href) return;
                     const url = href + (href.indexOf('?') === -1 ? '?partial=true' : '&partial=true');
-                    const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }});
+                    const res = await fetch(url, { credentials: 'include', headers: { 'X-Requested-With': 'XMLHttpRequest' }});
                     if (!res.ok) { if (typeof showToast === 'function') showToast('Unable to load delete confirmation.'); else alert('Unable to load delete confirmation.'); return; }
                     const html = await res.text();
                     const content = document.getElementById('expenseOffcanvasContent');
@@ -146,6 +188,61 @@
                     const bsOff = new bootstrap.Offcanvas(offcanvasEl);
                     bsOff.show();
                     return;
+                }
+            });
+
+            // Receipt preview modal
+            var receiptModal = document.getElementById('receiptPreviewModal');
+            var receiptContent = document.getElementById('receiptPreviewContent');
+            var receiptDownload = document.getElementById('receiptPreviewDownload');
+            function openReceiptPreview(expenseId) {
+                if (!receiptModal || !receiptContent) return;
+                var url = '@Url.Action("Receipt", "Expense")/' + expenseId;
+                receiptContent.innerHTML = '<div class="d-flex align-items-center justify-content-center py-5"><div class="spinner-border text-light" role="status"></div></div>';
+                receiptDownload.href = url;
+                receiptDownload.style.display = 'inline-block';
+                var m = new bootstrap.Modal(receiptModal);
+                m.show();
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', url);
+                xhr.responseType = 'blob';
+                xhr.onload = function() {
+                    if (xhr.status !== 200) {
+                        receiptContent.innerHTML = '<p class="text-light py-5">Unable to load receipt.</p>';
+                        return;
+                    }
+                    var blob = xhr.response;
+                    var contentType = xhr.getResponseHeader('Content-Type') || '';
+                    var isPdf = contentType.indexOf('pdf') !== -1;
+                    if (isPdf) {
+                        receiptContent.innerHTML = '<iframe src="' + url + '" style="width:100%;height:500px;border:none;" title="Receipt PDF"></iframe>';
+                    } else {
+                        var reader = new FileReader();
+                        reader.onload = function() {
+                            receiptContent.innerHTML = '<img src="' + reader.result + '" alt="Receipt" style="max-width:100%;max-height:70vh;object-fit:contain;" />';
+                        };
+                        reader.readAsDataURL(blob);
+                    }
+                };
+                xhr.onerror = function() {
+                    receiptContent.innerHTML = '<p class="text-light py-5">Unable to load receipt.</p>';
+                };
+                xhr.send();
+            }
+            document.querySelector('#expenseTable')?.addEventListener('click', function(e) {
+                var btn = e.target.closest('.btn-receipt-preview');
+                if (btn) {
+                    e.preventDefault();
+                    var id = btn.getAttribute('data-expense-id');
+                    if (id) openReceiptPreview(id);
+                }
+            });
+            document.querySelector('#expenseOffcanvasContent')?.addEventListener('click', function(e) {
+                var btn = e.target.closest('.btn-preview-receipt');
+                if (btn) {
+                    e.preventDefault();
+                    var id = btn.getAttribute('data-expense-id');
+                    if (id) openReceiptPreview(id);
                 }
             });
         })();

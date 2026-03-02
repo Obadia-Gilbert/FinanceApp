@@ -281,17 +281,117 @@ body > .container-fluid {
   .icon-picker-grid { grid-template-columns: repeat(4, 1fr); }
 }
 
-/* Dashboard: Expense Trend chart – spacing and margin */
+/* Dashboard: compact layout, refined stat cards */
+.dashboard-page .dashboard-subtitle {
+  font-size: 0.9rem;
+}
+.dashboard-page .dashboard-alert {
+  padding: 0.6rem 1rem;
+  font-size: 0.9rem;
+}
+.dashboard-page .dashboard-alert .fs-4 {
+  font-size: 1.25rem !important;
+}
+
+.dashboard-stats .dashboard-stat-card {
+  border: none;
+  border-radius: 0.65rem;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.dashboard-stats .dashboard-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+.dashboard-stat-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  margin-right: 0.75rem;
+}
+.dashboard-stat-card .card-text {
+  font-size: 1.1rem;
+  line-height: 1.3;
+}
+.dashboard-stat-card .card-text small {
+  font-size: 0.8em;
+}
+
+/* Total Spend – deep teal gradient */
+.dashboard-stat-total {
+  background: linear-gradient(135deg, #0d9488 0%, #0f766e 50%, #115e59 100%);
+  color: #fff;
+}
+.dashboard-stat-total .dashboard-stat-icon {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Expenses – emerald */
+.dashboard-stat-expenses {
+  background: linear-gradient(135deg, #059669 0%, #047857 50%, #065f46 100%);
+  color: #fff;
+}
+.dashboard-stat-expenses .dashboard-stat-icon {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Categories – amber/warm */
+.dashboard-stat-categories {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 50%, #92400e 100%);
+  color: #fff;
+}
+.dashboard-stat-categories .dashboard-stat-icon {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* This Month – indigo */
+.dashboard-stat-month {
+  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 50%, #3730a3 100%);
+  color: #fff;
+}
+.dashboard-stat-month .dashboard-stat-icon {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Budget – slate/blue, over = red tint */
+.dashboard-stat-budget {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+  color: #fff;
+}
+.dashboard-stat-budget .dashboard-stat-icon {
+  background: rgba(255, 255, 255, 0.2);
+}
+.dashboard-stat-budget.dashboard-stat-over {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 50%, #991b1b 100%);
+}
+.dashboard-stat-budget .card-footer .btn-link {
+  color: rgba(255, 255, 255, 0.9);
+}
+.dashboard-stat-budget .card-footer .btn-link:hover {
+  color: #fff;
+}
+
+/* Expense Trend chart – spacing */
 .expense-trend-card {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 .expense-chart-wrap {
-  margin-bottom: 1rem;
-  min-height: 200px;
+  margin-bottom: 0.5rem;
+  min-height: 180px;
 }
 @media (min-width: 768px) {
   .expense-trend-card {
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .expense-chart-wrap {
+    min-height: 200px;
   }
 }
 

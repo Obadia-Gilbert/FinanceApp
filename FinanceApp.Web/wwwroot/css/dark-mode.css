@@ -425,3 +425,15 @@ body[data-theme="dark"] .btn-provider-default:hover {
   border-color: #555;
   color: #fff;
 }
+
+/* Dashboard stat cards in dark mode – keep gradients, add subtle glow */
+body[data-theme="dark"] .dashboard-stat-card {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+}
+body[data-theme="dark"] .dashboard-stat-card:hover {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+}
+body[data-theme="dark"] .expense-trend-card {
+  border-color: #333;
+  background-color: #1e1e1e;
+}

@@ -46,8 +46,13 @@
     </div>
 
     <div class="mb-3">
-        <label asp-for="ReceiptFile" class="form-label">Receipt</label>
-        <input asp-for="ReceiptFile" type="file" class="form-control" />
+        <label asp-for="ReceiptFile" class="form-label">Receipt / supporting document <span class="text-muted fw-normal">(optional)</span></label>
+        <input asp-for="ReceiptFile" type="file" class="form-control receipt-file-input" accept=".jpg,.jpeg,.png,.gif,.webp,.pdf" />
+        <small class="text-muted">JPG, PNG, GIF, WebP or PDF. Max 5MB.</small>
+        <div class="receipt-preview mt-2 d-none">
+            <img src="" alt="Preview" class="receipt-preview-img rounded border" style="max-height: 120px; max-width: 100%; object-fit: contain;" />
+            <p class="receipt-preview-pdf small text-muted mt-1 d-none">PDF selected — will be uploaded on save.</p>
+        </div>
     </div>
 
     <div class="d-flex justify-content-end gap-2">
@@ -59,10 +64,43 @@
     </div>
 </form>
 <script>
-    document.querySelector('#expenseOffcanvasContent form')?.addEventListener('submit', function() {
-        var btn = document.getElementById('expenseCreateSubmit');
-        if (btn) { btn.querySelector('.btn-text')?.classList.add('d-none'); btn.querySelector('.btn-loading')?.classList.remove('d-none'); btn.disabled = true; }
-    });
+    (function() {
+        var form = document.querySelector('#expenseOffcanvasContent form');
+        if (form) {
+            form.addEventListener('submit', function() {
+                var btn = document.getElementById('expenseCreateSubmit');
+                if (btn) { btn.querySelector('.btn-text')?.classList.add('d-none'); btn.querySelector('.btn-loading')?.classList.remove('d-none'); btn.disabled = true; }
+            });
+            var fileInput = form.querySelector('.receipt-file-input');
+            var preview = form.querySelector('.receipt-preview');
+            var previewImg = form.querySelector('.receipt-preview-img');
+            var previewPdf = form.querySelector('.receipt-preview-pdf');
+            if (fileInput && preview) {
+                fileInput.addEventListener('change', function() {
+                    var file = this.files?.[0];
+                    preview.classList.add('d-none');
+                    if (previewImg) previewImg.src = '';
+                    if (previewPdf) previewPdf.classList.add('d-none');
+                    if (!file) return;
+                    var ext = (file.name.split('.').pop() || '').toLowerCase();
+                    if (['jpg','jpeg','png','gif','webp'].indexOf(ext) !== -1) {
+                        var r = new FileReader();
+                        r.onload = function() {
+                            previewImg.src = r.result;
+                            previewImg.classList.remove('d-none');
+                            if (previewPdf) previewPdf.classList.add('d-none');
+                            preview.classList.remove('d-none');
+                        };
+                        r.readAsDataURL(file);
+                    } else if (ext === 'pdf') {
+                        if (previewImg) previewImg.classList.add('d-none');
+                        if (previewPdf) previewPdf.classList.remove('d-none');
+                        preview.classList.remove('d-none');
+                    }
+                });
+            }
+        }
+    })();
 </script>
 
 <partial name="_ValidationScriptsPartial" />

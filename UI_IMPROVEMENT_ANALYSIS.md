@@ -208,3 +208,9 @@ Implementing the high-priority items first will improve correctness, consistency
 - **Done:** **Dashboard** shows a **budget card** when a budget is set: "Spent / Budget" in the budget currency, with "On track" or "Over limit" and a link to edit budget.
 - **Done:** When expenses in that month and currency **reach or exceed** the budget, a **danger alert** is shown at the top of the dashboard: "Budget limit reached" with spent vs budget and link to update budget.
 - **Done:** If no budget is set, a secondary alert invites the user to "Set a monthly budget" with a link to the Budget page.
+
+### 12.2 Category budgets (implemented)
+- **Done:** Users can optionally set **per-category monthly budgets** via the Budget page. One budget per user per category per month (stored in `CategoryBudgets` table).
+- **Done:** **Budget page** has a "Category budgets" section with a table showing category, spent vs budget, status (On track / Near limit / Over limit), and a remove button.
+- **Done:** "Add category budget" opens an offcanvas form (category dropdown, amount, currency). Categories that already have a budget for the month are excluded from the dropdown.
+- **Done:** **Dashboard** shows alerts for category budgets that are **over limit** (danger) or **near limit** (≥80%, warning) with spent vs budget and link to manage budgets.
