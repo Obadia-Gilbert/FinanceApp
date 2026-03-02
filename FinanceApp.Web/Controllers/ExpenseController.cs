@@ -139,7 +139,7 @@ public class ExpenseController : Controller
             model.ExpenseDate,
             model.CategoryId,
             userId,
-            model.Description,
+            model.Description ?? "",
             receiptPath
         );
 

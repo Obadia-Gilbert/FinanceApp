@@ -1,7 +1,7 @@
 @model FinanceApp.Web.Models.ExpenseEditViewModel
 
 @{
-    var categories = ViewBag.Categories as IEnumerable<FinanceApp.Domain.Entities.Category>;
+    var categories = ViewBag.Categories as IEnumerable<FinanceApp.Domain.Entities.Category> ?? Enumerable.Empty<FinanceApp.Domain.Entities.Category>();
 }
 
 <form asp-action="Edit" method="post" enctype="multipart/form-data" class="p-3">

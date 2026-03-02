@@ -25,6 +25,7 @@ namespace FinanceApp.Web.Controllers
       public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10)
 {
     var userId = _userManager.GetUserId(User); // get logged-in user
+    if (userId == null) return Unauthorized();
     var pagedCategories = await _categoryService.GetPagedCategoriesAsync(
         pageNumber, pageSize, userId
     );

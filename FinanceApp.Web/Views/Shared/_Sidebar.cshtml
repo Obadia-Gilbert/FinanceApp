@@ -2,7 +2,7 @@
 @{
     var controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
     var action = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
-    bool IsActive(string c, string a = null) => string.Equals(controller, c, StringComparison.OrdinalIgnoreCase) && (a == null || string.Equals(action, a, StringComparison.OrdinalIgnoreCase));
+    bool IsActive(string c, string? a = null) => string.Equals(controller, c, StringComparison.OrdinalIgnoreCase) && (a == null || string.Equals(action, a, StringComparison.OrdinalIgnoreCase));
 }
 <nav class="d-md-block bg-light sidebar">
     <div class="position-sticky pt-1 px-2">
