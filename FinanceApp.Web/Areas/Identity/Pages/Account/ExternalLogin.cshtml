@@ -1,33 +1,52 @@
-﻿@page
+@page
 @model ExternalLoginModel
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Complete sign in";
 }
 
-<h1>@ViewData["Title"]</h1>
-<h2 id="external-login-title">Associate your @Model.ProviderDisplayName account.</h2>
-<hr />
+<div class="container-fluid auth-page">
+    <div class="row justify-content-center py-3 py-md-4">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+            <div class="card shadow-lg border-0 rounded-lg auth-card">
+                <div class="card-body p-4 auth-card-body">
+                    <h1 class="h3 fw-bold mb-2 text-center">Link your @Model.ProviderDisplayName account</h1>
+                    <p class="text-muted text-center mb-4">
+                        You've signed in with <strong>@Model.ProviderDisplayName</strong>. Enter your email below to finish and create your account.
+                    </p>
 
-<p id="external-login-description" class="text-info">
-    You've successfully authenticated with <strong>@Model.ProviderDisplayName</strong>.
-    Please enter an email address for this site below and click the Register button to finish
-    logging in.
-</p>
+                    <form asp-page-handler="Confirmation" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show mb-3 @(!Model.ModelState.IsValid ? "" : "d-none")" role="alert" id="validationAlert">
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
 
-<div class="row">
-    <div class="col-md-4">
-        <form asp-page-handler="Confirmation" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Email" class="form-control" autocomplete="email" placeholder="Please enter your email."/>
-                <label asp-for="Input.Email" class="form-label"></label>
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
+                        <div class="mb-3">
+                            <label asp-for="Input.Email" class="form-label fw-500">Email Address</label>
+                            <input asp-for="Input.Email" class="form-control" autocomplete="email" placeholder="Enter your email" />
+                            <span asp-validation-for="Input.Email" class="invalid-feedback d-block small"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 fw-600 mb-3">
+                            <i class="bi bi-person-plus me-2"></i>Complete registration
+                        </button>
+
+                        <p class="text-center mb-0 small">
+                            <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl" class="text-decoration-none fw-500">
+                                <i class="bi bi-arrow-left me-1"></i>Back to sign in
+                            </a>
+                        </p>
+                    </form>
+                </div>
             </div>
-            <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
-        </form>
+        </div>
     </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var alert = document.getElementById('validationAlert');
+            if (alert && alert.textContent.trim().length > 0) alert.classList.remove('d-none');
+        });
+    </script>
 }

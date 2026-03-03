@@ -1,0 +1,207 @@
+/* Landing page – SaaS-style layout and sections */
+
+.landing-body {
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: var(--color-bg-alt, #F9FAFB);
+}
+
+.landing-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1030;
+  background: var(--color-bg, #fff);
+  border-bottom: 1px solid var(--color-border, #E5E7EB);
+}
+
+.landing-header .navbar {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.landing-header .nav-link {
+  color: var(--color-text-body, #374151);
+  font-weight: 500;
+}
+
+/* Only text links turn blue on hover; buttons keep their own hover styles */
+.landing-header .nav-link:not(.btn):hover {
+  color: var(--color-brand, #0d6efd);
+}
+
+/* Keep button text visible on hover (override any nav-link color) */
+.landing-header .nav-link.btn-primary,
+.landing-header .nav-link.btn-primary:hover {
+  color: #fff !important;
+}
+.landing-header .nav-link.btn-outline-primary {
+  color: var(--color-brand, #0d6efd);
+}
+.landing-header .nav-link.btn-outline-primary:hover {
+  color: #fff !important;
+}
+
+.landing-header .navbar-brand {
+  color: var(--color-text-dark, #111827);
+}
+
+.landing-header .navbar-brand:hover {
+  color: var(--color-brand);
+}
+
+.landing-main {
+  padding-top: 72px; /* clear fixed header */
+  min-height: 100vh;
+}
+
+/* Hero */
+.landing-hero {
+  padding: 4rem 0 5rem;
+  text-align: center;
+}
+
+.landing-hero h1 {
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-text-dark, #111827);
+  margin-bottom: 1.25rem;
+}
+
+.landing-hero .lead {
+  font-size: 1.2rem;
+  color: var(--color-text-body, #374151);
+  max-width: 36rem;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 2rem;
+}
+
+.landing-cta-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.landing-cta-group .btn {
+  min-width: 140px;
+}
+
+/* Sections */
+.landing-section {
+  padding: 4rem 0;
+}
+
+.landing-section-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-text-dark);
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+
+.landing-feature-card {
+  height: 100%;
+  border-radius: var(--radius-lg, 0.75rem);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  padding: 1.5rem;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.landing-feature-card:hover {
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(0,0,0,.08));
+  transform: translateY(-2px);
+}
+
+.landing-feature-card .bi {
+  font-size: 2rem;
+  color: var(--color-brand);
+  margin-bottom: 1rem;
+}
+
+.landing-feature-card h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--color-text-dark);
+  margin-bottom: 0.5rem;
+}
+
+.landing-feature-card p {
+  color: var(--color-text-body);
+  margin: 0;
+  font-size: 0.9375rem;
+}
+
+/* How it works */
+.landing-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  counter-reset: step;
+}
+
+.landing-steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+  counter-increment: step;
+}
+
+.landing-steps li::before {
+  content: counter(step);
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: var(--color-brand);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.landing-steps h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-dark);
+  margin-bottom: 0.25rem;
+}
+
+.landing-steps p {
+  color: var(--color-text-body);
+  margin: 0;
+  font-size: 0.9375rem;
+}
+
+/* Final CTA */
+.landing-cta-block {
+  padding: 4rem 0 5rem;
+  text-align: center;
+  background: linear-gradient(180deg, transparent 0%, var(--color-bg-hover, #F3F4F6) 100%);
+  border-radius: var(--radius-lg);
+}
+
+.landing-cta-block h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-text-dark);
+  margin-bottom: 0.75rem;
+}
+
+.landing-cta-block p {
+  color: var(--color-text-body);
+  margin-bottom: 1.5rem;
+}
+
+/* Dark mode overrides for landing */
+body[data-theme="dark"] .landing-body { background: var(--color-bg-alt); }
+body[data-theme="dark"] .landing-header { background: var(--color-bg); border-color: var(--color-border); }
+body[data-theme="dark"] .landing-cta-block { background: linear-gradient(180deg, transparent 0%, rgba(255,255,255,.04) 100%); }

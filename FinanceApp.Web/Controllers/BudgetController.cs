@@ -106,8 +106,8 @@ public class BudgetController : Controller
         var now = DateTime.Now;
         var existing = await _categoryBudgetService.GetForMonthAsync(userId, now.Month, now.Year);
         var usedCategoryIds = existing.Select(cb => cb.CategoryId).ToHashSet();
-        var allCategories = await _categoryService.GetAllAsync(userId);
-        var availableCategories = allCategories.Where(c => !usedCategoryIds.Contains(c.Id)).ToList();
+        var expenseCategories = await _categoryService.GetCategoriesForExpenseAsync(userId);
+        var availableCategories = expenseCategories.Where(c => !usedCategoryIds.Contains(c.Id)).ToList();
 
         var model = new CategoryBudgetViewModel
         {
@@ -139,7 +139,7 @@ public class BudgetController : Controller
 
         if (!ModelState.IsValid)
         {
-            ViewBag.AvailableCategories = await _categoryService.GetAllAsync(userId);
+            ViewBag.AvailableCategories = (await _categoryService.GetCategoriesForExpenseAsync(userId)).ToList();
             ViewBag.MonthName = new DateTime(model.Year, model.Month, 1).ToString("MMMM yyyy");
             var isAjax = string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
             if (isAjax)

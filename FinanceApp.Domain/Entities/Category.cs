@@ -1,4 +1,5 @@
 using FinanceApp.Domain.Common;
+using FinanceApp.Domain.Enums;
 
 namespace FinanceApp.Domain.Entities;
 
@@ -7,6 +8,9 @@ public class Category : BaseEntity
     public string Name { get; private set; }
 
     public string? Description { get; private set; }
+
+    /// <summary>Expense, Income, or Both — determines where this category appears (expense form, income form, or both).</summary>
+    public CategoryType Type { get; private set; } = CategoryType.Expense;
 
     // Icon name (e.g., "shopping-cart", "home", "car")
     public string? Icon { get; private set; } = "shopping-cart";
@@ -27,13 +31,14 @@ public class Category : BaseEntity
     }
 
     // Main constructor
-    public Category(string name, string? description = null, string? icon = null, string? badgeColor = null)
+    public Category(string name, string? description = null, CategoryType type = CategoryType.Expense, string? icon = null, string? badgeColor = null)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("Category name cannot be empty.", nameof(name));
 
         Name = name;
         Description = description;
+        Type = type;
         Icon = icon ?? "shopping-cart";
         BadgeColor = badgeColor ?? "#137fec";
     }
@@ -63,5 +68,10 @@ public class Category : BaseEntity
             throw new ArgumentException("Badge color must be a valid hex color (e.g., #137fec).", nameof(badgeColor));
 
         BadgeColor = badgeColor;
+    }
+
+    public void UpdateType(CategoryType type)
+    {
+        Type = type;
     }
 }

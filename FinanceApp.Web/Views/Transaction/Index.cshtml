@@ -1,0 +1,178 @@
+@model IEnumerable<FinanceApp.Web.Models.TransactionViewModel>
+
+@{
+    ViewData["Title"] = "Transactions";
+    int pageNumber = ViewBag.PageNumber;
+    int totalPages = ViewBag.TotalPages;
+    int totalItems = ViewBag.TotalItems;
+}
+
+<div class="mb-4">
+    <h1 class="visually-hidden">Transactions</h1>
+    <p class="page-subtitle mb-3">All income, expense and transfer records across your accounts.</p>
+    <div class="d-flex gap-2 mb-3">
+        <button id="btnAddTransaction" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Add Transaction
+        </button>
+        <button id="btnTransfer" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left-right"></i> Transfer
+        </button>
+    </div>
+
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="txOffcanvas" aria-labelledby="txOffcanvasLabel">
+        <div class="offcanvas-header">
+            <h5 id="txOffcanvasLabel">Transaction</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body px-0">
+            <div class="p-3 d-flex align-items-center justify-content-center min-vh-25" id="txOffcanvasContent">
+                <div class="text-center text-muted"><span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Loading…</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i>No transactions yet. Click <strong>Add Transaction</strong> to get started.
+    </div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table id="txTable" class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Account</th>
+                            <th>Type</th>
+                            <th>Category</th>
+                            <th class="text-end">Amount</th>
+                            <th>Note</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var tx in Model)
+                        {
+                            var typeClass = tx.Type == FinanceApp.Domain.Enums.TransactionType.Income ? "text-success" : tx.Type == FinanceApp.Domain.Enums.TransactionType.Expense ? "text-danger" : "text-info";
+                            var typeIcon = tx.Type == FinanceApp.Domain.Enums.TransactionType.Income ? "bi-arrow-down-circle" : tx.Type == FinanceApp.Domain.Enums.TransactionType.Expense ? "bi-arrow-up-circle" : "bi-arrow-left-right";
+                            var sign = tx.Type == FinanceApp.Domain.Enums.TransactionType.Income ? "+" : tx.Type == FinanceApp.Domain.Enums.TransactionType.Expense ? "−" : "⇄";
+                            <tr>
+                                <td class="text-nowrap">@tx.Date.ToString("yyyy-MM-dd")</td>
+                                <td>@tx.AccountName</td>
+                                <td>
+                                    <span class="@typeClass">
+                                        <i class="bi @typeIcon me-1"></i>@tx.Type
+                                    </span>
+                                    @if (tx.TransferGroupId.HasValue)
+                                    {
+                                        <span class="badge bg-info text-dark ms-1">Transfer</span>
+                                    }
+                                    @if (tx.IsRecurring)
+                                    {
+                                        <span class="badge bg-secondary ms-1"><i class="bi bi-arrow-repeat"></i></span>
+                                    }
+                                </td>
+                                <td>@(tx.CategoryName ?? "—")</td>
+                                <td class="text-end @typeClass text-nowrap">
+                                    <strong>@sign @tx.Currency @tx.Amount.ToString("N2")</strong>
+                                </td>
+                                <td class="text-truncate" style="max-width:160px;" title="@tx.Note">@(tx.Note ?? "—")</td>
+                                <td class="text-nowrap">
+                                    @if (!tx.TransferGroupId.HasValue)
+                                    {
+                                        <a href="@Url.Action("Edit", "Transaction", new { id = tx.Id })" class="btn btn-sm btn-outline-secondary btn-edit me-1">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form method="post" asp-action="Delete" asp-controller="Transaction" asp-route-id="@tx.Id" style="display:inline" onsubmit="return confirm('Delete this transaction?');">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">Transfer</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    @if (totalPages > 1)
+    {
+        <nav class="mt-3" aria-label="Transactions pagination">
+            <ul class="pagination justify-content-center mb-0">
+                <li class="page-item @(pageNumber <= 1 ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-pageNumber="@(pageNumber - 1)">‹ Prev</a>
+                </li>
+                @for (int p = 1; p <= totalPages; p++)
+                {
+                    <li class="page-item @(p == pageNumber ? "active" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-pageNumber="@p">@p</a>
+                    </li>
+                }
+                <li class="page-item @(pageNumber >= totalPages ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-pageNumber="@(pageNumber + 1)">Next ›</a>
+                </li>
+            </ul>
+        </nav>
+    }
+}
+
+@section Scripts {
+    <script>
+        (function () {
+            const offcanvasEl = document.getElementById('txOffcanvas');
+            const content = document.getElementById('txOffcanvasContent');
+
+            async function loadIntoOffcanvas(url) {
+                content.innerHTML = '<div class="text-center text-muted p-4"><span class="spinner-border spinner-border-sm me-2"></span>Loading…</div>';
+                bootstrap.Offcanvas.getOrCreateInstance(offcanvasEl).show();
+                const res = await fetch(url, { credentials: 'include', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                if (!res.ok) { if (typeof showToast === 'function') showToast('Failed to load form.'); return; }
+                content.innerHTML = await res.text();
+            }
+
+            document.getElementById('btnAddTransaction')?.addEventListener('click', () =>
+                loadIntoOffcanvas('@Url.Action("Create", "Transaction")?partial=true'));
+
+            document.getElementById('btnTransfer')?.addEventListener('click', () =>
+                loadIntoOffcanvas('@Url.Action("Transfer", "Transaction")?partial=true'));
+
+            document.getElementById('txTable')?.addEventListener('click', async function (e) {
+                const editBtn = e.target.closest('.btn-edit');
+                if (editBtn) {
+                    e.preventDefault();
+                    const href = editBtn.getAttribute('href');
+                    if (href) await loadIntoOffcanvas(href + (href.includes('?') ? '&' : '?') + 'partial=true');
+                }
+            });
+
+            offcanvasEl?.addEventListener('submit', async function (e) {
+                const form = e.target.closest('form');
+                if (!form || !offcanvasEl.contains(form)) return;
+                e.preventDefault();
+                const data = new FormData(form);
+                const res = await fetch(form.action, { method: 'POST', body: data, credentials: 'include', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                const json = await res.json().catch(() => null);
+                if (json?.success) {
+                    bootstrap.Offcanvas.getInstance(offcanvasEl)?.hide();
+                    location.reload();
+                } else {
+                    const html = await res.text().catch(() => null);
+                    if (html) content.innerHTML = html;
+                }
+            });
+        })();
+    </script>
+}

@@ -8,7 +8,7 @@ using FinanceApp.Domain.Common;
 using FinanceApp.Application.Common;
 using FinanceApp.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using FinanceApp.Infrastructure.Extensions;
+using FinanceApp.Application.Extensions;
 
 namespace FinanceApp.Infrastructure.Repositories
 {

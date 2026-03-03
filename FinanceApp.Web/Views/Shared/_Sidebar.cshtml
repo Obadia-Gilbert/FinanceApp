@@ -4,7 +4,7 @@
     var action = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
     bool IsActive(string c, string? a = null) => string.Equals(controller, c, StringComparison.OrdinalIgnoreCase) && (a == null || string.Equals(action, a, StringComparison.OrdinalIgnoreCase));
 }
-<nav class="d-md-block bg-light sidebar">
+<nav class="sidebar">
     <div class="position-sticky pt-1 px-2">
         <div class="sidebar-heading text-uppercase small fw-semibold px-2 mb-2 ">Navigation</div>
         <ul class="nav flex-column app-sidebar-nav">
@@ -24,6 +24,18 @@
                 <a class="nav-link @(IsActive("Category") ? "active" : "")" asp-area="" asp-controller="Category" asp-action="Index">
                     <span class="nav-icon"><i class="bi bi-tags"></i></span>
                     <span class="nav-label">Categories</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(IsActive("Account") ? "active" : "")" asp-area="" asp-controller="Account" asp-action="Index">
+                    <span class="nav-icon"><i class="bi bi-bank"></i></span>
+                    <span class="nav-label">Accounts</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(IsActive("Transaction") ? "active" : "")" asp-area="" asp-controller="Transaction" asp-action="Index">
+                    <span class="nav-icon"><i class="bi bi-arrow-left-right"></i></span>
+                    <span class="nav-label">Transactions</span>
                 </a>
             </li>
             <li class="nav-item">

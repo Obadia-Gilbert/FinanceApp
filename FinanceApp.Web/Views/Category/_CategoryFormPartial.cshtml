@@ -15,10 +15,10 @@
         <span asp-validation-for="Name" class="invalid-feedback d-block small"></span>
     </div>
 
-    <!-- Type (mockup-style) -->
+    <!-- Type -->
     <div class="mb-4">
-        <label class="form-label fw-600">Type</label>
-        <div class="form-control form-control-lg bg-light text-muted">Expense</div>
+        <label asp-for="Type" class="form-label fw-600">Type</label>
+        <select asp-for="Type" class="form-select form-select-lg" asp-items="Html.GetEnumSelectList<FinanceApp.Domain.Enums.CategoryType>()"></select>
     </div>
 
     <!-- Icon Selection -->

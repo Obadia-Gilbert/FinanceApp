@@ -30,6 +30,13 @@ builder.Services.AddScoped<ICategoryBudgetService, CategoryBudgetService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+builder.Services.AddScoped<ISupportingDocumentService>(sp =>
+{
+    var repo = sp.GetRequiredService<IRepository<FinanceApp.Domain.Entities.SupportingDocument>>();
+    var env  = sp.GetRequiredService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>();
+    var uploadRoot = Path.Combine(env.WebRootPath, "uploads", "documents");
+    return new SupportingDocumentService(repo, uploadRoot);
+});
 builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddSingleton<ICurrencyConversionService, CurrencyConversionService>();
@@ -109,9 +116,7 @@ builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
 builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("EmailSettings"));
 
-builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddTransient<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender, IdentityEmailSender>();
-builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddRazorPages(); // For Identity UI
 
 var app = builder.Build();
@@ -147,7 +152,7 @@ app.MapControllerRoute(
 );
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
+    pattern: "{controller=Landing}/{action=Index}/{id?}")
     .WithStaticAssets();
 
 app.MapRazorPages(); // For Identity UI 

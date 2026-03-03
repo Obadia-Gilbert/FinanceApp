@@ -1,11 +1,12 @@
 using FinanceApp.Application.Interfaces.Services;
-using FinanceApp.Application.Common;    
+using FinanceApp.Application.Common;
 using FinanceApp.Domain.Entities;
+using FinanceApp.Domain.Enums;
 using FinanceApp.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using FinanceApp.Infrastructure.Identity; // for ApplicationUser
+using FinanceApp.Infrastructure.Identity;
 
 namespace FinanceApp.Web.Controllers
 {
@@ -22,13 +23,14 @@ namespace FinanceApp.Web.Controllers
         }
 
         // GET: /Category
-      public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10)
-{
-    var userId = _userManager.GetUserId(User); // get logged-in user
-    if (userId == null) return Unauthorized();
-    var pagedCategories = await _categoryService.GetPagedCategoriesAsync(
-        pageNumber, pageSize, userId
-    );
+        // Loads ALL user categories — DataTables handles client-side pagination/search/sort.
+        public async Task<IActionResult> Index()
+        {
+            var userId = _userManager.GetUserId(User);
+            if (userId == null) return Unauthorized();
+            var pagedCategories = await _categoryService.GetPagedCategoriesAsync(
+                pageNumber: 1, pageSize: int.MaxValue, userId: userId
+            );
 
     // Map Category -> CategoryViewModel
     var pagedViewModel = new PagedResult<CategoryViewModel>
@@ -37,6 +39,7 @@ namespace FinanceApp.Web.Controllers
         {
             Id = c.Id,
             Name = c.Name,
+            Type = c.Type,
             Description = c.Description,
             Icon = c.Icon,
             BadgeColor = c.BadgeColor
@@ -77,6 +80,7 @@ namespace FinanceApp.Web.Controllers
             await _categoryService.CreateCategoryAsync(
                 model.Name,
                 userId!,
+                model.Type,
                 model.Description,
                 model.Icon,
                 model.BadgeColor
@@ -101,6 +105,7 @@ namespace FinanceApp.Web.Controllers
             {
                 Id = category.Id,
                 Name = category.Name,
+                Type = category.Type,
                 Description = category.Description,
                 Icon = category.Icon,
                 BadgeColor = category.BadgeColor
@@ -135,6 +140,7 @@ namespace FinanceApp.Web.Controllers
                 model.Id,
                 userId!,
                 model.Name,
+                model.Type,
                 model.Description,
                 model.Icon,
                 model.BadgeColor

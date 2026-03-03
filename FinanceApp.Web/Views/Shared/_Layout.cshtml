@@ -1,5 +1,9 @@
 <!DOCTYPE html>
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@{
+    var path = Context.Request.Path.Value?.ToLowerInvariant() ?? string.Empty;
+    var showShell = !path.Contains("/identity/account/login") && !path.Contains("/identity/account/register") && !path.Contains("/identity/account/forgotpassword") && !path.Contains("/identity/account/externallogin") && !path.Contains("/home/privacy");
+}
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -7,7 +11,7 @@
     <title>@ViewData["Title"] - FinanceApp</title>
     <link rel="icon" type="image/png" href="@Url.Content("~/financeapp-logo.png")" />
     <script type="importmap"></script>
-    <!-- Antiforgery token for AJAX POSTs - retrieved by JS for security -->
+    <!-- Antiforgery token for AJAX POSTs -->
     <meta name="request-verification-token" content="@Antiforgery.GetAndStoreTokens(Context).RequestToken" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,88 +25,100 @@
     <link rel="stylesheet" href="~/FinanceApp.Web.styles.css" asp-append-version="true" />
 </head>
 <body data-theme="light">
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm navbar-modern">
-            @{ var path = Context.Request.Path.Value?.ToLowerInvariant() ?? string.Empty; }
+
+    <!-- ── Fixed top navbar ─────────────────────────────────────── -->
+    <header class="app-header">
+        <nav class="navbar navbar-expand-lg navbar-light navbar-modern">
             <div class="container-fluid px-2 px-sm-3">
-                <!-- Brand/Logo (left) -->
-                <a class="navbar-brand fw-bold d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
-                    <img src="~/financeapp-logo.png" alt="FinanceApp Logo" class="img-fluid me-2" width="52" height="52" style="border-radius:10px;"/>
-                    <span class="d-none d-sm-inline">FinanceApp</span>
+                <!-- Brand / Logo: landing when not signed in, dashboard when signed in -->
+                <a class="navbar-brand fw-bold d-flex align-items-center gap-2" asp-area="" asp-controller="@(User.Identity?.IsAuthenticated == true ? "Home" : "Landing")" asp-action="Index">
+                    <img src="~/financeapp-logo.png" alt="FinanceApp Logo" width="26" height="26" style="border-radius:6px; flex-shrink:0;" />
+                    <span class="d-none d-sm-inline navbar-brand-text">FinanceApp</span>
                 </a>
-                
-                <!-- Right: on desktop = theme + profile; on mobile = hamburger only -->
-                <div class="d-flex align-items-center gap-2 ms-auto">
-                    <!-- Theme toggle: desktop only (mobile: use sidebar) -->
-                    <button id="themeToggle" class="theme-toggle btn btn-sm btn-outline-secondary d-none d-md-inline-flex" title="Toggle dark/light mode" aria-label="Toggle dark mode">
+
+                <!-- Right-side actions -->
+                <div class="d-flex align-items-center gap-1 ms-auto">
+                    <button id="themeToggle" class="theme-toggle navbar-icon-btn d-none d-md-inline-flex"
+                            title="Toggle dark/light mode" aria-label="Toggle dark mode">
                         <i class="bi bi-moon"></i>
                     </button>
-                    @if (!path.Contains("/identity/account/login") && !path.Contains("/identity/account/register"))
+                    @if (showShell)
                     {
-                        <!-- User profile: desktop only (mobile: use sidebar Profile link) -->
                         <div class="d-none d-md-block">
                             @await Component.InvokeAsync("UserProfile")
                         </div>
                         <!-- Hamburger: mobile only -->
-                        <button class="btn btn-sm btn-outline-secondary d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarCollapse" aria-controls="sidebarCollapse" aria-expanded="false" aria-label="Menu" title="Menu">
-                            <i class="bi bi-list"></i>
+                        <button class="navbar-icon-btn d-md-none" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#sidebarCollapse"
+                                aria-controls="sidebarCollapse" aria-expanded="false"
+                                aria-label="Menu" title="Menu">
+                            <i class="bi bi-list fs-5"></i>
                         </button>
                     }
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container-fluid">
-        <div class="row">
-            @if (!path.Contains("/identity/account/login") && !path.Contains("/identity/account/register"))
-            {
-                <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse" id="sidebarCollapse">
-                    @await Html.PartialAsync("_Sidebar")
+
+    <!-- ── App shell: sidebar + scrollable main ─────────────────── -->
+    <div class="app-shell">
+        @if (showShell)
+        {
+            <!-- Fixed sidebar (desktop) / overlay (mobile) -->
+            <aside class="app-sidebar collapse d-md-block" id="sidebarCollapse">
+                @await Html.PartialAsync("_Sidebar")
+            </aside>
+
+            <!-- Scrollable main content -->
+            <main class="app-main">
+                <div class="app-main-content">
+                    @RenderBody()
                 </div>
-                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+
+                <footer class="app-footer border-top mt-auto">
+                    <div class="container-fluid px-3 px-md-4 py-3">
+                        <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="~/financeapp-logo.png" alt="FinanceApp" width="22" height="22" class="rounded-1" />
+                                <span class="fw-semibold">FinanceApp</span>
+                            </div>
+                            <div class="d-flex flex-wrap align-items-center gap-3 small">
+                                <a asp-area="" asp-controller="Home" asp-action="Privacy" class="footer-link">Privacy</a>
+                                <a asp-area="" asp-controller="Home" asp-action="Index" class="footer-link">Dashboard</a>
+                                <span class="text-muted">&copy; @DateTime.Now.Year FinanceApp</span>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+            </main>
+        }
+        else
+        {
+            <!-- Auth pages: full-width, no sidebar -->
+            <main class="app-main app-main--full">
+                <div class="app-main-content">
                     @RenderBody()
-                </main>
-            }
-            else
-            {
-                <main class="col-12 px-md-4">
-                    @RenderBody()
-                </main>
-            }
-        </div>
+                </div>
+            </main>
+        }
     </div>
 
-    <!-- Toast container for non-blocking messages -->
+    <!-- Toast container (stays fixed regardless of scroll) -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer"></div>
 
-    <footer class="footer app-footer border-top">
-        <div class="container-fluid px-3 px-md-4 py-3">
-            <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-2">
-                <div class="d-flex align-items-center gap-2">
-                    <img src="~/financeapp-logo.png" alt="FinanceApp" width="22" height="22" class="rounded-1" />
-                    <span class="fw-semibold">FinanceApp</span>
-                </div>
-                <div class="d-flex flex-wrap align-items-center gap-3 small">
-                    <a asp-area="" asp-controller="Home" asp-action="Privacy" class="footer-link">Privacy</a>
-                    <a asp-area="" asp-controller="Home" asp-action="Index" class="footer-link">Dashboard</a>
-                    <span class="text-muted">&copy; @DateTime.Now.Year FinanceApp</span>
-                </div>
-            </div>
-        </div>
-    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/datatables.net@1.13.8/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/datatables.net-bs5@1.13.8/js/dataTables.bootstrap5.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script>
-        // Theme toggle (navbar + sidebar on mobile)
-        (function(){
-            const body = document.body;
+        // Theme toggle
+        (function () {
+            const body    = document.body;
             const toggles = document.querySelectorAll('.theme-toggle');
             const iconClass = (theme) => theme === 'dark' ? 'bi bi-sun' : 'bi bi-moon';
 
-            function setTheme(theme){
+            function setTheme(theme) {
                 body.setAttribute('data-theme', theme);
                 localStorage.setItem('theme', theme);
                 toggles.forEach(t => {
@@ -113,8 +129,7 @@
 
             const saved = localStorage.getItem('theme') || 'light';
             setTheme(saved);
-
-            toggles.forEach(t => t.addEventListener('click', function(){
+            toggles.forEach(t => t.addEventListener('click', function () {
                 setTheme(body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
             }));
         })();

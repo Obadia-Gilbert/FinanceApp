@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using FinanceApp.Domain.Enums;
 
 namespace FinanceApp.Web.Models
 {
@@ -11,6 +12,9 @@ namespace FinanceApp.Web.Models
         [Required(ErrorMessage = "Category name is required.")]
         [StringLength(100, ErrorMessage = "Category name cannot exceed 100 characters.")]
         public string Name { get; set; } = string.Empty;
+
+        [Display(Name = "Type")]
+        public CategoryType Type { get; set; } = CategoryType.Expense;
 
         [StringLength(250, ErrorMessage = "Description cannot exceed 250 characters.")]
         public string? Description { get; set; }

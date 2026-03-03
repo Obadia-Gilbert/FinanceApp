@@ -5,7 +5,7 @@
 
 <div class="mb-4">
     <h1 class="visually-hidden">Edit Profile</h1>
-    <p class="page-subtitle mb-0">Update your name and profile photo.</p>
+    <p class="page-subtitle mb-0">Update your name, phone, country, and profile photo.</p>
 </div>
 
 @if (TempData["ProfileUpdated"] as bool? == true)
@@ -54,10 +54,23 @@
                         <input asp-for="FirstName" class="form-control" placeholder="First name" />
                         <span asp-validation-for="FirstName" class="invalid-feedback d-block small"></span>
                     </div>
-                    <div class="mb-4">
+                    <div class="mb-3">
                         <label asp-for="LastName" class="form-label fw-600">Last Name</label>
                         <input asp-for="LastName" class="form-control" placeholder="Last name" />
                         <span asp-validation-for="LastName" class="invalid-feedback d-block small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="CountryCode" class="form-label fw-600">Country</label>
+                        <select asp-for="CountryCode" asp-items="ViewBag.Countries" class="form-select" id="profileCountryCode">
+                        </select>
+                        <small class="text-muted">Select country first — phone will format automatically.</small>
+                        <span asp-validation-for="CountryCode" class="invalid-feedback d-block small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="PhoneNumber" class="form-label fw-600">Phone Number</label>
+                        <input asp-for="PhoneNumber" class="form-control" type="tel" id="profilePhoneNumber" placeholder="e.g. 0712 345 678" autocomplete="tel" />
+                        <small class="text-muted">Formatted by country. Include national number or full international.</small>
+                        <span asp-validation-for="PhoneNumber" class="invalid-feedback d-block small"></span>
                     </div>
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary">
@@ -73,4 +86,41 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="https://cdn.jsdelivr.net/npm/libphonenumber-js@1.10.51/bundle.min.js" crossorigin="anonymous"></script>
+    <script>
+    (function() {
+        var countrySelect = document.getElementById('profileCountryCode');
+        var phoneInput = document.getElementById('profilePhoneNumber');
+        if (!countrySelect || !phoneInput) return;
+        var lib = window.libphonenumber;
+        if (!lib) return;
+
+        function getCountry() {
+            var code = (countrySelect.value || '').trim().toUpperCase();
+            return code || null;
+        }
+
+        function formatPhone() {
+            var country = getCountry();
+            var value = (phoneInput.value || '').trim().replace(/\s+/g, '');
+            if (!value) return;
+            try {
+                if (country) {
+                    var formatter = new lib.AsYouType(country);
+                    var digits = value.replace(/\D/g, '');
+                    if (digits.length > 0) formatter.input(digits);
+                    var num = formatter.getNumber();
+                    if (num) phoneInput.value = num.formatInternational();
+                } else {
+                    var parsed = lib.parsePhoneNumber(value);
+                    if (parsed) phoneInput.value = parsed.formatInternational();
+                }
+            } catch (e) {}
+        }
+
+        countrySelect.addEventListener('change', formatPhone);
+        phoneInput.addEventListener('blur', formatPhone);
+        if (phoneInput.value && getCountry()) formatPhone();
+    })();
+    </script>
 }

@@ -1,0 +1,171 @@
+@*
+    Reusable supporting documents widget.
+    Usage:
+        @await Html.PartialAsync("_SupportingDocuments", new FinanceApp.Web.Models.SupportingDocumentsViewModel
+        {
+            EntityType = DocumentEntityType.Expense,
+            EntityId   = expense.Id,
+            Documents  = documents,
+            ReturnUrl  = Url.Action("Index", "Expense") ?? "/Expense",
+            ReloadUrl  = Url.Action("Edit",  "Expense", new { id = expense.Id })
+        })
+
+    IMPORTANT: render this partial OUTSIDE any parent <form> — it contains its own forms.
+*@
+@model FinanceApp.Web.Models.SupportingDocumentsViewModel
+@using FinanceApp.Domain.Enums
+
+@{
+    var widgetId   = $"docs-{Model.EntityId:N}";
+    var collapseId = $"docsCollapse-{Model.EntityId:N}";
+    var modalId    = $"previewModal-{Model.EntityId:N}";
+    var hasReload  = !string.IsNullOrEmpty(Model.ReloadUrl);
+}
+
+<div class="supporting-docs-widget mt-3"
+     id="@widgetId"
+     data-reload-url="@Model.ReloadUrl"
+     data-entity-type="@Model.EntityType"
+     data-entity-id="@Model.EntityId">
+
+    <!-- ---- Header toggle ---- -->
+    <div class="d-flex align-items-center justify-content-between mb-2">
+        <button class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#@collapseId"
+                aria-expanded="@(Model.Documents.Any() ? "true" : "false")"
+                aria-controls="@collapseId">
+            <i class="bi bi-paperclip"></i>
+            <span>Supporting Documents</span>
+            @if (Model.Documents.Any())
+            {
+                <span class="badge bg-secondary">@Model.Documents.Count()</span>
+            }
+        </button>
+    </div>
+
+    <!-- ---- Collapsible body ---- -->
+    <div class="collapse @(Model.Documents.Any() ? "show" : "")" id="@collapseId">
+
+        @if (Model.Documents.Any())
+        {
+            <div class="list-group list-group-flush mb-3 rounded border" style="border-color: var(--color-border) !important;">
+                @foreach (var doc in Model.Documents)
+                {
+                    var isImage   = doc.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase);
+                    var isPdf     = doc.ContentType.Equals("application/pdf", StringComparison.OrdinalIgnoreCase);
+                    var isWord    = doc.ContentType.Contains("word", StringComparison.OrdinalIgnoreCase);
+                    var isExcel   = doc.ContentType.Contains("excel", StringComparison.OrdinalIgnoreCase) || doc.ContentType.Contains("spreadsheet", StringComparison.OrdinalIgnoreCase);
+                    var sizeKb    = (doc.FileSizeBytes / 1024.0).ToString("F0");
+                    var icon      = isImage ? "bi-file-image" : isPdf ? "bi-file-pdf" : isWord ? "bi-file-word" : isExcel ? "bi-file-excel" : "bi-file-earmark";
+                    var iconColor = isImage ? "text-success" : isPdf ? "text-danger" : isWord ? "text-primary" : isExcel ? "text-success" : "text-secondary";
+
+                    <div class="list-group-item d-flex align-items-center gap-2 py-2 px-3">
+                        <i class="bi @icon @iconColor fs-5 flex-shrink-0"></i>
+                        <div class="flex-grow-1" style="min-width:0;">
+                            <div class="text-truncate fw-500 small" title="@doc.OriginalFileName">@doc.OriginalFileName</div>
+                            <div class="text-muted" style="font-size:0.75rem;">
+                                @sizeKb KB
+                                @if (!string.IsNullOrEmpty(doc.Label))
+                                {
+                                    <span class="ms-2 badge bg-light text-dark border">@doc.Label</span>
+                                }
+                                <span class="ms-2">@doc.CreatedAt.ToString("yyyy-MM-dd")</span>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-1 flex-shrink-0">
+                            @if (isImage || isPdf)
+                            {
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-secondary btn-preview-doc"
+                                        data-preview-url="@Url.Action("Preview", "SupportingDocument", new { id = doc.Id })"
+                                        data-modal-id="@modalId"
+                                        data-content-type="@doc.ContentType"
+                                        title="Preview @doc.OriginalFileName">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            }
+                            <a href="@Url.Action("Download", "SupportingDocument", new { id = doc.Id })"
+                               class="btn btn-sm btn-outline-secondary"
+                               title="Download @doc.OriginalFileName">
+                                <i class="bi bi-download"></i>
+                            </a>
+                            <form method="post"
+                                  asp-action="Delete"
+                                  asp-controller="SupportingDocument"
+                                  asp-route-id="@doc.Id"
+                                  asp-route-returnUrl="@Model.ReturnUrl"
+                                  style="display:inline"
+                                  data-docs-delete-form>
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-muted small mb-3">
+                <i class="bi bi-info-circle me-1"></i>No documents attached yet.
+            </p>
+        }
+
+        <!-- ---- Upload form ---- -->
+        <form method="post"
+              asp-action="Upload"
+              asp-controller="SupportingDocument"
+              asp-route-returnUrl="@Model.ReturnUrl"
+              enctype="multipart/form-data"
+              class="d-flex align-items-end gap-2 flex-wrap"
+              data-docs-upload-form>
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="entityType" value="@((int)Model.EntityType)" />
+            <input type="hidden" name="entityId"   value="@Model.EntityId" />
+
+            <div class="flex-grow-1" style="min-width:180px;">
+                <label class="form-label mb-1" style="font-size:.8125rem;">Attach a file</label>
+                <input type="file"
+                       name="file"
+                       class="form-control form-control-sm"
+                       accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx"
+                       required />
+                <div class="form-text">Max 10 MB &nbsp;·&nbsp; JPG, PNG, PDF, Word, Excel</div>
+            </div>
+            <div style="min-width:120px;">
+                <label class="form-label mb-1" style="font-size:.8125rem;">Label <span class="text-muted">(optional)</span></label>
+                <input type="text" name="label" class="form-control form-control-sm" placeholder="e.g. Receipt" maxlength="200" />
+            </div>
+            <div class="pb-4">
+                <button type="submit" class="btn btn-sm btn-primary docs-upload-btn">
+                    <i class="bi bi-upload me-1"></i><span class="docs-upload-label">Upload</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ---- Preview modal (one per widget instance) ---- -->
+<div class="modal fade" id="@modalId" tabindex="-1" aria-labelledby="@(modalId)Label" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="@(modalId)Label">
+                    <i class="bi bi-eye me-2"></i>Document Preview
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0 text-center bg-dark" style="min-height:300px;" id="@(modalId)Content">
+                <div class="d-flex align-items-center justify-content-center py-5">
+                    <span class="spinner-border text-light" role="status">
+                        <span class="visually-hidden">Loading…</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

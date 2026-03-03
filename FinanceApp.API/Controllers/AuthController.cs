@@ -112,7 +112,8 @@ public class AuthController : ControllerBase
 
     private async Task<LoginResponse> BuildLoginResponseAsync(ApplicationUser user)
     {
-        var jwt = GenerateJwt(user);
+        var roles = await _userManager.GetRolesAsync(user);
+        var jwt = GenerateJwt(user, roles);
         var refreshToken = await _refreshTokenService.CreateAsync(
             user.Id,
             expirationDays: int.TryParse(_config["Jwt:RefreshExpirationDays"], out var d) ? d : 30);
@@ -126,14 +127,14 @@ public class AuthController : ControllerBase
             user.LastName ?? "");
     }
 
-    private (string Token, DateTime ExpiresAt) GenerateJwt(ApplicationUser user)
+    private (string Token, DateTime ExpiresAt) GenerateJwt(ApplicationUser user, IList<string> roles)
     {
         var key = _config["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key is required.");
         var issuer = _config["Jwt:Issuer"] ?? "FinanceApp.API";
         var audience = _config["Jwt:Audience"] ?? "FinanceApp";
         var expMinutes = int.TryParse(_config["Jwt:ExpirationMinutes"], out var m) ? m : 30;
 
-        var claims = new[]
+        var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id),
             new Claim(ClaimTypes.Email, user.Email ?? ""),
@@ -143,6 +144,8 @@ public class AuthController : ControllerBase
             new Claim(JwtRegisteredClaimNames.FamilyName, user.LastName ?? ""),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
+        foreach (var role in roles)
+            claims.Add(new Claim(ClaimTypes.Role, role));
 
         var creds = new SigningCredentials(
             new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
@@ -150,7 +153,6 @@ public class AuthController : ControllerBase
 
         var expiresAt = DateTime.UtcNow.AddMinutes(expMinutes);
         var token = new JwtSecurityToken(issuer, audience, claims, expires: expiresAt, signingCredentials: creds);
-
         return (new JwtSecurityTokenHandler().WriteToken(token), expiresAt);
     }
 }

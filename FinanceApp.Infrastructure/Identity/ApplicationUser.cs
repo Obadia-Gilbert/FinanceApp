@@ -14,6 +14,12 @@ public class ApplicationUser : IdentityUser
     /// <summary>Relative path for profile image (e.g. /uploads/profiles/xxx.jpg).</summary>
     public string? ProfileImagePath { get; set; }
 
+    /// <summary>Country name (e.g. Tanzania, United States) for display and reporting.</summary>
+    public string? Country { get; set; }
+
+    /// <summary>ISO 3166-1 alpha-2 country code (e.g. TZ, US) for phone dialing and APIs.</summary>
+    public string? CountryCode { get; set; }
+
     /// <summary>Current subscription plan (defaults to Free).</summary>
     public SubscriptionPlan SubscriptionPlan { get; set; } = SubscriptionPlan.Free;
 

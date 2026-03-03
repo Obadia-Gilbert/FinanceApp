@@ -1,5 +1,6 @@
 using FinanceApp.Application.Common;
 using FinanceApp.Domain.Entities;
+using FinanceApp.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -11,6 +12,13 @@ namespace FinanceApp.Application.Interfaces.Services
     {
         Task<Category?> GetByIdAsync(Guid id, string userId);
         Task<IEnumerable<Category>> GetAllAsync(string userId);
+
+        /// <summary>Categories that can be used for expenses (Type is Expense or Both).</summary>
+        Task<IEnumerable<Category>> GetCategoriesForExpenseAsync(string userId);
+
+        /// <summary>Categories that can be used for income (Type is Income or Both).</summary>
+        Task<IEnumerable<Category>> GetCategoriesForIncomeAsync(string userId);
+
         Task<PagedResult<Category>> GetPagedCategoriesAsync(
             int pageNumber,
             int pageSize,
@@ -19,8 +27,8 @@ namespace FinanceApp.Application.Interfaces.Services
             Func<IQueryable<Category>, IOrderedQueryable<Category>>? orderBy = null
         );
 
-        Task<Category> CreateCategoryAsync(string name, string userId, string? description = null, string? icon = null, string? badgeColor = null);
-        Task UpdateCategoryAsync(Guid id, string userId, string name, string? description = null, string? icon = null, string? badgeColor = null);
+        Task<Category> CreateCategoryAsync(string name, string userId, CategoryType type = CategoryType.Expense, string? description = null, string? icon = null, string? badgeColor = null);
+        Task UpdateCategoryAsync(Guid id, string userId, string name, CategoryType type, string? description = null, string? icon = null, string? badgeColor = null);
         Task DeleteCategoryAsync(Guid id, string userId);
         Task AssignDefaultCategoriesToUserAsync(string userId);
 

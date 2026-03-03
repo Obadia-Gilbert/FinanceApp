@@ -1,0 +1,104 @@
+@{
+    Layout = "~/Views/Shared/_LayoutLanding.cshtml";
+    ViewData["Title"] = "FinanceApp – Personal Finance & Budget Tracker";
+}
+@section Head {
+    <meta name="keywords" content="personal finance, budget tracker, expense tracker, manage money, spending, categories, multi-currency" />
+}
+
+<section class="landing-hero">
+    <div class="container">
+        <h1>Take control of your money</h1>
+        <p class="lead">Track expenses, set budgets, and see where your money goes. One simple app for your personal finance—free to start.</p>
+        <div class="landing-cta-group">
+            <a class="btn btn-primary btn-lg px-4" asp-area="Identity" asp-page="/Account/Register" asp-route-returnUrl="/Home/Index">Get started free</a>
+            <a class="btn btn-outline-secondary btn-lg px-4" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="/Home/Index">Sign in</a>
+        </div>
+        <p class="small text-muted">No credit card required · Free to use</p>
+    </div>
+</section>
+
+<section class="landing-section" id="features">
+    <div class="container">
+        <h2 class="landing-section-title">Everything you need to manage your finances</h2>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="landing-feature-card">
+                    <i class="bi bi-wallet2"></i>
+                    <h3>Track expenses</h3>
+                    <p>Log spending by category and date. See totals and trends at a glance.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="landing-feature-card">
+                    <i class="bi bi-pie-chart"></i>
+                    <h3>Categories & insights</h3>
+                    <p>Organize with custom categories. Break down spending by type and time.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="landing-feature-card">
+                    <i class="bi bi-graph-up"></i>
+                    <h3>Budgets that work</h3>
+                    <p>Set monthly budgets per category and get alerts before you overspend.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="landing-feature-card">
+                    <i class="bi bi-currency-exchange"></i>
+                    <h3>Multi-currency</h3>
+                    <p>Record transactions in your currency. View equivalents and totals in one place.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="landing-section" id="how-it-works">
+    <div class="container">
+        <h2 class="landing-section-title">How it works</h2>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <ol class="landing-steps">
+                    <li>
+                        <div>
+                            <h4>Create your account</h4>
+                            <p>Sign up in seconds with email or use Google, Facebook, or Twitter.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <h4>Add expenses and categories</h4>
+                            <p>Start logging what you spend. Use default categories or create your own (expense, income, or both).</p>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <h4>Set budgets and check the dashboard</h4>
+                            <p>Define monthly limits and see spending vs budget, trends, and recent activity in one dashboard.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <h4>Stay in control</h4>
+                            <p>Export to Excel, attach documents to transactions, and keep everything in one secure place.</p>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="landing-section">
+    <div class="container">
+        <div class="landing-cta-block">
+            <h2>Ready to get started?</h2>
+            <p class="mb-0">Join FinanceApp and start managing your money with clarity.</p>
+            <div class="landing-cta-group mt-3">
+                <a class="btn btn-primary btn-lg px-4" asp-area="Identity" asp-page="/Account/Register" asp-route-returnUrl="/Home/Index">Get started free</a>
+                <a class="btn btn-outline-secondary btn-lg px-4" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="/Home/Index">Sign in</a>
+            </div>
+        </div>
+    </div>
+</section>

@@ -3,7 +3,7 @@ using FinanceApp.Application.Interfaces;
 using FinanceApp.Application.Interfaces.Services;
 using FinanceApp.Domain.Entities;
 using FinanceApp.Domain.Enums;
-using FinanceApp.Infrastructure.Extensions;
+using FinanceApp.Application.Extensions;
 using System.Linq.Expressions;
 
 namespace FinanceApp.Application.Services;
@@ -81,6 +81,23 @@ public class TransactionService : ITransactionService
         transaction.UpdateNote(note);
 
         _repository.Update(transaction);
+
+        // If this is one leg of a transfer, keep the paired leg in sync (amount, date, note)
+        if (transaction.TransferGroupId.HasValue)
+        {
+            var pairs = await _repository.FindAsync(t =>
+                t.UserId == userId &&
+                t.TransferGroupId == transaction.TransferGroupId &&
+                t.Id != id);
+            foreach (var pair in pairs)
+            {
+                pair.UpdateAmount(amount);
+                pair.UpdateDate(date);
+                pair.UpdateNote(note);
+                _repository.Update(pair);
+            }
+        }
+
         await _repository.SaveChangesAsync();
     }
 
@@ -88,7 +105,21 @@ public class TransactionService : ITransactionService
     {
         var transaction = await GetByIdAsync(id, userId)
             ?? throw new InvalidOperationException("Transaction not found.");
-        _repository.SoftDelete(transaction);
+
+        if (transaction.TransferGroupId.HasValue)
+        {
+            var group = await _repository.FindAsync(t =>
+                t.UserId == userId && t.TransferGroupId == transaction.TransferGroupId);
+            foreach (var t in group)
+            {
+                _repository.SoftDelete(t);
+            }
+        }
+        else
+        {
+            _repository.SoftDelete(transaction);
+        }
+
         await _repository.SaveChangesAsync();
     }
 }

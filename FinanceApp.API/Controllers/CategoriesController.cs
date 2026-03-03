@@ -58,6 +58,7 @@ public class CategoriesController : ControllerBase
         var category = await _categoryService.CreateCategoryAsync(
             request.Name,
             UserId,
+            request.Type,
             request.Description,
             request.Icon,
             request.BadgeColor);
@@ -81,6 +82,7 @@ public class CategoriesController : ControllerBase
             id,
             UserId,
             request.Name,
+            request.Type,
             request.Description,
             request.Icon,
             request.BadgeColor);
@@ -108,6 +110,7 @@ public class CategoriesController : ControllerBase
     private static CategoryDto MapToDto(Category c) => new(
         c.Id,
         c.Name,
+        c.Type.ToString(),
         c.Description,
         c.Icon,
         c.BadgeColor);

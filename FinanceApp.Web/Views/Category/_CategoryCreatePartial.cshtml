@@ -9,10 +9,11 @@
         <span asp-validation-for="Name" class="invalid-feedback d-block small"></span>
     </div>
 
-    <!-- Type (mockup-style: Expense) -->
+    <!-- Type: where this category can be used (Expense form, Income form, or Both) -->
     <div class="mb-4">
-        <label class="form-label fw-600">Type</label>
-        <div class="form-control form-control-lg bg-light text-muted">Expense</div>
+        <label asp-for="Type" class="form-label fw-600">Type</label>
+        <select asp-for="Type" class="form-select form-select-lg" asp-items="Html.GetEnumSelectList<FinanceApp.Domain.Enums.CategoryType>()"></select>
+        <small class="text-muted d-block mt-1">Expense = only when recording expenses; Income = only when recording income; Both = either.</small>
     </div>
 
     <!-- Icon Selection -->

@@ -1,8 +1,8 @@
 using FinanceApp.Application.Interfaces.Services;
 using FinanceApp.Domain.Entities;
 using FinanceApp.Domain.Enums;
-using Microsoft.AspNetCore.Mvc;
 using FinanceApp.Web.Models;
+using Microsoft.AspNetCore.Mvc;
 using FinanceApp.Infrastructure.Identity; // for ApplicationUser
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
@@ -16,33 +16,37 @@ namespace FinanceApp.Web.Controllers;
 public class ExpenseController : Controller
 {
     private readonly IExpenseService _expenseService;
-    private readonly IRepository<Category> _categoryRepository;
+    private readonly ICategoryService _categoryService;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly ISupportingDocumentService _documentService;
 
     public ExpenseController(
         IExpenseService expenseService,
-        IRepository<Category> categoryRepository,
-        UserManager<ApplicationUser> userManager)
+        ICategoryService categoryService,
+        UserManager<ApplicationUser> userManager,
+        ISupportingDocumentService documentService)
     {
         _expenseService = expenseService;
-        _categoryRepository = categoryRepository;
+        _categoryService = categoryService;
         _userManager = userManager;
+        _documentService = documentService;
     }
 
     // GET: /Expense
-    public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10)
+    // Loads ALL user expenses — DataTables handles client-side pagination/search/sort.
+    public async Task<IActionResult> Index()
     {
         var userId = _userManager.GetUserId(User);
         if (userId == null) return Unauthorized();
 
-        var pagedExpenses = await _expenseService.GetPagedExpensesAsync(
-            pageNumber,
-            pageSize,
-            e => e.UserId == userId,           // show only current user's expenses
-            q => q.OrderByDescending(e => e.ExpenseDate)
+        var allExpenses = await _expenseService.GetPagedExpensesAsync(
+            pageNumber: 1,
+            pageSize: int.MaxValue,
+            filter: e => e.UserId == userId,
+            orderBy: q => q.OrderByDescending(e => e.ExpenseDate)
         );
 
-        return View(pagedExpenses);
+        return View(allExpenses);
     }
 
     // GET: /Expense/Create
@@ -57,7 +61,7 @@ public class ExpenseController : Controller
             ExpenseDate = DateTime.Today
         };
 
-        ViewBag.Categories = await GetUserCategoriesDistinctByNameAsync(userId);
+        ViewBag.Categories = await _categoryService.GetCategoriesForExpenseAsync(userId);
         ViewBag.Currencies = Enum.GetValues(typeof(Currency));
 
         bool isAjax = partial ||
@@ -81,7 +85,7 @@ public class ExpenseController : Controller
 
         if (!ModelState.IsValid)
         {
-            ViewBag.Categories = await GetUserCategoriesDistinctByNameAsync(userId);
+            ViewBag.Categories = await _categoryService.GetCategoriesForExpenseAsync(userId);
             ViewBag.Currencies = Enum.GetValues(typeof(Currency));
             if (isAjax)
             {
@@ -110,7 +114,7 @@ public class ExpenseController : Controller
                 var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads/receipts");
                 if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
 
-                var category = await _categoryRepository.GetByIdAsync(model.CategoryId);
+                var category = await _categoryService.GetByIdAsync(model.CategoryId, userId);
                 var categoryName = category?.Name.Replace(" ", "-") ?? "Unknown";
                 var dateString = model.ExpenseDate.ToString("yyyy-MM-dd");
                 var expenseId = Guid.NewGuid();
@@ -127,7 +131,7 @@ public class ExpenseController : Controller
         }
         if (!ModelState.IsValid)
         {
-            ViewBag.Categories = await GetUserCategoriesDistinctByNameAsync(userId);
+            ViewBag.Categories = await _categoryService.GetCategoriesForExpenseAsync(userId);
             ViewBag.Currencies = Enum.GetValues(typeof(Currency));
             if (isAjax) return PartialView("_ExpenseCreatePartial", model);
             return View(model);
@@ -155,10 +159,12 @@ public class ExpenseController : Controller
     // Optional ?partial=true or AJAX header to return layout‑less form for offcanvas
     public async Task<IActionResult> Edit(Guid id, bool partial = false)
     {
-        var expense = await _expenseService.GetByIdAsync(id);
-        if (expense == null) return NotFound();
         var userId = _userManager.GetUserId(User);
         if (userId == null) return Unauthorized();
+
+        var expense = await _expenseService.GetByIdAsync(id);
+        if (expense == null) return NotFound();
+        if (expense.UserId != userId) return Forbid();
 
         var model = new ExpenseEditViewModel
         {
@@ -171,8 +177,10 @@ public class ExpenseController : Controller
             ReceiptPath = expense.ReceiptPath
         };
 
-        ViewBag.Categories = await GetUserCategoriesDistinctByNameAsync(userId);
+        ViewBag.Categories = await _categoryService.GetCategoriesForExpenseAsync(userId);
         ViewBag.Currencies = Enum.GetValues(typeof(Currency));
+        ViewBag.SupportingDocs = await _documentService.GetForEntityAsync(
+            DocumentEntityType.Expense, id, userId);
 
         bool isAjax = partial ||
                      string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
@@ -195,7 +203,7 @@ public class ExpenseController : Controller
 
         if (!ModelState.IsValid)
         {
-            ViewBag.Categories = await GetUserCategoriesDistinctByNameAsync(userId);
+            ViewBag.Categories = await _categoryService.GetCategoriesForExpenseAsync(userId);
             ViewBag.Currencies = Enum.GetValues(typeof(Currency));
             if (isAjax)
             {
@@ -220,7 +228,7 @@ public class ExpenseController : Controller
             {
                 var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads/receipts");
                 if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
-                var category = await _categoryRepository.GetByIdAsync(model.CategoryId);
+                var category = await _categoryService.GetByIdAsync(model.CategoryId, userIdCheck);
                 var categoryName = category?.Name.Replace(" ", "-") ?? "Unknown";
                 var dateString = model.ExpenseDate.ToString("yyyy-MM-dd");
                 var fileName = $"Expense-{categoryName}-{dateString}-{expense.Id}{ext}";
@@ -253,15 +261,19 @@ public class ExpenseController : Controller
     // GET: /Expense/Delete/{id}
     public async Task<IActionResult> Delete(Guid id, bool partial = false)
     {
+        var userId = _userManager.GetUserId(User);
+        if (userId == null) return Unauthorized();
+
         var expense = await _expenseService.GetByIdAsync(id);
         if (expense == null) return NotFound();
+        if (expense.UserId != userId) return Forbid();
 
         var vm = new ExpenseDeleteViewModel
         {
             Id = expense.Id,
             Description = expense.Description,
             Currency = expense.Currency,
-            CategoryName = (await _categoryRepository.GetByIdAsync(expense.CategoryId))?.Name ?? "",
+            CategoryName = (await _categoryService.GetByIdAsync(expense.CategoryId, userId!))?.Name ?? "",
             Amount = expense.Amount,
             ExpenseDate = expense.ExpenseDate
         };
@@ -280,6 +292,13 @@ public class ExpenseController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(Guid id)
     {
+        var userId = _userManager.GetUserId(User);
+        if (userId == null) return Unauthorized();
+
+        var expense = await _expenseService.GetByIdAsync(id);
+        if (expense == null) return NotFound();
+        if (expense.UserId != userId) return Forbid();
+
         bool isAjax = string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
         await _expenseService.SoftDeleteExpenseAsync(id);
         if (isAjax)
@@ -321,7 +340,15 @@ public class ExpenseController : Controller
     // GET: /Expense/DownloadExcel
     public async Task<IActionResult> DownloadExcel()
     {
-        var expenses = await _expenseService.GetAllAsync();
+        var userId = _userManager.GetUserId(User);
+        if (userId == null) return Unauthorized();
+
+        var paged = await _expenseService.GetPagedExpensesAsync(
+            pageNumber: 1,
+            pageSize: int.MaxValue,
+            filter: e => e.UserId == userId,
+            orderBy: q => q.OrderByDescending(e => e.ExpenseDate));
+        var expenses = paged.Items;
 
         using var workbook = new XLWorkbook();
         var worksheet = workbook.Worksheets.Add("Expenses");
@@ -373,89 +400,4 @@ public class ExpenseController : Controller
         return View("Index", expenses);
     }
 
-    private async Task<IEnumerable<Category>> GetUserCategoriesDistinctByNameAsync(string userId)
-    {
-        var categories = await _categoryRepository.FindAsync(c => c.UserId == userId);
-        return categories
-            .Where(c => !string.IsNullOrWhiteSpace(c.Name))
-            .GroupBy(c => c.Name.Trim(), StringComparer.OrdinalIgnoreCase)
-            .Select(g => g.OrderBy(c => c.Name).First())
-            .OrderBy(c => c.Name)
-            .ToList();
-    }
-
 }
-
-
-// ==============================   
-/*
-    Notes:
-    - For simplicity, file uploads are stored in wwwroot/uploads/receipts. In production, consider using cloud storage (e.g., Azure Blob Storage, AWS S3).
-    - The DownloadExcel action generates an Excel file with all expenses. In a real app, you might want to add filters (e.g., by date range, category) before exporting.
-    - The Create and Edit views should have forms that bind to ExpenseCreateViewModel and ExpenseEditViewModel respectively, including file upload fields for receipts.
-    - Ensure that the necessary client-side validation and user feedback are implemented in the views for a better user experience.
-*/
-
-// ==============================
-// The above code is a complete implementation of the ExpenseController with CRUD operations, file upload handling, and Excel export functionality. It interacts with the IExpenseService for business logic and uses repositories to fetch related data like categories. The views (not shown here) should be designed to work with the provided view models and support the necessary form fields and actions.
-
-// ==============================
-// The following is improved DownloadExcel method that generates an Excel file with all expenses, including their descriptions, amounts, currencies, categories, and expense dates. The file is returned as a downloadable response to the user.
-/* public async Task<IActionResult> DownloadExcel()
-{
-    var expenses = await _expenseService.GetAllAsync();
-
-    using var workbook = new XLWorkbook();
-    var worksheet = workbook.Worksheets.Add("Expenses");
-
-    // ===== Header Row =====
-    worksheet.Cell(1, 1).Value = "Description";
-    worksheet.Cell(1, 2).Value = "Amount";
-    worksheet.Cell(1, 3).Value = "Currency";
-    worksheet.Cell(1, 4).Value = "Category";
-    worksheet.Cell(1, 5).Value = "Expense Date";
-
-    var headerRange = worksheet.Range(1, 1, 1, 5);
-    headerRange.Style.Font.Bold = true;
-    headerRange.Style.Fill.BackgroundColor = XLColor.LightGray;
-    headerRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-
-    // ===== Data Rows =====
-    int row = 2;
-    foreach (var expense in expenses)
-    {
-        worksheet.Cell(row, 1).Value = expense.Description;
-
-        worksheet.Cell(row, 2).Value = expense.Amount;
-        worksheet.Cell(row, 2).Style.NumberFormat.Format = "#,##0.00";
-
-        worksheet.Cell(row, 3).Value = expense.Currency.ToString();
-        worksheet.Cell(row, 4).Value = expense.Category?.Name;
-
-        worksheet.Cell(row, 5).Value = expense.ExpenseDate;
-        worksheet.Cell(row, 5).Style.DateFormat.Format = "yyyy-MM-dd";
-
-        row++;
-    }
-
-    // ===== Create Table Style =====
-    var tableRange = worksheet.Range(1, 1, row - 1, 5);
-    var table = tableRange.CreateTable();
-    table.Theme = XLTableTheme.TableStyleMedium2;
-
-    // ===== Auto-fit Columns =====
-    worksheet.Columns().AdjustToContents();
-
-    // ===== Freeze Header Row =====
-    worksheet.SheetView.FreezeRows(1);
-
-    using var stream = new MemoryStream();
-    workbook.SaveAs(stream);
-    var content = stream.ToArray();
-
-    return File(
-        content,
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        $"Expenses_{DateTime.Now:yyyyMMdd}.xlsx"
-    );
-} */

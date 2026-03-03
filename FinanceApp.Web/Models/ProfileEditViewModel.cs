@@ -12,6 +12,19 @@ public class ProfileEditViewModel
     [Display(Name = "Last Name")]
     public string? LastName { get; set; }
 
+    [Phone]
+    [StringLength(20)]
+    [Display(Name = "Phone Number")]
+    public string? PhoneNumber { get; set; }
+
+    [StringLength(100)]
+    [Display(Name = "Country")]
+    public string? Country { get; set; }
+
+    [StringLength(10)]
+    [Display(Name = "Country Code")]
+    public string? CountryCode { get; set; }
+
     [Display(Name = "Profile Photo")]
     public IFormFile? ProfileImage { get; set; }
 

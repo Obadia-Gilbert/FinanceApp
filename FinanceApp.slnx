@@ -4,4 +4,6 @@
   <Project Path="FinanceApp.Infrastructure/FinanceApp.Infrastructure.csproj" />
   <Project Path="FinanceApp.Web/FinanceApp.Web.csproj" />
   <Project Path="FinanceApp.API/FinanceApp.API.csproj" />
+  <Project Path="FinanceApp.Tests/FinanceApp.Tests.csproj" />
+  <Project Path="FinanceApp.API.Tests/FinanceApp.API.Tests.csproj" />
 </Solution>

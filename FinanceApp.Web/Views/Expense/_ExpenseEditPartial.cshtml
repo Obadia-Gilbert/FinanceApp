@@ -1,7 +1,11 @@
 @model FinanceApp.Web.Models.ExpenseEditViewModel
+@using FinanceApp.Domain.Enums
+@using FinanceApp.Web.Models
 
 @{
-    var categories = ViewBag.Categories as IEnumerable<FinanceApp.Domain.Entities.Category> ?? Enumerable.Empty<FinanceApp.Domain.Entities.Category>();
+    var categories    = ViewBag.Categories as IEnumerable<FinanceApp.Domain.Entities.Category> ?? Enumerable.Empty<FinanceApp.Domain.Entities.Category>();
+    var supportingDocs = ViewBag.SupportingDocs as IEnumerable<FinanceApp.Domain.Entities.SupportingDocument>
+                       ?? Enumerable.Empty<FinanceApp.Domain.Entities.SupportingDocument>();
 }
 
 <form asp-action="Edit" method="post" enctype="multipart/form-data" class="p-3">
@@ -15,13 +19,14 @@
 
     <div class="mb-3">
         <label asp-for="Amount" class="form-label">Amount</label>
-        <input asp-for="Amount" class="form-control" readonly />
+        <input asp-for="Amount" class="form-control" />
+        <span asp-validation-for="Amount" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label asp-for="Currency" class="form-label">Currency</label>
-        <select asp-for="Currency" class="form-select" >
-            @foreach (var currency in Enum.GetValues(typeof(FinanceApp.Domain.Enums.Currency)))
+        <select asp-for="Currency" class="form-select">
+            @foreach (var currency in Enum.GetValues(typeof(Currency)))
             {
                 <option value="@currency">@currency</option>
             }
@@ -30,7 +35,7 @@
 
     <div class="mb-3">
         <label asp-for="ExpenseDate" class="form-label">Expense Date</label>
-        <input asp-for="ExpenseDate" type="date" class="form-control"  />
+        <input asp-for="ExpenseDate" type="date" class="form-control" />
     </div>
 
     <div class="mb-3">
@@ -38,74 +43,89 @@
         <select asp-for="CategoryId" class="form-select">
             @foreach (var cat in categories)
             {
-                <option value="@cat.Id" selected="@(cat.Id == Model.CategoryId)">
-                    @cat.Name
-                </option>
+                <option value="@cat.Id" selected="@(cat.Id == Model.CategoryId)">@cat.Name</option>
             }
         </select>
     </div>
 
-    <div class="mb-3">
-        <label class="form-label">Receipt / supporting document</label>
-        @if (!string.IsNullOrEmpty(Model.ReceiptPath))
-        {
-            <div class="d-flex align-items-center gap-2 mb-2">
-                <a href="@Url.Action("Receipt", "Expense", new { id = Model.Id })" target="_blank" class="btn btn-sm btn-outline-primary" title="View receipt">
-                    <i class="bi bi-eye me-1"></i>View receipt
+    @* Legacy receipt — show read-only view/preview links if one exists *@
+    @if (!string.IsNullOrEmpty(Model.ReceiptPath))
+    {
+        <div class="mb-3">
+            <label class="form-label small text-muted">Original receipt (legacy)</label>
+            <div class="d-flex align-items-center gap-2">
+                <a href="@Url.Action("Receipt", "Expense", new { id = Model.Id })"
+                   target="_blank"
+                   class="btn btn-sm btn-outline-secondary"
+                   title="View receipt in new tab">
+                    <i class="bi bi-eye me-1"></i>View
                 </a>
-                <button type="button" class="btn btn-sm btn-outline-secondary btn-preview-receipt" data-expense-id="@Model.Id" title="Preview in modal">
+                <button type="button"
+                        class="btn btn-sm btn-outline-secondary btn-preview-receipt"
+                        data-expense-id="@Model.Id"
+                        title="Preview in modal">
                     <i class="bi bi-zoom-in me-1"></i>Preview
                 </button>
             </div>
-        }
-        <label asp-for="ReceiptFile" class="form-label small text-muted">@(string.IsNullOrEmpty(Model.ReceiptPath) ? "Upload receipt (optional)" : "Replace receipt (optional)")</label>
-        <input asp-for="ReceiptFile" type="file" class="form-control form-control-sm receipt-file-input" accept=".jpg,.jpeg,.png,.gif,.webp,.pdf" />
-        <small class="text-muted">JPG, PNG, GIF, WebP or PDF. Max 5MB.</small>
+        </div>
         <input type="hidden" asp-for="ReceiptPath" />
-    </div>
+    }
 
-    <div class="mb-3 d-flex justify-content-end gap-2">
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    <div class="d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>Save Changes
+        </button>
     </div>
 </form>
+
+@* Supporting Documents widget — OUTSIDE the main form (contains its own forms) *@
+<div class="border-top px-3 pt-2 pb-3">
+    @await Html.PartialAsync("_SupportingDocuments", new SupportingDocumentsViewModel
+    {
+        EntityType = DocumentEntityType.Expense,
+        EntityId   = Model.Id,
+        Documents  = supportingDocs,
+        ReturnUrl  = Url.Action("Index", "Expense") ?? "/Expense",
+        ReloadUrl  = Url.Action("Edit",  "Expense", new { id = Model.Id })
+    })
+</div>
 
 <partial name="_ValidationScriptsPartial" />
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.querySelector('#expenseOffcanvasContent form') || document.querySelector('form');
+    (function () {
+        var form = document.querySelector('#expenseOffcanvasContent form');
         if (!form) return;
 
-        form.addEventListener('submit', async function(e) {
+        form.addEventListener('submit', async function (e) {
             e.preventDefault();
-            const formData = new FormData(form);
-            const action = form.getAttribute('action') || window.location.href;
-            const res = await fetch(action, {
+            var formData = new FormData(form);
+            var action = form.getAttribute('action') || window.location.href;
+            var res = await fetch(action, {
                 method: 'POST',
                 headers: { 'X-Requested-With': 'XMLHttpRequest' },
                 body: formData
             });
 
-            const contentType = res.headers.get('content-type') || '';
-            if (contentType.indexOf('application/json') !== -1) {
-                const json = await res.json();
+            var contentType = res.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+                var json = await res.json();
                 if (json.success) {
-                    const offcanvasEl = document.getElementById('expenseOffcanvas');
-                    const bs = bootstrap.Offcanvas.getInstance(offcanvasEl) || new bootstrap.Offcanvas(offcanvasEl);
+                    var offcanvasEl = document.getElementById('expenseOffcanvas');
+                    var bs = bootstrap.Offcanvas.getInstance(offcanvasEl) || new bootstrap.Offcanvas(offcanvasEl);
                     bs.hide();
                     window.location.reload();
                 }
                 return;
             }
 
-            // HTML (validation errors) returned
-            const html = await res.text();
-            const content = document.getElementById('expenseOffcanvasContent');
+            var html = await res.text();
+            var content = document.getElementById('expenseOffcanvasContent');
             content.innerHTML = html;
             if (window.jQuery && jQuery.validator && jQuery.validator.unobtrusive) {
                 jQuery.validator.unobtrusive.parse(content);
             }
         });
-    });
+    })();
 </script>

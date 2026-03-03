@@ -10,9 +10,12 @@ namespace FinanceApp.Infrastructure.Persistence;
 public class FinanceDbContext 
     : IdentityDbContext<ApplicationUser> // 🔥 changed here
 {
+    private readonly DbContextOptions<FinanceDbContext> _options;
+
     public FinanceDbContext(DbContextOptions<FinanceDbContext> options)
         : base(options)
     {
+        _options = options;
     }
 
     // ==============================
@@ -26,6 +29,7 @@ public class FinanceDbContext
     public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
     public DbSet<Account> Accounts { get; set; } = null!;
     public DbSet<Transaction> Transactions { get; set; } = null!;
+    public DbSet<SupportingDocument> SupportingDocuments { get; set; } = null!;
 
     // ==============================
     // Automatically handle CreatedAt and UpdatedAt
@@ -54,11 +58,30 @@ public class FinanceDbContext
         // 🔥 VERY IMPORTANT: call base FIRST for Identity tables
         base.OnModelCreating(modelBuilder);
 
+        // SQLite: fix IdentityPasskeyData key (required for EnsureCreated) and DateTimeOffset ORDER BY
+        var isSqlite = _options.Extensions.Any(e => e.GetType().Name == "SqliteOptionsExtension");
+        if (isSqlite)
+        {
+            var passkeyType = modelBuilder.Model.GetEntityTypes().FirstOrDefault(t => t.ClrType.Name == "IdentityPasskeyData");
+            if (passkeyType != null)
+                modelBuilder.Entity(passkeyType.ClrType).HasNoKey();
+
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                if (entityType.ClrType.Namespace?.StartsWith("FinanceApp.", StringComparison.Ordinal) != true)
+                    continue;
+                foreach (var property in entityType.GetProperties().Where(p => p.ClrType == typeof(DateTimeOffset)))
+                    modelBuilder.Entity(entityType.ClrType).Property(property.Name).HasConversion<string>();
+            }
+        }
+
         // ==============================
         // Identity user extensions
         // ==============================
         modelBuilder.Entity<ApplicationUser>(entity =>
         {
+            entity.Property(u => u.Country).HasMaxLength(100);
+            entity.Property(u => u.CountryCode).HasMaxLength(10);
             entity.Property(u => u.SubscriptionPlan)
                   .HasDefaultValue(SubscriptionPlan.Free)
                   .IsRequired();
@@ -81,6 +104,10 @@ public class FinanceDbContext
 
             entity.Property(c => c.Description)
                   .HasMaxLength(500);
+
+            entity.Property(c => c.Type)
+                  .HasConversion<int>()
+                  .HasDefaultValue(FinanceApp.Domain.Enums.CategoryType.Expense);
         });
 
         // ==============================
@@ -183,6 +210,21 @@ public class FinanceDbContext
                   .HasForeignKey(t => t.CategoryId)
                   .IsRequired(false)
                   .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // ==============================
+        // SupportingDocument configuration
+        // ==============================
+        modelBuilder.Entity<SupportingDocument>(entity =>
+        {
+            entity.ToTable("SupportingDocuments");
+            entity.Property(d => d.UserId).IsRequired();
+            entity.Property(d => d.OriginalFileName).HasMaxLength(260).IsRequired();
+            entity.Property(d => d.StoredFileName).HasMaxLength(260).IsRequired();
+            entity.Property(d => d.ContentType).HasMaxLength(100).IsRequired();
+            entity.Property(d => d.Label).HasMaxLength(200);
+            entity.HasIndex(d => d.UserId);
+            entity.HasIndex(d => new { d.EntityType, d.EntityId });
         });
     }
 }

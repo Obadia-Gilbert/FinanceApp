@@ -2,7 +2,8 @@ using FinanceApp.Application.Common;
 using FinanceApp.Application.Interfaces;
 using FinanceApp.Application.Interfaces.Services;
 using FinanceApp.Domain.Entities;
-using FinanceApp.Infrastructure.Extensions; // for AndAlso
+using FinanceApp.Domain.Enums;
+using FinanceApp.Application.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,6 +48,28 @@ namespace FinanceApp.Application.Services
         }
 
         /// <summary>
+        /// Categories that can be used for expenses (Type is Expense or Both).
+        /// </summary>
+        public async Task<IEnumerable<Category>> GetCategoriesForExpenseAsync(string userId)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+                throw new ArgumentException("UserId is required", nameof(userId));
+            var list = await _categoryRepository.FindAsync(c => c.UserId == userId && (c.Type == CategoryType.Expense || c.Type == CategoryType.Both));
+            return list.OrderBy(c => c.Name).ToList();
+        }
+
+        /// <summary>
+        /// Categories that can be used for income (Type is Income or Both).
+        /// </summary>
+        public async Task<IEnumerable<Category>> GetCategoriesForIncomeAsync(string userId)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+                throw new ArgumentException("UserId is required", nameof(userId));
+            var list = await _categoryRepository.FindAsync(c => c.UserId == userId && (c.Type == CategoryType.Income || c.Type == CategoryType.Both));
+            return list.OrderBy(c => c.Name).ToList();
+        }
+
+        /// <summary>
         /// Get paged categories for a user with optional filtering and ordering.
         /// </summary>
         public async Task<PagedResult<Category>> GetPagedCategoriesAsync(
@@ -77,7 +100,7 @@ namespace FinanceApp.Application.Services
         /// <summary>
         /// Create a new category for a user.
         /// </summary>
-        public async Task<Category> CreateCategoryAsync(string name, string userId, string? description = null, string? icon = null, string? badgeColor = null)
+        public async Task<Category> CreateCategoryAsync(string name, string userId, CategoryType type = CategoryType.Expense, string? description = null, string? icon = null, string? badgeColor = null)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Category name is required", nameof(name));
@@ -85,7 +108,7 @@ namespace FinanceApp.Application.Services
             if (string.IsNullOrWhiteSpace(userId))
                 throw new ArgumentException("UserId is required", nameof(userId));
 
-            var category = new Category(name, description, icon, badgeColor)
+            var category = new Category(name, description, type, icon, badgeColor)
             {
                 UserId = userId
             };
@@ -99,7 +122,7 @@ namespace FinanceApp.Application.Services
         /// <summary>
         /// Update an existing category owned by the user.
         /// </summary>
-        public async Task UpdateCategoryAsync(Guid id, string userId, string name, string? description = null, string? icon = null, string? badgeColor = null)
+        public async Task UpdateCategoryAsync(Guid id, string userId, string name, CategoryType type, string? description = null, string? icon = null, string? badgeColor = null)
         {
             if (string.IsNullOrWhiteSpace(userId))
                 throw new ArgumentException("UserId is required", nameof(userId));
@@ -109,6 +132,7 @@ namespace FinanceApp.Application.Services
                 throw new InvalidOperationException("Category not found or not owned by user");
 
             category.UpdateName(name);
+            category.UpdateType(type);
             category.UpdateDescription(description);
             category.UpdateIcon(icon);
             if (!string.IsNullOrWhiteSpace(badgeColor))
@@ -136,26 +160,20 @@ namespace FinanceApp.Application.Services
 
 public async Task AssignDefaultCategoriesToUserAsync(string userId)
 {
-    // 1. Get all categories already assigned to this user
-    var existingCategories = await _categoryRepository.FindAsync(c => c.UserId == userId);
+    var existing = await _categoryRepository.FindAsync(c => c.UserId == userId);
+    var existingNames = new HashSet<string>(existing.Select(c => c.Name.Trim()), StringComparer.OrdinalIgnoreCase);
 
-    // 2. Get all default categories (UserId is null or empty)
-    var defaultCategories = await _categoryRepository.FindAsync(c => string.IsNullOrEmpty(c.UserId));
-
-    // 3. Assign default categories that the user doesn't already have
-    foreach (var category in defaultCategories)
+    foreach (var name in CategoryDefaults.DefaultCategories)
     {
-        if (existingCategories.Any(ec => ec.Name == category.Name))
-            continue; // skip if already assigned
+        var trimmed = name.Trim();
+        if (string.IsNullOrWhiteSpace(trimmed) || existingNames.Contains(trimmed))
+            continue;
 
-        var userCategory = new Category(category.Name, category.Description)
-        {
-            UserId = userId
-        };
+        var userCategory = new Category(trimmed, null, CategoryType.Expense, null, null) { UserId = userId };
         await _categoryRepository.AddAsync(userCategory);
+        existingNames.Add(trimmed);
     }
 
-    // 4. Save all changes
     await _categoryRepository.SaveChangesAsync();
 }
     public async Task<IEnumerable<Category>> GetCategoriesAsync(string userId, bool isAdmin)

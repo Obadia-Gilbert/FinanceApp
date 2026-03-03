@@ -31,9 +31,9 @@
 </div>
 
 <div class="card shadow-sm">
-    <div class="card-body">
+    <div class="card-body p-0 px-1">
         <div class="table-responsive">
-            <table id="expenseTable" class="table table-hover mb-0" aria-label="List of expenses">
+            <table id="expenseTable" class="table table-hover table-sm mb-0" aria-label="List of expenses">
                 <caption class="visually-hidden">List of expenses with description, amount, currency, category, date and actions</caption>
                 <thead>
                     <tr>
@@ -42,8 +42,8 @@
                         <th>Currency</th>
                         <th>Category</th>
                         <th>Date</th>
-                        <th>Receipt</th>
-                        <th>Actions</th>
+                        <th title="Attached files / supporting documents"><i class="bi bi-paperclip"></i></th>
+                        <th class="text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -120,13 +120,12 @@
                 ordering: true,
                 pageLength: 10,
                 language: {
-                    search: "Filter:",
-                    paginate: {
-                        first: "First",
-                        last: "Last",
-                        next: "Next",
-                        previous: "Previous"
-                    }
+                    search: "",
+                    searchPlaceholder: "Search expenses…",
+                    info: "_TOTAL_ records",
+                    infoFiltered: "(filtered from _MAX_)",
+                    lengthMenu: "Show _MENU_ rows",
+                    paginate: { first: "«", last: "»", next: "›", previous: "‹" }
                 }
             });
         });

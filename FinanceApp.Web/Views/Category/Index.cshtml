@@ -33,6 +33,7 @@
                 <thead>
                     <tr>
                         <th>Name</th>
+                        <th>Type</th>
                         <th>Description</th>
                         <th style="width: 220px;">Actions</th>
                     </tr>
@@ -50,6 +51,9 @@
                                     }
                                     @category.Name
                                 </span>
+                            </td>
+                            <td>
+                                <span class="badge @(category.Type == FinanceApp.Domain.Enums.CategoryType.Expense ? "bg-danger" : category.Type == FinanceApp.Domain.Enums.CategoryType.Income ? "bg-success" : "bg-secondary")">@category.Type</span>
                             </td>
                             <td>@category.Description</td>
                             <td>
@@ -80,13 +84,12 @@
                 ordering: true,
                 pageLength: 10,
                 language: {
-                    search: "Filter:",
-                    paginate: {
-                        first: "First",
-                        last: "Last",
-                        next: "Next",
-                        previous: "Previous"
-                    }
+                    search: "",
+                    searchPlaceholder: "Search categories…",
+                    info: "_TOTAL_ records",
+                    infoFiltered: "(filtered from _MAX_)",
+                    lengthMenu: "Show _MENU_ rows",
+                    paginate: { first: "«", last: "»", next: "›", previous: "‹" }
                 }
             });
 

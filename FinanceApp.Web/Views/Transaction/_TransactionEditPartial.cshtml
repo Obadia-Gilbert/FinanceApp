@@ -1,0 +1,111 @@
+@model FinanceApp.Web.Models.TransactionEditViewModel
+@using FinanceApp.Domain.Enums
+@using FinanceApp.Web.Models
+
+@{
+    var categories    = ViewBag.Categories as IEnumerable<FinanceApp.Domain.Entities.Category> ?? Enumerable.Empty<FinanceApp.Domain.Entities.Category>();
+    var typeClass     = Model.Type == TransactionType.Income ? "text-success" : "text-danger";
+    var supportingDocs = ViewBag.SupportingDocs as IEnumerable<FinanceApp.Domain.Entities.SupportingDocument>
+                       ?? Enumerable.Empty<FinanceApp.Domain.Entities.SupportingDocument>();
+}
+
+<form asp-action="Edit" asp-controller="Transaction" asp-route-id="@Model.Id" method="post" class="p-3" id="transactionEditForm">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <p class="text-muted small mb-0">
+            <i class="bi bi-info-circle me-1"></i>
+            <strong class="@typeClass">@Model.Type</strong> on <strong>@Model.AccountName</strong> (@Model.Currency)
+        </p>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Amount" class="form-label">Amount</label>
+        <input asp-for="Amount" class="form-control" type="number" step="0.01" min="0.01" />
+        <span asp-validation-for="Amount" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Date" class="form-label">Date</label>
+        <input asp-for="Date" type="date" class="form-control" />
+        <span asp-validation-for="Date" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="CategoryId" class="form-label">Category <span class="text-muted fw-normal">(optional)</span></label>
+        <select asp-for="CategoryId" class="form-select">
+            <option value="">— None —</option>
+            @foreach (var cat in categories)
+            {
+                <option value="@cat.Id">@cat.Name</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Note" class="form-label">Note <span class="text-muted fw-normal">(optional)</span></label>
+        <input asp-for="Note" class="form-control" />
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>Save Changes
+        </button>
+    </div>
+</form>
+
+@* Supporting Documents widget — OUTSIDE the main form (contains its own forms) *@
+<div class="border-top px-3 pt-2 pb-3">
+    @await Html.PartialAsync("_SupportingDocuments", new SupportingDocumentsViewModel
+    {
+        EntityType = DocumentEntityType.Transaction,
+        EntityId   = Model.Id,
+        Documents  = supportingDocs,
+        ReturnUrl  = Url.Action("Index", "Transaction") ?? "/Transaction",
+        ReloadUrl  = Url.Action("Edit",  "Transaction", new { id = Model.Id })
+    })
+</div>
+
+<partial name="_ValidationScriptsPartial" />
+
+<script>
+    (function () {
+        var form = document.getElementById('transactionEditForm');
+        if (!form) return;
+
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            var formData = new FormData(form);
+            var action = form.getAttribute('action') || window.location.href;
+            var res = await fetch(action, {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                body: formData
+            });
+
+            var contentType = res.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+                var json = await res.json();
+                if (json.success) {
+                    var offcanvasEl = document.getElementById('transactionOffcanvas');
+                    if (offcanvasEl) {
+                        var bs = bootstrap.Offcanvas.getInstance(offcanvasEl) || new bootstrap.Offcanvas(offcanvasEl);
+                        bs.hide();
+                    }
+                    window.location.reload();
+                }
+                return;
+            }
+
+            var html = await res.text();
+            var content = document.getElementById('transactionOffcanvasContent');
+            if (content) {
+                content.innerHTML = html;
+                if (window.jQuery && jQuery.validator && jQuery.validator.unobtrusive) {
+                    jQuery.validator.unobtrusive.parse(content);
+                }
+            }
+        });
+    })();
+</script>

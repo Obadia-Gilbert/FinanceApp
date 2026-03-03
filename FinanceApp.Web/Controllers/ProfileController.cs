@@ -1,8 +1,10 @@
 using FinanceApp.Infrastructure.Identity;
+using FinanceApp.Web.Helpers;
 using FinanceApp.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace FinanceApp.Web.Controllers;
 
@@ -26,9 +28,17 @@ public class ProfileController : Controller
         {
             FirstName = user.FirstName,
             LastName = user.LastName,
+            PhoneNumber = user.PhoneNumber,
+            Country = user.Country,
+            CountryCode = user.CountryCode,
             CurrentProfileImagePath = user.ProfileImagePath,
             Email = user.Email
         };
+        ViewBag.Countries = new SelectList(
+            CountryList.All.Select(c => new SelectListItem { Value = c.Code, Text = c.Name }),
+            "Value",
+            "Text",
+            user.CountryCode);
         return View(model);
     }
 
@@ -43,6 +53,9 @@ public class ProfileController : Controller
         {
             user.FirstName = model.FirstName?.Trim();
             user.LastName = model.LastName?.Trim();
+            user.PhoneNumber = string.IsNullOrWhiteSpace(model.PhoneNumber) ? null : model.PhoneNumber?.Trim();
+            user.CountryCode = string.IsNullOrWhiteSpace(model.CountryCode) ? null : model.CountryCode?.Trim();
+            user.Country = CountryList.GetNameByCode(user.CountryCode) ?? model.Country?.Trim();
 
             if (model.ProfileImage != null && model.ProfileImage.Length > 0)
             {
@@ -72,6 +85,14 @@ public class ProfileController : Controller
 
         model.CurrentProfileImagePath = user.ProfileImagePath;
         model.Email = user.Email;
+        model.PhoneNumber = user.PhoneNumber;
+        model.Country = user.Country;
+        model.CountryCode = user.CountryCode;
+        ViewBag.Countries = new SelectList(
+            CountryList.All.Select(c => new SelectListItem { Value = c.Code, Text = c.Name }),
+            "Value",
+            "Text",
+            model.CountryCode);
         return View(model);
     }
 }
