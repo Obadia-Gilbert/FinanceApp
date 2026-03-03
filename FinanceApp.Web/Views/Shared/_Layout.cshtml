@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - FinanceApp</title>
-    <link rel="icon" type="image/png" href="@Url.Content("~/Lime and Black Modern Finance Logo.png")" />
+    <link rel="icon" type="image/png" href="@Url.Content("~/financeapp-logo.png")" />
     <script type="importmap"></script>
     <!-- Antiforgery token for AJAX POSTs - retrieved by JS for security -->
     <meta name="request-verification-token" content="@Antiforgery.GetAndStoreTokens(Context).RequestToken" />
@@ -27,7 +27,7 @@
             <div class="container-fluid px-2 px-sm-3">
                 <!-- Brand/Logo (left) -->
                 <a class="navbar-brand fw-bold d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
-                    <img src="~/Lime and Black Modern Finance Logo.png" alt="FinanceApp Logo" class="img-fluid me-2" width="40" height="20"/>
+                    <img src="~/financeapp-logo.png" alt="FinanceApp Logo" class="img-fluid me-2" width="52" height="52" style="border-radius:10px;"/>
                     <span class="d-none d-sm-inline">FinanceApp</span>
                 </a>
                 
@@ -79,7 +79,7 @@
         <div class="container-fluid px-3 px-md-4 py-3">
             <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-2">
                 <div class="d-flex align-items-center gap-2">
-                    <img src="~/Lime and Black Modern Finance Logo.png" alt="FinanceApp" width="22" height="22" class="rounded-1" />
+                    <img src="~/financeapp-logo.png" alt="FinanceApp" width="22" height="22" class="rounded-1" />
                     <span class="fw-semibold">FinanceApp</span>
                 </div>
                 <div class="d-flex flex-wrap align-items-center gap-3 small">

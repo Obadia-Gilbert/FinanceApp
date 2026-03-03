@@ -23,6 +23,9 @@ public class FinanceDbContext
     public DbSet<Category> Categories { get; set; } = null!;
     public DbSet<Budget> Budgets { get; set; } = null!;
     public DbSet<CategoryBudget> CategoryBudgets { get; set; } = null!;
+    public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
+    public DbSet<Account> Accounts { get; set; } = null!;
+    public DbSet<Transaction> Transactions { get; set; } = null!;
 
     // ==============================
     // Automatically handle CreatedAt and UpdatedAt
@@ -63,17 +66,6 @@ public class FinanceDbContext
             entity.Property(u => u.SubscriptionAssignedAt)
                   .HasDefaultValueSql("GETUTCDATE()")
                   .IsRequired();
-        });
-
-        // ==============================
-        // BaseEntity configuration
-        // ==============================
-        modelBuilder.Entity<BaseEntity>(entity =>
-        {
-            entity.HasKey(b => b.Id);
-
-            entity.Property(b => b.CreatedAt)
-                  .HasDefaultValueSql("GETUTCDATE()");
         });
 
         // ==============================
@@ -141,6 +133,56 @@ public class FinanceDbContext
                 .WithMany()
                 .HasForeignKey(cb => cb.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ==============================
+        // RefreshToken configuration
+        // ==============================
+        modelBuilder.Entity<RefreshToken>(entity =>
+        {
+            entity.ToTable("RefreshTokens");
+            entity.HasKey(rt => rt.Id);
+            entity.Property(rt => rt.Token).HasMaxLength(500).IsRequired();
+            entity.Property(rt => rt.UserId).IsRequired();
+            entity.HasIndex(rt => rt.Token).IsUnique();
+            entity.HasIndex(rt => rt.UserId);
+        });
+
+        // ==============================
+        // Account configuration
+        // ==============================
+        modelBuilder.Entity<Account>(entity =>
+        {
+            entity.ToTable("Accounts");
+            entity.Property(a => a.Name).HasMaxLength(100).IsRequired();
+            entity.Property(a => a.Description).HasMaxLength(500);
+            entity.Property(a => a.InitialBalance).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(a => a.UserId).IsRequired();
+            entity.HasIndex(a => a.UserId);
+        });
+
+        // ==============================
+        // Transaction configuration
+        // ==============================
+        modelBuilder.Entity<Transaction>(entity =>
+        {
+            entity.ToTable("Transactions");
+            entity.Property(t => t.Amount).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(t => t.UserId).IsRequired();
+            entity.Property(t => t.Note).HasMaxLength(500);
+            entity.HasIndex(t => t.UserId);
+            entity.HasIndex(t => t.TransferGroupId);
+
+            entity.HasOne(t => t.Account)
+                  .WithMany(a => a.Transactions)
+                  .HasForeignKey(t => t.AccountId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(t => t.Category)
+                  .WithMany()
+                  .HasForeignKey(t => t.CategoryId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
         });
     }
 }

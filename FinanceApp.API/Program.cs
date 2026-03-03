@@ -22,6 +22,9 @@ builder.Services.AddScoped<IExpenseService, ExpenseService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<ICategoryBudgetService, CategoryBudgetService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
 // Identity (required for JWT login)
 builder.Services
@@ -58,6 +61,9 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddControllers();
 
+// OpenAPI (built-in .NET 10)
+builder.Services.AddOpenApi();
+
 // CORS
 builder.Services.AddCors(options =>
 {
@@ -76,7 +82,14 @@ using (var scope = app.Services.CreateScope())
 {
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    await RoleSeeder.SeedRolesAndAdminAsync(userManager, roleManager);
+    var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    await RoleSeeder.SeedRolesAndAdminAsync(userManager, roleManager, config, logger);
+}
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi(); // serves /openapi/v1.json
 }
 
 app.UseHttpsRedirection();
