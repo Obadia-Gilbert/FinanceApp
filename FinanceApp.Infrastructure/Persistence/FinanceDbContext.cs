@@ -30,6 +30,11 @@ public class FinanceDbContext
     public DbSet<Account> Accounts { get; set; } = null!;
     public DbSet<Transaction> Transactions { get; set; } = null!;
     public DbSet<SupportingDocument> SupportingDocuments { get; set; } = null!;
+    public DbSet<Notification> Notifications { get; set; } = null!;
+    public DbSet<SharedReport> SharedReports { get; set; } = null!;
+    public DbSet<Income> Incomes { get; set; } = null!;
+    public DbSet<RecurringTemplate> RecurringTemplates { get; set; } = null!;
+    public DbSet<UserFeedback> UserFeedbacks { get; set; } = null!;
 
     // ==============================
     // Automatically handle CreatedAt and UpdatedAt
@@ -134,6 +139,17 @@ public class FinanceDbContext
                   .WithMany(c => c.Expenses)
                   .HasForeignKey(e => e.CategoryId)
                   .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(e => e.Account)
+                  .WithMany()
+                  .HasForeignKey(e => e.AccountId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
+            entity.HasOne<Transaction>()
+                  .WithMany()
+                  .HasForeignKey(e => e.TransactionId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.SetNull);
+            entity.HasIndex(e => new { e.UserId, e.ExpenseDate });
         });
 
         // ==============================
@@ -199,6 +215,8 @@ public class FinanceDbContext
             entity.Property(t => t.Note).HasMaxLength(500);
             entity.HasIndex(t => t.UserId);
             entity.HasIndex(t => t.TransferGroupId);
+            entity.HasIndex(t => new { t.UserId, t.Date });
+            entity.HasIndex(t => new { t.UserId, t.Type, t.Date });
 
             entity.HasOne(t => t.Account)
                   .WithMany(a => a.Transactions)
@@ -225,6 +243,98 @@ public class FinanceDbContext
             entity.Property(d => d.Label).HasMaxLength(200);
             entity.HasIndex(d => d.UserId);
             entity.HasIndex(d => new { d.EntityType, d.EntityId });
+        });
+
+        // ==============================
+        // Notification configuration
+        // ==============================
+        modelBuilder.Entity<Notification>(entity =>
+        {
+            entity.ToTable("Notifications");
+            entity.Property(n => n.UserId).HasMaxLength(450).IsRequired();
+            entity.Property(n => n.Title).HasMaxLength(200).IsRequired();
+            entity.Property(n => n.Message).HasMaxLength(1000).IsRequired();
+            entity.Property(n => n.RelatedLink).HasMaxLength(500);
+            entity.Property(n => n.TopicKey).HasMaxLength(200);
+            entity.HasIndex(n => n.UserId);
+            entity.HasIndex(n => new { n.UserId, n.TopicKey }).HasFilter("[TopicKey] IS NOT NULL");
+        });
+
+        // ==============================
+        // SharedReport configuration
+        // ==============================
+        modelBuilder.Entity<SharedReport>(entity =>
+        {
+            entity.ToTable("SharedReports");
+            entity.Property(s => s.UserId).HasMaxLength(450).IsRequired();
+            entity.Property(s => s.Token).HasMaxLength(64).IsRequired();
+            entity.HasIndex(s => s.Token).IsUnique();
+            entity.HasIndex(s => s.UserId);
+        });
+
+        // ==============================
+        // Income configuration
+        // ==============================
+        modelBuilder.Entity<Income>(entity =>
+        {
+            entity.ToTable("Incomes");
+            entity.Property(i => i.Amount).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(i => i.UserId).HasMaxLength(450).IsRequired();
+            entity.Property(i => i.Description).HasMaxLength(500);
+            entity.Property(i => i.Source).HasMaxLength(200);
+            entity.HasIndex(i => i.UserId);
+            entity.HasIndex(i => new { i.UserId, i.IncomeDate });
+            entity.HasOne(i => i.Account)
+                .WithMany()
+                .HasForeignKey(i => i.AccountId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
+            entity.HasOne(i => i.Category)
+                .WithMany()
+                .HasForeignKey(i => i.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(i => i.Transaction)
+                .WithMany()
+                .HasForeignKey(i => i.TransactionId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // ==============================
+        // RecurringTemplate configuration
+        // ==============================
+        modelBuilder.Entity<RecurringTemplate>(entity =>
+        {
+            entity.ToTable("RecurringTemplates");
+            entity.Property(r => r.Amount).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(r => r.UserId).HasMaxLength(450).IsRequired();
+            entity.Property(r => r.Note).HasMaxLength(500);
+            entity.HasIndex(r => r.UserId);
+            entity.HasIndex(r => r.NextRunDate);
+            entity.HasOne(r => r.Account)
+                .WithMany()
+                .HasForeignKey(r => r.AccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(r => r.Category)
+                .WithMany()
+                .HasForeignKey(r => r.CategoryId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // ==============================
+        // UserFeedback configuration
+        // ==============================
+        modelBuilder.Entity<UserFeedback>(entity =>
+        {
+            entity.ToTable("UserFeedbacks");
+            entity.Property(f => f.UserId).HasMaxLength(450).IsRequired();
+            entity.Property(f => f.Subject).HasMaxLength(200);
+            entity.Property(f => f.Message).HasMaxLength(4000).IsRequired();
+            entity.Property(f => f.AdminNotes).HasMaxLength(2000);
+            entity.HasIndex(f => f.UserId);
+            entity.HasIndex(f => f.Status);
+            entity.HasIndex(f => f.Type);
         });
     }
 }

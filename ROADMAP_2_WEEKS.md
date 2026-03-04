@@ -2,6 +2,8 @@
 
 Goal: improve production safety, architecture boundaries, UI consistency, and feature depth with clear day-by-day execution.
 
+**Handoff:** Resume from [WHERE_WE_LEFT_OFF.md](./WHERE_WE_LEFT_OFF.md). Mobile app is next; production checklist runs after mobile is done.
+
 ---
 
 ## Week 1 - Stabilize and Secure

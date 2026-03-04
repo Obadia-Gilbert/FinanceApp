@@ -1,0 +1,65 @@
+@model FinanceApp.Domain.Entities.UserFeedback
+@using FinanceApp.Domain.Enums
+@{
+    ViewData["Title"] = "Feedback detail";
+    var userEmail = ViewBag.UserEmail as string ?? Model.UserId;
+}
+
+<div class="mb-4">
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm mb-2"><i class="bi bi-arrow-left"></i> Back to list</a>
+    <h1 class="h4 mb-2">Feedback detail</h1>
+    <p class="text-muted small mb-0">From: @userEmail · @Model.CreatedAt.LocalDateTime.ToString("yyyy-MM-dd HH:mm")</p>
+</div>
+
+<div class="row">
+    <div class="col-12 col-lg-8">
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <div class="d-flex gap-2 flex-wrap mb-2">
+                    <span class="badge @(Model.Type == FeedbackType.Question ? "bg-info" : Model.Type == FeedbackType.Suggestion ? "bg-primary" : "bg-secondary")">@Model.Type</span>
+                    <span class="badge @(Model.Status == FeedbackStatus.New ? "bg-warning text-dark" : Model.Status == FeedbackStatus.Read ? "bg-success" : "bg-secondary")">@Model.Status</span>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.Subject))
+                {
+                    <h2 class="h6 mb-2">@Model.Subject</h2>
+                }
+                <p class="mb-0 text-break">@Model.Message</p>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header py-2">
+                <span class="fw-semibold">Admin actions</span>
+            </div>
+            <div class="card-body">
+                @if (Model.Status == FeedbackStatus.New)
+                {
+                    <form method="post" asp-action="MarkRead" asp-route-id="@Model.Id" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-success btn-sm">Mark as read</button>
+                    </form>
+                }
+                <form method="post" asp-action="SetStatus" asp-route-id="@Model.Id" class="d-inline ms-2">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="status" value="@((int)FeedbackStatus.Archived)" />
+                    <button type="submit" class="btn btn-outline-secondary btn-sm">Archive</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-header py-2">
+                <span class="fw-semibold">Internal notes</span>
+            </div>
+            <div class="card-body">
+                <p class="small text-muted mb-2">Not visible to the user. Use for follow-up or context.</p>
+                <form method="post" asp-action="SaveAdminNotes" asp-route-id="@Model.Id">
+                    @Html.AntiForgeryToken()
+                    <textarea name="adminNotes" class="form-control form-control-sm mb-2" rows="4" placeholder="Add or edit notes...">@Model.AdminNotes</textarea>
+                    <button type="submit" class="btn btn-primary btn-sm">Save notes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

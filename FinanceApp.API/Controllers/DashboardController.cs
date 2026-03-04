@@ -12,21 +12,24 @@ namespace FinanceApp.API.Controllers;
 [Authorize]
 public class DashboardController : ControllerBase
 {
-    private readonly IExpenseService _expenseService;
+    private readonly IExpenseQueryService _expenseQueryService;
     private readonly ICategoryService _categoryService;
     private readonly IBudgetService _budgetService;
     private readonly ICategoryBudgetService _categoryBudgetService;
+    private readonly INotificationService _notificationService;
 
     public DashboardController(
-        IExpenseService expenseService,
+        IExpenseQueryService expenseQueryService,
         ICategoryService categoryService,
         IBudgetService budgetService,
-        ICategoryBudgetService categoryBudgetService)
+        ICategoryBudgetService categoryBudgetService,
+        INotificationService notificationService)
     {
-        _expenseService = expenseService;
+        _expenseQueryService = expenseQueryService;
         _categoryService = categoryService;
         _budgetService = budgetService;
         _categoryBudgetService = categoryBudgetService;
+        _notificationService = notificationService;
     }
 
     private string? UserId => User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -38,77 +41,72 @@ public class DashboardController : ControllerBase
     {
         if (UserId == null) return Unauthorized();
 
-        var allExpenses = await _expenseService.GetPagedExpensesAsync(
-            pageNumber: 1,
-            pageSize: 1000,
-            filter: e => e.UserId == UserId,
-            orderBy: q => q.OrderByDescending(e => e.ExpenseDate));
-
-        var expenses = allExpenses.Items.ToList();
-
-        var pagedCategories = await _categoryService.GetPagedCategoriesAsync(
-            pageNumber: 1,
-            pageSize: 100,
-            userId: UserId);
-
-        var categoryCount = pagedCategories.TotalItems;
-
-        var displayCurrency = expenses
-            .GroupBy(e => e.Currency)
-            .OrderByDescending(g => g.Sum(x => x.Amount))
-            .Select(g => g.Key)
-            .FirstOrDefault();
-        if (expenses.Count == 0)
-            displayCurrency = Currency.TZS;
-
-        var totalSpend = expenses
-            .Where(e => e.Currency == displayCurrency)
-            .Sum(e => e.Amount);
-
-        var expenseCount = expenses.Count;
         var currentMonth = DateTime.Now.Month;
         var currentYear = DateTime.Now.Year;
+        var last30Start = DateTimeOffset.UtcNow.AddDays(-30);
+        var last30End = DateTimeOffset.UtcNow.AddDays(1);
 
-        var thisMonthExpense = expenses
-            .Where(e => e.Currency == displayCurrency &&
-                        e.ExpenseDate.Month == currentMonth &&
-                        e.ExpenseDate.Year == currentYear)
-            .Sum(e => e.Amount);
+        // Sequential: DbContext is not thread-safe for concurrent operations
+        var totalsByCurrency = await _expenseQueryService.GetTotalsByCurrencyAsync(UserId);
+        var thisMonthTotals = await _expenseQueryService.GetMonthTotalsByCurrencyAsync(UserId, currentMonth, currentYear);
+        var expenseCount = await _expenseQueryService.GetTotalCountAsync(UserId);
+        var pagedCategories = await _categoryService.GetPagedCategoriesAsync(pageNumber: 1, pageSize: 100, userId: UserId);
+        var categoryCount = pagedCategories.TotalItems;
 
-        var last30Days = DateTime.Now.AddDays(-30);
-        var chartData = expenses
-            .Where(e => e.Currency == displayCurrency && e.ExpenseDate >= last30Days)
-            .GroupBy(e => e.ExpenseDate.Date)
-            .OrderBy(g => g.Key)
-            .Select(g => new ChartDataPoint(g.Key.ToString("MMM dd"), g.Sum(e => e.Amount)))
+        var displayCurrency = totalsByCurrency.Count > 0
+            ? totalsByCurrency.OrderByDescending(kv => kv.Value).Select(kv => kv.Key).First()
+            : Currency.TZS;
+        var totalSpend = totalsByCurrency.GetValueOrDefault(displayCurrency, 0);
+        var thisMonthExpense = thisMonthTotals.GetValueOrDefault(displayCurrency, 0);
+
+        var trendSums = await _expenseQueryService.GetSumsByDayAsync(UserId, last30Start, last30End, displayCurrency);
+        var trendByDate = trendSums.ToDictionary(s => s.Date, s => s.Sum);
+        var now = DateTime.Now;
+        var chartData = Enumerable.Range(0, 30)
+            .Select(i => now.Date.AddDays(-29 + i))
+            .Select(d => new ChartDataPoint(d.ToString("MMM dd"), trendByDate.GetValueOrDefault(d, 0m)))
             .ToList();
 
-        var currentMonthBudget = await _budgetService.GetBudgetForMonthAsync(
-            UserId, currentMonth, currentYear);
+        var currentMonthBudget = await _budgetService.GetBudgetForMonthAsync(UserId, currentMonth, currentYear);
         decimal? budgetAmount = currentMonthBudget?.Amount;
         var budgetCurrency = currentMonthBudget?.Currency ?? displayCurrency;
-        var thisMonthSpendInBudgetCurrency = expenses
-            .Where(e => e.Currency == budgetCurrency &&
-                        e.ExpenseDate.Month == currentMonth &&
-                        e.ExpenseDate.Year == currentYear)
-            .Sum(e => e.Amount);
-        var isOverBudget = budgetAmount.HasValue &&
-                           budgetAmount.Value > 0 &&
-                           thisMonthSpendInBudgetCurrency >= budgetAmount.Value;
+        var thisMonthSpendInBudgetCurrency = thisMonthTotals.GetValueOrDefault(budgetCurrency, 0);
+        var isOverBudget = budgetAmount.HasValue && budgetAmount.Value > 0 && thisMonthSpendInBudgetCurrency >= budgetAmount.Value;
 
-        var categoryBudgets = await _categoryBudgetService.GetForMonthAsync(
-            UserId, currentMonth, currentYear);
+        var categorySpendForMonth = await _categoryBudgetService.GetCategorySpendForMonthAsync(UserId, currentMonth, currentYear);
+        var categoryBudgets = await _categoryBudgetService.GetForMonthAsync(UserId, currentMonth, currentYear);
         var categoryBudgetAlerts = new List<CategoryBudgetAlertDto>();
         foreach (var cb in categoryBudgets)
         {
-            var spent = await _categoryBudgetService.GetCategorySpendAsync(
-                UserId, cb.CategoryId, currentMonth, currentYear, cb.Currency);
+            var spent = categorySpendForMonth.GetValueOrDefault((cb.CategoryId, cb.Currency), 0);
+            var catName = cb.Category?.Name ?? "Unknown";
             if (spent >= cb.Amount)
-                categoryBudgetAlerts.Add(new CategoryBudgetAlertDto(
-                    cb.Category?.Name ?? "Unknown", spent, cb.Amount, cb.Currency.ToString(), true));
+            {
+                categoryBudgetAlerts.Add(new CategoryBudgetAlertDto(catName, spent, cb.Amount, cb.Currency.ToString(), true));
+                var topicKey = $"budget-category-{cb.CategoryId}-{currentYear}-{currentMonth}";
+                await _notificationService.CreateIfNotExistsAsync(UserId!,
+                    "Category budget exceeded",
+                    $"{catName}: {spent:N0} {cb.Currency} of {cb.Amount:N0} {cb.Currency} ({(spent / cb.Amount * 100):F0}%).",
+                    NotificationType.CategoryBudgetExceeded, "/Budget", topicKey);
+            }
             else if (cb.Amount > 0 && spent >= cb.Amount * 0.8m)
-                categoryBudgetAlerts.Add(new CategoryBudgetAlertDto(
-                    cb.Category?.Name ?? "Unknown", spent, cb.Amount, cb.Currency.ToString(), false));
+            {
+                categoryBudgetAlerts.Add(new CategoryBudgetAlertDto(catName, spent, cb.Amount, cb.Currency.ToString(), false));
+                var topicKey = $"budget-category-{cb.CategoryId}-{currentYear}-{currentMonth}";
+                await _notificationService.CreateIfNotExistsAsync(UserId!,
+                    "Category budget warning",
+                    $"{catName}: {spent:N0} {cb.Currency} of {cb.Amount:N0} {cb.Currency} ({(spent / cb.Amount * 100):F0}%).",
+                    NotificationType.CategoryBudgetWarning, "/Budget", topicKey);
+            }
+        }
+
+        if (isOverBudget && budgetAmount.HasValue)
+        {
+            var topicKey = $"budget-global-{currentYear}-{currentMonth}";
+            await _notificationService.CreateIfNotExistsAsync(UserId!,
+                "Monthly budget exceeded",
+                $"You've spent {thisMonthSpendInBudgetCurrency:N0} {budgetCurrency} against a budget of {budgetAmount.Value:N0} {budgetCurrency}.",
+                NotificationType.BudgetExceeded, "/Budget", topicKey);
         }
 
         var dto = new DashboardDto(

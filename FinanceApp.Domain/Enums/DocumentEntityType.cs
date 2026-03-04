@@ -4,5 +4,6 @@ namespace FinanceApp.Domain.Enums;
 public enum DocumentEntityType
 {
     Expense,
-    Transaction
+    Transaction,
+    Income
 }

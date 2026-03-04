@@ -17,17 +17,20 @@ public class ExpenseController : Controller
 {
     private readonly IExpenseService _expenseService;
     private readonly ICategoryService _categoryService;
+    private readonly IAccountService _accountService;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ISupportingDocumentService _documentService;
 
     public ExpenseController(
         IExpenseService expenseService,
         ICategoryService categoryService,
+        IAccountService accountService,
         UserManager<ApplicationUser> userManager,
         ISupportingDocumentService documentService)
     {
         _expenseService = expenseService;
         _categoryService = categoryService;
+        _accountService = accountService;
         _userManager = userManager;
         _documentService = documentService;
     }
@@ -63,6 +66,7 @@ public class ExpenseController : Controller
 
         ViewBag.Categories = await _categoryService.GetCategoriesForExpenseAsync(userId);
         ViewBag.Currencies = Enum.GetValues(typeof(Currency));
+        ViewBag.Accounts = await _accountService.GetAllAsync(userId);
 
         bool isAjax = partial ||
                      string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
@@ -87,6 +91,7 @@ public class ExpenseController : Controller
         {
             ViewBag.Categories = await _categoryService.GetCategoriesForExpenseAsync(userId);
             ViewBag.Currencies = Enum.GetValues(typeof(Currency));
+            ViewBag.Accounts = await _accountService.GetAllAsync(userId);
             if (isAjax)
             {
                 return PartialView("_ExpenseCreatePartial", model);
@@ -133,10 +138,12 @@ public class ExpenseController : Controller
         {
             ViewBag.Categories = await _categoryService.GetCategoriesForExpenseAsync(userId);
             ViewBag.Currencies = Enum.GetValues(typeof(Currency));
+            ViewBag.Accounts = await _accountService.GetAllAsync(userId);
             if (isAjax) return PartialView("_ExpenseCreatePartial", model);
             return View(model);
         }
 
+        var accountId = model.AccountId is { } aid && aid != Guid.Empty ? aid : (Guid?)null;
         var expense = await _expenseService.CreateExpenseAsync(
             model.Amount,
             model.Currency,
@@ -144,7 +151,8 @@ public class ExpenseController : Controller
             model.CategoryId,
             userId,
             model.Description ?? "",
-            receiptPath
+            receiptPath,
+            accountId
         );
 
         if (isAjax)

@@ -13,13 +13,14 @@
     <div class="card-body">
         <div class="table-responsive">
             <table class="table table-hover mb-0" aria-label="List of users">
-                <caption class="visually-hidden">Users with email, name, role and actions</caption>
+                <caption class="visually-hidden">Users with email, name, role, subscription and actions</caption>
                 <thead>
                     <tr>
                         <th>Photo</th>
                         <th>Name</th>
                         <th>Email</th>
                         <th>Role</th>
+                        <th>Subscription</th>
                         <th style="width: 200px;">Actions</th>
                     </tr>
                 </thead>
@@ -43,6 +44,7 @@
                             <td>@(string.IsNullOrWhiteSpace(u.FirstName) && string.IsNullOrWhiteSpace(u.LastName) ? "—" : $"{u.FirstName?.Trim()} {u.LastName?.Trim()}".Trim())</td>
                             <td>@u.Email</td>
                             <td><span class="badge bg-primary">@u.Role</span></td>
+                            <td><span class="badge @(u.SubscriptionPlan == "Pro" ? "bg-info" : u.SubscriptionPlan == "Premium" ? "bg-warning text-dark" : "bg-secondary")">@u.SubscriptionPlan</span></td>
                             <td>
                                 <div class="d-flex flex-nowrap gap-1 align-items-center">
                                     @if (u.Role?.Contains("Admin") != true)

@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using FinanceApp.Domain.Enums;
 using FinanceApp.Infrastructure.Identity;
 
 namespace FinanceApp.Web.Areas.Identity.Pages.Account
@@ -153,6 +154,8 @@ namespace FinanceApp.Web.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
+                user.SubscriptionPlan = SubscriptionPlan.Free;
+                user.SubscriptionAssignedAt = DateTimeOffset.UtcNow;
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);

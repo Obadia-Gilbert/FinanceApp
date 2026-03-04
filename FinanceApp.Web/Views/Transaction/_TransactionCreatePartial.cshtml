@@ -56,7 +56,7 @@
     </div>
 
     <div class="mb-3">
-        <label asp-for="CategoryId" class="form-label">Category <span class="text-muted fw-normal">(optional)</span></label>
+        <label asp-for="CategoryId" class="form-label">Category <span class="text-muted fw-normal">(optional — expense or income)</span></label>
         <select asp-for="CategoryId" class="form-select" id="transactionCategorySelect">
             <option value="">— None —</option>
             @foreach (var cat in categories)

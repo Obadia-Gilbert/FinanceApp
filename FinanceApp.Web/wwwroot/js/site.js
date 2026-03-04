@@ -186,3 +186,95 @@ function showToast(message, type) {
 		el.addEventListener('hidden.bs.toast', function () { el.remove(); });
 	}
 }
+
+// ============================================================
+// Notifications — bell dropdown: unread count, list, mark read
+// ============================================================
+document.addEventListener('DOMContentLoaded', function () {
+	var badge = document.getElementById('notificationBadge');
+	var listEl = document.getElementById('notificationList');
+	var loadingEl = document.getElementById('notificationListLoading');
+	var dropdown = document.getElementById('notificationDropdown');
+	var markAllBtn = document.getElementById('notificationMarkAllRead');
+	if (!dropdown) return;
+
+	function getAntiforgeryHeaders() {
+		var token = document.querySelector('meta[name="request-verification-token"]');
+		var h = { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' };
+		if (token && token.getAttribute('content')) h['RequestVerificationToken'] = token.getAttribute('content');
+		return h;
+	}
+
+	function refreshUnreadCount() {
+		fetch('/Notification/UnreadCount', { credentials: 'include', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+			.then(function (r) { return r.ok ? r.json() : null; })
+			.then(function (data) {
+				if (data && typeof data.count === 'number') {
+					badge.textContent = data.count > 99 ? '99+' : data.count;
+					badge.style.display = data.count > 0 ? 'inline' : 'none';
+				}
+			});
+	}
+
+	function renderList(items) {
+		if (!listEl) return;
+		listEl.innerHTML = '';
+		if (!items || items.length === 0) {
+			listEl.insertAdjacentHTML('beforeend', '<li class="list-group-item text-muted small text-center py-3">No notifications</li>');
+			return;
+		}
+		items.forEach(function (n) {
+			var link = (n.relatedLink && n.relatedLink.length) ? ('<a href="' + n.relatedLink + '" class="list-group-item list-group-item-action py-2 ' + (n.isRead ? '' : 'notification-unread') + '">') : ('<div class="list-group-item py-2 ' + (n.isRead ? '' : 'notification-unread') + '">');
+			var close = (n.relatedLink && n.relatedLink.length) ? '</a>' : '</div>';
+			var readBtn = n.isRead ? '' : '<button type="button" class="btn btn-link btn-sm p-0 float-end notification-mark-one" data-id="' + n.id + '" title="Mark as read"><i class="bi bi-check2"></i></button>';
+			listEl.insertAdjacentHTML('beforeend', link + readBtn + '<div class="small fw-semibold">' + (n.title || '') + '</div><div class="small text-muted">' + (n.message || '') + '</div>' + close);
+		});
+		listEl.querySelectorAll('.notification-mark-one').forEach(function (btn) {
+			btn.addEventListener('click', function (e) {
+				e.preventDefault();
+				e.stopPropagation();
+				var id = btn.getAttribute('data-id');
+				if (!id) return;
+				fetch('/Notification/MarkRead', {
+					method: 'POST',
+					credentials: 'include',
+					headers: getAntiforgeryHeaders(),
+					body: JSON.stringify({ id: id })
+				}).then(function (r) {
+					if (r.ok) { btn.remove(); refreshUnreadCount(); }
+				});
+			});
+		});
+	}
+
+	function loadList() {
+		if (loadingEl) loadingEl.style.display = 'block';
+		if (listEl) listEl.innerHTML = '';
+		fetch('/Notification/List?page=1&pageSize=15', { credentials: 'include', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+			.then(function (r) { return r.ok ? r.json() : null; })
+			.then(function (data) {
+				if (loadingEl) loadingEl.style.display = 'none';
+				if (data && data.items) renderList(data.items);
+			})
+			.catch(function () { if (loadingEl) loadingEl.style.display = 'none'; });
+	}
+
+	var bell = document.getElementById('notificationBell');
+	if (bell && typeof bootstrap !== 'undefined') {
+		bell.addEventListener('show.bs.dropdown', loadList);
+	}
+	if (markAllBtn) {
+		markAllBtn.addEventListener('click', function (e) {
+			e.preventDefault();
+			fetch('/Notification/MarkAllRead', {
+				method: 'POST',
+				credentials: 'include',
+				headers: getAntiforgeryHeaders(),
+				body: JSON.stringify({})
+			}).then(function (r) {
+				if (r.ok) { loadList(); refreshUnreadCount(); }
+			});
+		});
+	}
+	refreshUnreadCount();
+});

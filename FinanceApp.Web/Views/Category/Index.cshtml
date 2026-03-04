@@ -6,10 +6,18 @@
 
 <div class="mb-4">
     <h1 class="visually-hidden">Categories</h1>
-    <p class="page-subtitle mb-3">Organize expenses with clear, reusable categories.</p>
-    <button type="button" id="btnAddCategory" class="btn btn-primary">
-        <i class="bi bi-plus-circle"></i> Add New Category
-    </button>
+    <p class="page-subtitle mb-3">Organize <strong>expenses</strong> and <strong>income</strong> with clear categories. Each category is for expenses only, income only, or both.</p>
+    <div class="d-flex flex-wrap gap-2 align-items-center">
+        <button type="button" id="btnAddCategory" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Add New Category
+        </button>
+        <div class="btn-group btn-group-sm" role="group" aria-label="Filter by type">
+            <button type="button" class="btn btn-outline-secondary active" data-filter="all">All</button>
+            <button type="button" class="btn btn-outline-secondary" data-filter="Expense">Expenses only</button>
+            <button type="button" class="btn btn-outline-secondary" data-filter="Income">Income only</button>
+            <button type="button" class="btn btn-outline-secondary" data-filter="Both">Both</button>
+        </div>
+    </div>
 </div>
 
 <!-- Offcanvas for category create/edit/delete (like Expense) -->
@@ -33,7 +41,7 @@
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Type</th>
+                        <th>Use for</th>
                         <th>Description</th>
                         <th style="width: 220px;">Actions</th>
                     </tr>
@@ -41,7 +49,11 @@
                 <tbody>
                     @foreach (var category in Model.Items)
                     {
-                        <tr>
+                        var type = category.Type;
+                        var isExpense = type == FinanceApp.Domain.Enums.CategoryType.Expense;
+                        var isIncome = type == FinanceApp.Domain.Enums.CategoryType.Income;
+                        var isBoth = type == FinanceApp.Domain.Enums.CategoryType.Both;
+                        <tr data-category-type="@type">
                             <td>
                                 @{ var bg = string.IsNullOrEmpty(category.BadgeColor) ? "#6c757d" : category.BadgeColor; }
                                 <span class="category-badge" style="background:@bg; color:#fff;">
@@ -53,7 +65,7 @@
                                 </span>
                             </td>
                             <td>
-                                <span class="badge @(category.Type == FinanceApp.Domain.Enums.CategoryType.Expense ? "bg-danger" : category.Type == FinanceApp.Domain.Enums.CategoryType.Income ? "bg-success" : "bg-secondary")">@category.Type</span>
+                                <span class="badge @(isExpense ? "bg-danger" : isIncome ? "bg-success" : "bg-secondary")">@(isExpense ? "Expenses only" : isIncome ? "Income only" : "Both")</span>
                             </td>
                             <td>@category.Description</td>
                             <td>
@@ -63,9 +75,18 @@
                                 <a class="btn btn-sm btn-danger btn-delete" href="@Url.Action("Delete", "Category", new { id = category.Id })" title="Delete" aria-label="Delete category">
                                     <i class="bi bi-trash" aria-hidden="true"></i>
                                 </a>
-                                <a asp-controller="Expense" asp-action="ByCategory" asp-route-categoryId="@category.Id" class="btn btn-sm btn-info" title="View expenses" aria-label="View expenses in this category">
-                                    <i class="bi bi-eye" aria-hidden="true"></i>
-                                </a>
+                                @if (isExpense || isBoth)
+                                {
+                                    <a asp-controller="Expense" asp-action="ByCategory" asp-route-categoryId="@category.Id" class="btn btn-sm btn-info" title="View expenses" aria-label="View expenses in this category">
+                                        <i class="bi bi-cash-stack" aria-hidden="true"></i>
+                                    </a>
+                                }
+                                @if (isIncome || isBoth)
+                                {
+                                    <a asp-controller="Income" asp-action="Index" class="btn btn-sm btn-success" title="View income" aria-label="View income">
+                                        <i class="bi bi-arrow-down-circle" aria-hidden="true"></i>
+                                    </a>
+                                }
                             </td>
                         </tr>
                     }
@@ -150,6 +171,20 @@
                 }
             });
 
+            // Filter by type: All | Expenses only | Income only | Both
+            document.querySelectorAll('[data-filter]').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var filter = this.getAttribute('data-filter');
+                    document.querySelectorAll('[data-filter]').forEach(function(b) { b.classList.remove('active'); });
+                    this.classList.add('active');
+                    var rows = document.querySelectorAll('#categoryTable tbody tr[data-category-type]');
+                    rows.forEach(function(row) {
+                        var type = row.getAttribute('data-category-type');
+                        var show = filter === 'all' || type === filter;
+                        row.style.display = show ? '' : 'none';
+                    });
+                });
+            });
         });
     </script>
 }

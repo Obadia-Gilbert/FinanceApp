@@ -15,10 +15,11 @@
         <span asp-validation-for="Name" class="invalid-feedback d-block small"></span>
     </div>
 
-    <!-- Type -->
+    <!-- Use for: explicit so user knows where this category appears -->
     <div class="mb-4">
-        <label asp-for="Type" class="form-label fw-600">Type</label>
+        <label asp-for="Type" class="form-label fw-600">Use for</label>
         <select asp-for="Type" class="form-select form-select-lg" asp-items="Html.GetEnumSelectList<FinanceApp.Domain.Enums.CategoryType>()"></select>
+        <small class="text-muted d-block mt-1"><strong>Expenses only</strong> — when adding expenses. <strong>Income only</strong> — when adding income. <strong>Both</strong> — on both forms.</small>
     </div>
 
     <!-- Icon Selection -->

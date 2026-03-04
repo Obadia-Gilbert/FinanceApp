@@ -26,7 +26,7 @@ namespace FinanceApp.Application.Interfaces.Services
             Expression<Func<Expense, bool>>? filter = null,
             Func<IQueryable<Expense>, IOrderedQueryable<Expense>>? orderBy = null);
 
-        // Optional: create via parameters (instead of passing full entity)
+        /// <summary>Creates an Expense. If accountId is set, also creates a Transaction so account balance updates.</summary>
         Task<Expense> CreateExpenseAsync(
             decimal amount,
             Currency currency,
@@ -34,7 +34,8 @@ namespace FinanceApp.Application.Interfaces.Services
             Guid categoryId,
             string userId,
             string description,
-            string? receiptPath = null);
+            string? receiptPath = null,
+            Guid? accountId = null);
         Task<PagedResult<Expense>> GetByCategoryIdAsync(
             Guid categoryId,
             string userId,

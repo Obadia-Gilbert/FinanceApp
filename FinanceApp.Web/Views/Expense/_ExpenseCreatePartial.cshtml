@@ -2,6 +2,7 @@
 
 @{
     var categories = ViewBag.Categories as IEnumerable<FinanceApp.Domain.Entities.Category>;
+    var accounts = ViewBag.Accounts as IEnumerable<FinanceApp.Domain.Entities.Account>;
 }
 
 <form asp-action="Create" method="post" enctype="multipart/form-data" class="p-3">
@@ -35,7 +36,7 @@
     </div>
 
     <div class="mb-3">
-        <label asp-for="CategoryId" class="form-label">Category</label>
+        <label asp-for="CategoryId" class="form-label">Expense category</label>
         <select asp-for="CategoryId" class="form-select">
             <option value="">-- Select Category --</option>
             @foreach (var cat in categories ?? Enumerable.Empty<FinanceApp.Domain.Entities.Category>())
@@ -43,6 +44,21 @@
                 <option value="@cat.Id">@cat.Name</option>
             }
         </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="AccountId" class="form-label">Account <span class="text-muted">(optional — for balance tracking)</span></label>
+        <select asp-for="AccountId" class="form-select">
+            <option value="">— None (tracking only) —</option>
+            @if (accounts != null)
+            {
+                @foreach (var acc in accounts)
+                {
+                    <option value="@acc.Id">@acc.Name (@acc.Currency)</option>
+                }
+            }
+        </select>
+        <small class="text-muted">Leave as "None" if you don't use accounts; your expense will still be listed and included in reports.</small>
     </div>
 
     <div class="mb-3">

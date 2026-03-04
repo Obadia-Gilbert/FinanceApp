@@ -25,6 +25,9 @@ namespace FinanceApp.Web.Models
         [Required]
         public Guid CategoryId { get; set; }
 
+        /// <summary>Optional. When set, a transaction is created so account balance updates.</summary>
+        public Guid? AccountId { get; set; }
+
         // For uploading a receipt
         [Display(Name = "Receipt")]
         public IFormFile? ReceiptFile { get; set; }

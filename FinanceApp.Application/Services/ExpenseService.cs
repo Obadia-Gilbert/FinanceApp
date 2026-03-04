@@ -15,10 +15,12 @@ namespace FinanceApp.Application.Services
     public class ExpenseService : IExpenseService
     {
         private readonly IRepository<Expense> _expenseRepository;
+        private readonly ITransactionService _transactionService;
 
-        public ExpenseService(IRepository<Expense> expenseRepository)
+        public ExpenseService(IRepository<Expense> expenseRepository, ITransactionService transactionService)
         {
             _expenseRepository = expenseRepository;
+            _transactionService = transactionService;
         }
 
         // -----------------------
@@ -48,6 +50,16 @@ namespace FinanceApp.Application.Services
         public async Task UpdateExpenseAsync(Expense expense)
         {
             _expenseRepository.Update(expense);
+            if (expense.TransactionId.HasValue)
+            {
+                await _transactionService.UpdateAsync(
+                    expense.TransactionId.Value,
+                    expense.UserId,
+                    expense.Amount,
+                    expense.ExpenseDate,
+                    expense.CategoryId,
+                    expense.Description);
+            }
             await _expenseRepository.SaveChangesAsync();
         }
 
@@ -55,6 +67,9 @@ namespace FinanceApp.Application.Services
         {
             var expense = await _expenseRepository.GetByIdAsync(id);
             if (expense == null) return;
+
+            if (expense.TransactionId.HasValue)
+                await _transactionService.DeleteAsync(expense.TransactionId.Value, expense.UserId);
 
             _expenseRepository.SoftDelete(expense);
             await _expenseRepository.SaveChangesAsync();
@@ -88,17 +103,28 @@ namespace FinanceApp.Application.Services
             Guid categoryId,
             string userId,
             string description,
-            string? receiptPath = null)
+            string? receiptPath = null,
+            Guid? accountId = null)
         {
+            Guid? transactionId = null;
+            if (accountId.HasValue)
+            {
+                var transaction = await _transactionService.CreateAsync(
+                    userId, accountId.Value, TransactionType.Expense, amount, currency,
+                    new DateTimeOffset(expenseDate), categoryId, description, isRecurring: false);
+                transactionId = transaction.Id;
+            }
+
             var expense = new Expense(
                 amount: amount,
                 currency: currency,
                 expenseDate: expenseDate,
                 categoryId: categoryId,
                 userId: userId,
+                accountId: accountId,
                 description: description,
-                receiptPath: receiptPath
-            );
+                receiptPath: receiptPath,
+                transactionId: transactionId);
 
             await _expenseRepository.AddAsync(expense);
             await _expenseRepository.SaveChangesAsync();

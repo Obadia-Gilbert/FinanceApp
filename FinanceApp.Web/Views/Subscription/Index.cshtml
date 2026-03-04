@@ -7,7 +7,7 @@
 <div class="mb-4">
     <h1 class="visually-hidden">Subscription</h1>
     <p class="page-subtitle mb-2">Your current plan is <strong>@Model.CurrentPlan</strong>.</p>
-    <p class="text-muted small mb-0">Assigned on @Model.SubscriptionAssignedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm").</p>
+    <p class="text-muted small mb-0">Assigned on @Model.SubscriptionAssignedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm"). Every new user is enrolled in the Free plan by default.</p>
 </div>
 
 @if (TempData["SubscriptionSuccess"] is string success)

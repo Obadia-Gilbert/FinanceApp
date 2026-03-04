@@ -174,6 +174,17 @@ public async Task AssignDefaultCategoriesToUserAsync(string userId)
         existingNames.Add(trimmed);
     }
 
+    foreach (var name in CategoryDefaults.DefaultIncomeCategories)
+    {
+        var trimmed = name.Trim();
+        if (string.IsNullOrWhiteSpace(trimmed) || existingNames.Contains(trimmed))
+            continue;
+
+        var userCategory = new Category(trimmed, null, CategoryType.Income, null, null) { UserId = userId };
+        await _categoryRepository.AddAsync(userCategory);
+        existingNames.Add(trimmed);
+    }
+
     await _categoryRepository.SaveChangesAsync();
 }
     public async Task<IEnumerable<Category>> GetCategoriesAsync(string userId, bool isAdmin)

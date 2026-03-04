@@ -2,6 +2,8 @@
 
 This document summarizes the current state of the project against the README and gives concrete steps to make it safe and ready for deployment.
 
+**Order of work:** Finish the **mobile app** first, then run this checklist before pushing to production. See [WHERE_WE_LEFT_OFF.md](./WHERE_WE_LEFT_OFF.md) for where we ended and what to do next.
+
 ---
 
 ## Critical (must fix before deploy)

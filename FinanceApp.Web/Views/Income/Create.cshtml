@@ -1,0 +1,13 @@
+@model FinanceApp.Web.Models.IncomeCreateViewModel
+@{
+    ViewData["Title"] = "Add Income";
+}
+<div class="mb-4">
+    <h1 class="h4">Add Income</h1>
+    <p class="text-muted">Record a new income entry.</p>
+</div>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <partial name="_IncomeCreatePartial" model="Model" />
+    </div>
+</div>

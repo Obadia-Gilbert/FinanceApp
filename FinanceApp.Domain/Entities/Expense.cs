@@ -11,6 +11,9 @@ public class Expense : BaseEntity
 
     public string UserId { get; private set; } = null!;
 
+    /// <summary>Optional. When set, a Transaction is created so account balance updates.</summary>
+    public Guid? AccountId { get; private set; }
+
     public DateTimeOffset ExpenseDate { get; private set; }
 
     public string? Description { get; private set; }
@@ -19,23 +22,25 @@ public class Expense : BaseEntity
 
     public string? ReceiptPath { get; private set; }
 
-    //public Guid UserId { get; private set; }
+    /// <summary>Set when this expense was synced to the ledger (AccountId was provided).</summary>
+    public Guid? TransactionId { get; private set; }
 
-    // 🔹 Navigation property to Category
     public Category Category { get; private set; } = null!;
+    public Account? Account { get; private set; }
 
     // ✅ Parameterless constructor required by EF Core & MVC model binding
     protected Expense() { }
 
-    // 🔹 Main constructor for creating new Expense
     public Expense(
         decimal amount,
         Currency currency,
         DateTimeOffset expenseDate,
         Guid categoryId,
         string userId,
+        Guid? accountId = null,
         string? description = null,
-        string? receiptPath = null)
+        string? receiptPath = null,
+        Guid? transactionId = null)
     {
         if (amount <= 0)
             throw new ArgumentException("Amount must be greater than zero.");
@@ -45,9 +50,14 @@ public class Expense : BaseEntity
         ExpenseDate = expenseDate;
         CategoryId = categoryId;
         UserId = userId;
+        AccountId = accountId;
         Description = description;
         ReceiptPath = receiptPath;
+        TransactionId = transactionId;
     }
+
+    public void SetTransactionId(Guid transactionId) => TransactionId = transactionId;
+    public void UpdateAccount(Guid? accountId) => AccountId = accountId;
 
     // 🔹 Optional update methods
     public void UpdateDescription(string description)

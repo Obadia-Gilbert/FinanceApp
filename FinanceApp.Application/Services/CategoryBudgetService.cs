@@ -9,13 +9,16 @@ public class CategoryBudgetService : ICategoryBudgetService
 {
     private readonly IRepository<CategoryBudget> _categoryBudgetRepository;
     private readonly IRepository<Expense> _expenseRepository;
+    private readonly IExpenseQueryService _expenseQueryService;
 
     public CategoryBudgetService(
         IRepository<CategoryBudget> categoryBudgetRepository,
-        IRepository<Expense> expenseRepository)
+        IRepository<Expense> expenseRepository,
+        IExpenseQueryService expenseQueryService)
     {
         _categoryBudgetRepository = categoryBudgetRepository ?? throw new ArgumentNullException(nameof(categoryBudgetRepository));
         _expenseRepository = expenseRepository ?? throw new ArgumentNullException(nameof(expenseRepository));
+        _expenseQueryService = expenseQueryService ?? throw new ArgumentNullException(nameof(expenseQueryService));
     }
 
     public async Task<IEnumerable<CategoryBudget>> GetForMonthAsync(string userId, int month, int year)
@@ -73,5 +76,11 @@ public class CategoryBudgetService : ICategoryBudgetService
             e.ExpenseDate.Month == month &&
             e.ExpenseDate.Year == year);
         return expenses.Sum(e => e.Amount);
+    }
+
+    public async Task<Dictionary<(Guid CategoryId, Currency Currency), decimal>> GetCategorySpendForMonthAsync(string userId, int month, int year)
+    {
+        if (string.IsNullOrWhiteSpace(userId)) return new Dictionary<(Guid, Currency), decimal>();
+        return await _expenseQueryService.GetCategorySpendForMonthAsync(userId, month, year);
     }
 }

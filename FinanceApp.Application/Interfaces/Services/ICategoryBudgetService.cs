@@ -19,4 +19,7 @@ public interface ICategoryBudgetService
 
     /// <summary>Gets the total spent in a category for the given month/year in the specified currency.</summary>
     Task<decimal> GetCategorySpendAsync(string userId, Guid categoryId, int month, int year, Currency currency);
+
+    /// <summary>Gets spend per (CategoryId, Currency) for the month in one query. Use for dashboard/report to avoid N+1.</summary>
+    Task<Dictionary<(Guid CategoryId, Currency Currency), decimal>> GetCategorySpendForMonthAsync(string userId, int month, int year);
 }

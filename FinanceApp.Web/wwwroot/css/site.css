@@ -634,6 +634,21 @@ textarea.form-control { resize: vertical; min-height: 80px; }
   .app-sidebar-nav .nav-link { padding: 0.625rem 0.75rem; }
 }
 
+/* Sign out button at bottom of sidebar – match nav link look */
+.sidebar-signout-btn {
+  color: var(--color-text-body);
+  font-weight: 500;
+  font-size: 0.875rem;
+  border-radius: var(--radius-md);
+  padding: 0.5rem 0.75rem;
+  text-decoration: none;
+}
+.sidebar-signout-btn:hover {
+  background-color: var(--color-bg-hover);
+  color: var(--color-text-dark);
+}
+.sidebar-signout-btn:hover .nav-icon { color: var(--color-brand); }
+
 /* ============================================================
    FOOTER
    ============================================================ */
@@ -774,6 +789,35 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 
 .dashboard-stat-budget .card-footer .btn-link { color: rgba(255, 255, 255, 0.9); }
 .dashboard-stat-budget .card-footer .btn-link:hover { color: #fff; }
+
+/* Dashboard Overview KPI cards (icon + label + value + trend) */
+.dashboard-overview-title { font-weight: 600; color: var(--color-text-dark); }
+.dashboard-kpi-cards .dashboard-kpi-card { border-radius: var(--radius-lg); transition: box-shadow var(--transition-fast); }
+.dashboard-kpi-cards .dashboard-kpi-card:hover { box-shadow: var(--shadow-md) !important; }
+.dashboard-kpi-icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.1rem;
+}
+.dashboard-kpi-icon-balance { background: #3b82f6; }
+.dashboard-kpi-icon-income { background: #22c55e; }
+.dashboard-kpi-icon-expense { background: #ef4444; }
+.dashboard-kpi-icon-budget { background: #f59e0b; }
+.dashboard-kpi-icon-spend { background: #0d9488; }
+.dashboard-kpi-icon-categories { background: #8b5cf6; }
+.dashboard-bar-chart-wrap { min-height: 120px; }
+
+/* Report page: month/year side by side, arrow not overlapping value, buttons normal height */
+.report-form-row { flex-wrap: nowrap; }
+.report-year-select { width: auto; min-width: 4.5rem; padding-right: 1.75rem; max-width: 5.5rem; }
+.report-month-select { width: auto; min-width: 6rem; padding-right: 1.75rem; max-width: 8rem; }
+@media (max-width: 575.98px) {
+  .report-form-row { flex-wrap: wrap; }
+}
 
 .expense-trend-card {
   margin-bottom: 1rem;
@@ -991,3 +1035,9 @@ textarea.form-control { resize: vertical; min-height: 80px; }
   --bs-body-bg: #111111;
   --bs-body-color: #D1D5DB;
 }
+
+/* Notification dropdown & unread state */
+.notification-dropdown .notification-unread { background-color: var(--color-bg-alt); }
+.notification-dropdown .list-group-item { border-left: 0; border-right: 0; }
+.notification-dropdown .list-group-item-action:hover { background-color: var(--color-bg-hover); }
+[data-theme="dark"] .notification-dropdown .notification-unread { background-color: rgba(255,255,255,.05); }

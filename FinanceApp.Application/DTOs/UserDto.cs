@@ -14,5 +14,7 @@ namespace FinanceApp.Application.DTOs
         public string? ProfileImagePath { get; set; }
         /// <summary>Comma-separated role names or single role.</summary>
         public string Role { get; set; } = string.Empty;
+        /// <summary>User's subscription plan (Free, Pro, Premium).</summary>
+        public string SubscriptionPlan { get; set; } = "Free";
     }
 }

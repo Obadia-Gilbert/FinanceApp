@@ -2,6 +2,8 @@
 
 Use this board for daily execution tracking. Move items from **Backlog** to **This Week**, then to **Done**.
 
+**Handoff:** See [WHERE_WE_LEFT_OFF.md](./WHERE_WE_LEFT_OFF.md) for current state and next steps (mobile app → production).
+
 ---
 
 ## Backlog

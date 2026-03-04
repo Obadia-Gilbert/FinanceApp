@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using FinanceApp.API.DTOs;
 using FinanceApp.Application.Interfaces.Services;
+using FinanceApp.Domain.Enums;
 using FinanceApp.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -48,7 +49,9 @@ public class AuthController : ControllerBase
             Email = request.Email,
             FirstName = request.FirstName,
             LastName = request.LastName,
-            EmailConfirmed = true
+            EmailConfirmed = true,
+            SubscriptionPlan = SubscriptionPlan.Free,
+            SubscriptionAssignedAt = DateTimeOffset.UtcNow
         };
 
         var result = await _userManager.CreateAsync(user, request.Password);

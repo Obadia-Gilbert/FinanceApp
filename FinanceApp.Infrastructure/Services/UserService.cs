@@ -32,7 +32,8 @@ namespace FinanceApp.Infrastructure.Services
                     FirstName = user.FirstName,
                     LastName = user.LastName,
                     ProfileImagePath = user.ProfileImagePath,
-                    Role = roles.Count > 0 ? string.Join(", ", roles) : "User"
+                    Role = roles.Count > 0 ? string.Join(", ", roles) : "User",
+                    SubscriptionPlan = user.SubscriptionPlan.ToString()
                 });
             }
             return dtos;

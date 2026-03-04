@@ -1,0 +1,154 @@
+@using FinanceApp.Application.Common
+@{
+    ViewData["Title"] = "Monthly Report";
+    var report = ViewBag.Report as MonthlyReportResult;
+    var selectedYear = ViewBag.SelectedYear as int? ?? DateTime.Now.Year;
+    var selectedMonth = ViewBag.SelectedMonth as int? ?? DateTime.Now.Month;
+    var years = ViewBag.Years as List<int> ?? new List<int> { DateTime.Now.Year };
+    var monthNames = new[] { "", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="visually-hidden">Monthly report</h1>
+            <p class="text-muted small mb-0">Expenses and budget summary for a given month. Share or download as you like.</p>
+        </div>
+    </div>
+
+    <div class="row mb-4 align-items-center">
+        <div class="col-auto">
+            <form method="get" asp-action="Index" class="d-flex flex-nowrap align-items-center gap-2 report-form-row">
+                <label class="form-label mb-0">Month</label>
+                <select name="month" class="form-select form-select-sm report-month-select">
+                    @for (var i = 1; i <= 12; i++)
+                    {
+                        <option value="@i" selected="@(i == selectedMonth)">@monthNames[i]</option>
+                    }
+                </select>
+                <label class="form-label mb-0">Year</label>
+                <select name="year" class="form-select form-select-sm report-year-select">
+                    @foreach (var y in years)
+                    {
+                        <option value="@y" selected="@(y == selectedYear)">@y</option>
+                    }
+                </select>
+                <button type="submit" class="btn btn-primary btn-sm">Show report</button>
+            </form>
+        </div>
+        @if (report != null)
+        {
+            <div class="col-auto ms-auto d-flex flex-nowrap gap-2 align-items-center">
+                <a asp-action="Download" asp-route-year="@report.Year" asp-route-month="@report.Month" class="btn btn-outline-secondary btn-sm text-nowrap" target="_blank" rel="noopener">Download as HTML</a>
+                <form method="post" asp-action="CreateShareLink" asp-route-year="@report.Year" asp-route-month="@report.Month" asp-route-expiryDays="7" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-outline-primary btn-sm">Get shareable link</button>
+                </form>
+            </div>
+        }
+    </div>
+
+    @if (TempData["ShareReportUrl"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+            <strong>Shareable link created.</strong> It expires @TempData["ShareReportExpires"]. Copy the link below to share your report.
+            <div class="input-group mt-2">
+                <input type="text" class="form-control form-control-sm" id="shareReportUrl" value="@TempData["ShareReportUrl"]" readonly />
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('shareReportUrl').value); this.textContent='Copied!'; setTimeout(() => this.textContent='Copy', 2000);">Copy</button>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (report != null)
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h2 class="h5 mb-4">@report.MonthName</h2>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="p-3 rounded bg-light">
+                            <div class="small text-muted">Total spent</div>
+                            <div class="fw-bold fs-4">@report.TotalSpent.ToString("N0") @report.Currency</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 rounded bg-light">
+                            <div class="small text-muted">Total income</div>
+                            <div class="fw-bold fs-4 text-success">@report.TotalIncome.ToString("N0") @report.Currency</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 rounded bg-light">
+                            <div class="small text-muted">Net cash flow</div>
+                            <div class="fw-bold fs-4 @(report.NetCashFlow >= 0 ? "text-success" : "text-danger")">@report.NetCashFlow.ToString("N0") @report.Currency</div>
+                        </div>
+                    </div>
+                    @if (report.GlobalBudgetAmount.HasValue)
+                    {
+                        <div class="col-md-4">
+                            <div class="p-3 rounded @(report.IsOverGlobalBudget ? "bg-danger bg-opacity-10" : "bg-light")">
+                                <div class="small text-muted">Monthly budget</div>
+                                <div class="fw-bold">@report.GlobalBudgetAmount.Value.ToString("N0") @report.Currency</div>
+                                @if (report.GlobalBudgetRemaining.HasValue)
+                                {
+                                    <div class="small @(report.IsOverGlobalBudget ? "text-danger" : "text-success")">
+                                        @(report.IsOverGlobalBudget ? "Exceeded by " + (-report.GlobalBudgetRemaining.Value).ToString("N0") : "Left: " + report.GlobalBudgetRemaining.Value.ToString("N0")) @report.Currency
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                @if (report.CategoryLines.Any())
+                {
+                    <h3 class="h6 mb-2">By category</h3>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th class="text-end">Spent</th>
+                                    <th class="text-end">Budget</th>
+                                    <th class="text-end">Left</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var line in report.CategoryLines)
+                                {
+                                    <tr class="@(line.IsOverBudget ? "table-danger" : "")">
+                                        <td>@line.CategoryName</td>
+                                        <td class="text-end">@line.Spent.ToString("N0") @report.Currency</td>
+                                        <td class="text-end">@(line.BudgetAmount.HasValue ? line.BudgetAmount.Value.ToString("N0") + " " + report.Currency : "—")</td>
+                                        <td class="text-end">@(line.Remaining.HasValue ? (line.IsOverBudget ? "Over" : line.Remaining.Value.ToString("N0")) : "—")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+
+                @if (report.TopExpenses.Any())
+                {
+                    <h3 class="h6 mt-4 mb-2">Top expenses</h3>
+                    <ul class="list-group list-group-flush">
+                        @foreach (var e in report.TopExpenses.Take(10))
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span>@(string.IsNullOrEmpty(e.Description) ? "Expense" : e.Description) <small class="text-muted">@e.CategoryName · @e.Date.ToString("MMM d")</small></span>
+                                <span class="fw-semibold">@e.Amount.ToString("N0") @e.Currency</span>
+                            </li>
+                        }
+                    </ul>
+                }
+
+                @if (!report.CategoryLines.Any() && !report.TopExpenses.Any())
+                {
+                    <p class="text-muted mb-0">No expenses recorded for this month.</p>
+                }
+            </div>
+        </div>
+    }
+</div>

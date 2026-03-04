@@ -1,5 +1,23 @@
 public static class CategoryDefaults
 {
+    /// <summary>Default income categories (seeded for new users). Covers employment, side income, investments, and one‑offs.</summary>
+    public static readonly string[] DefaultIncomeCategories =
+    {
+        "Salary / Wages",
+        "Bonus",
+        "Commission",
+        "Freelance / Contract",
+        "Side Hustle / Gig",
+        "Rental Income",
+        "Dividends / Investment Income",
+        "Interest",
+        "Tax Refund",
+        "Gift / Donation Received",
+        "Refund (Purchase)",
+        "Reimbursement",
+        "Other Income"
+    };
+
     public static readonly string[] DefaultCategories =
     {
         "Groceries", "Restaurants / Dining Out", "Coffee / Snacks", "Takeout / Delivery", "Alcohol / Bars",

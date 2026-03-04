@@ -418,6 +418,8 @@ dotnet ef database update PreviousMigrationName \
 
 ## Roadmap
 
+**Resuming work?** See [WHERE_WE_LEFT_OFF.md](./WHERE_WE_LEFT_OFF.md) for current state, next steps (mobile app → production), and links to deployment and roadmap docs.
+
 | Feature | Status |
 |---|---|
 | Expense tracking | ✅ Complete |

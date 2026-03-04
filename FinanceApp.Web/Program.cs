@@ -29,6 +29,9 @@ builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<ICategoryBudgetService, CategoryBudgetService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddScoped<IIncomeService, IncomeService>();
+builder.Services.AddScoped<IRecurringTemplateService, RecurringTemplateService>();
+builder.Services.AddHostedService<FinanceApp.Infrastructure.Services.RecurringTransactionJob>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<ISupportingDocumentService>(sp =>
 {
@@ -39,6 +42,11 @@ builder.Services.AddScoped<ISupportingDocumentService>(sp =>
 });
 builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IFeedbackService, FeedbackService>();
+builder.Services.AddScoped<IExpenseQueryService, FinanceApp.Infrastructure.Services.ExpenseQueryService>();
+builder.Services.AddScoped<IMonthlyReportService, MonthlyReportService>();
+builder.Services.AddScoped<ISharedReportService, SharedReportService>();
 builder.Services.AddSingleton<ICurrencyConversionService, CurrencyConversionService>();
 //builder.Services.AddTransient<IEmailSender, IdentityEmailSender>();
 

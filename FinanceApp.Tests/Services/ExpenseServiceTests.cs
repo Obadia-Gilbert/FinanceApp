@@ -11,19 +11,21 @@ namespace FinanceApp.Tests.Services;
 public class ExpenseServiceTests
 {
     private readonly Mock<IRepository<Expense>> _repoMock;
+    private readonly Mock<FinanceApp.Application.Interfaces.Services.ITransactionService> _txMock;
     private readonly ExpenseService _sut;
 
     public ExpenseServiceTests()
     {
         _repoMock = new Mock<IRepository<Expense>>();
-        _sut = new ExpenseService(_repoMock.Object);
+        _txMock = new Mock<FinanceApp.Application.Interfaces.Services.ITransactionService>();
+        _sut = new ExpenseService(_repoMock.Object, _txMock.Object);
     }
 
     [Fact]
     public async Task GetByIdAsync_ReturnsExpense_WhenExists()
     {
         var id = Guid.NewGuid();
-        var expense = new Expense(100, Currency.USD, DateTimeOffset.UtcNow, Guid.NewGuid(), "user-1", "Test");
+        var expense = new Expense(100, Currency.USD, DateTimeOffset.UtcNow, Guid.NewGuid(), "user-1", null, "Test", null, null);
         _repoMock.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(expense);
 
         var result = await _sut.GetByIdAsync(id);
@@ -53,7 +55,7 @@ public class ExpenseServiceTests
         _repoMock.Setup(r => r.AddAsync(It.IsAny<Expense>())).Returns(Task.CompletedTask);
         _repoMock.Setup(r => r.SaveChangesAsync()).Returns(Task.CompletedTask);
 
-        var result = await _sut.CreateExpenseAsync(50.00m, Currency.TZS, date, categoryId, userId, "Coffee", null);
+        var result = await _sut.CreateExpenseAsync(50.00m, Currency.TZS, date, categoryId, userId, "Coffee", null, null);
 
         Assert.NotNull(result);
         Assert.Equal(50.00m, result.Amount);
@@ -68,7 +70,7 @@ public class ExpenseServiceTests
     public async Task CreateExpenseAsync_Throws_WhenAmountZero()
     {
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _sut.CreateExpenseAsync(0, Currency.USD, DateTime.UtcNow, Guid.NewGuid(), "user-1", "Test", null));
+            _sut.CreateExpenseAsync(0, Currency.USD, DateTime.UtcNow, Guid.NewGuid(), "user-1", "Test", null, null));
         _repoMock.Verify(r => r.AddAsync(It.IsAny<Expense>()), Times.Never);
     }
 
@@ -76,7 +78,7 @@ public class ExpenseServiceTests
     public async Task SoftDeleteExpenseAsync_SoftDeletesAndSaves_WhenExists()
     {
         var id = Guid.NewGuid();
-        var expense = new Expense(10, Currency.USD, DateTimeOffset.UtcNow, Guid.NewGuid(), "user-1", "To delete");
+        var expense = new Expense(10, Currency.USD, DateTimeOffset.UtcNow, Guid.NewGuid(), "user-1", null, "To delete", null, null);
         _repoMock.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(expense);
         _repoMock.Setup(r => r.SoftDelete(It.IsAny<Expense>())).Verifiable();
         _repoMock.Setup(r => r.SaveChangesAsync()).Returns(Task.CompletedTask);

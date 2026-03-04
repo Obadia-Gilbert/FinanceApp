@@ -15,13 +15,30 @@
     var thisMonthSpendInBudgetCurrency = ViewBag.ThisMonthSpendInBudgetCurrency is decimal b ? b : 0m;
     var isOverBudget = ViewBag.IsOverBudget as bool? == true;
     var categoryBudgetAlerts = ViewBag.CategoryBudgetAlerts as IEnumerable<FinanceApp.Web.Models.CategoryBudgetAlertViewModel> ?? Enumerable.Empty<FinanceApp.Web.Models.CategoryBudgetAlertViewModel>();
+    var userFirstName = ViewBag.UserFirstName as string ?? "User";
+    var totalBalance = ViewBag.TotalBalance is decimal tb ? tb : 0m;
+    var monthlyIncome = ViewBag.MonthlyIncome is decimal mi ? mi : 0m;
+    var momIncomeChange = ViewBag.MoMIncomeChange as decimal?;
+    var momSpendChange = ViewBag.MoMSpendChange as decimal?;
+    var activeBudgetsCount = ViewBag.ActiveBudgetsCount as int? ?? 0;
+    var cashFlowSixMonthLabels = ViewBag.CashFlowSixMonthLabels ?? "[]";
+    var cashFlowSixMonthData = ViewBag.CashFlowSixMonthData ?? "[]";
+    var recentActivity = ViewBag.RecentActivity as IEnumerable<FinanceApp.Web.Models.RecentActivityViewModel> ?? Enumerable.Empty<FinanceApp.Web.Models.RecentActivityViewModel>();
+    var cashFlowThisMonth = ViewBag.CashFlowThisMonth is decimal cf ? cf : (monthlyIncome - thisMonthSpend);
+    var cashFlowMoMChange = ViewBag.CashFlowMoMChange as decimal?;
 }
 
 <div class="container-fluid dashboard-page">
-    <div class="row mb-2 mb-md-3">
-        <div class="col-12">
-            <h1 class="visually-hidden">Dashboard</h1>
-            <p class="page-subtitle mb-0 dashboard-subtitle">A quick overview of your spending, categories, and monthly budget progress.</p>
+    <div class="row mb-3 mb-md-4">
+        <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
+            <div>
+                <h1 class="visually-hidden">Dashboard</h1>
+                <h2 class="visually-hidden">Dashboard Overview</h2>
+                <p class="text-muted small mb-0">Welcome back, @userFirstName. Here's what's happening with your finances.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <span class="btn btn-outline-secondary btn-sm"><i class="bi bi-calendar3 me-1"></i>This Month</span>
+            </div>
         </div>
     </div>
 
@@ -73,89 +90,160 @@
         </div>
     }
 
-    <div class="row g-2 g-md-3 dashboard-stats">
+    <div class="row g-3 mb-4 dashboard-kpi-cards">
         <div class="col-6 col-lg-3">
-            <div class="card dashboard-stat-card dashboard-stat-total h-100">
-                <div class="card-body d-flex align-items-center py-3">
-                    <div class="dashboard-stat-icon">
-                        <i class="bi bi-currency-dollar"></i>
+            <div class="card dashboard-kpi-card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-start justify-content-between">
+                        <div class="dashboard-kpi-icon dashboard-kpi-icon-balance rounded-2"><i class="bi bi-wallet2"></i></div>
                     </div>
-                    <div class="flex-grow-1 min-w-0">
-                        <h6 class="card-title mb-0 text-uppercase small opacity-85">Total Spend</h6>
-                        <p class="card-text mb-0 fw-bold">@totalSpend.ToString("N0") <small class="fw-normal opacity-85">@displayCurrency</small></p>
-                        @if (totalSpendUsd > 0 && displayCurrency != "USD")
+                    <p class="small text-muted text-uppercase mb-1 mt-2">Total Balance</p>
+                    <p class="fw-bold mb-0 fs-5">@totalBalance.ToString("N2") <small class="fw-normal text-muted">@displayCurrency</small></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card dashboard-kpi-card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-start justify-content-between">
+                        <div class="dashboard-kpi-icon dashboard-kpi-icon-income rounded-2"><i class="bi bi-arrow-down-circle"></i></div>
+                        @if (momIncomeChange.HasValue)
                         {
-                            <p class="card-text mb-0 small opacity-75">≈ @totalSpendUsd.ToString("N2") USD</p>
+                            <span class="small @(momIncomeChange >= 0 ? "text-success" : "text-danger")"><i class="bi bi-graph-up-arrow"></i> @(momIncomeChange >= 0 ? "+" : "")@momIncomeChange.Value.ToString("F1")%</span>
                         }
                     </div>
+                    <p class="small text-muted text-uppercase mb-1 mt-2">Monthly Income</p>
+                    <p class="fw-bold mb-0 fs-5">@monthlyIncome.ToString("N2") <small class="fw-normal text-muted">@displayCurrency</small></p>
                 </div>
             </div>
         </div>
         <div class="col-6 col-lg-3">
-            <div class="card dashboard-stat-card dashboard-stat-expenses h-100">
-                <div class="card-body d-flex align-items-center py-3">
-                    <div class="dashboard-stat-icon">
-                        <i class="bi bi-receipt"></i>
+            <div class="card dashboard-kpi-card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-start justify-content-between">
+                        <div class="dashboard-kpi-icon dashboard-kpi-icon-expense rounded-2"><i class="bi bi-cart"></i></div>
+                        @if (momSpendChange.HasValue)
+                        {
+                            <span class="small @(momSpendChange <= 0 ? "text-success" : "text-danger")"><i class="bi bi-graph-down-arrow"></i> @(momSpendChange >= 0 ? "+" : "")@momSpendChange.Value.ToString("F1")%</span>
+                        }
                     </div>
-                    <div class="flex-grow-1 min-w-0">
-                        <h6 class="card-title mb-0 text-uppercase small opacity-85">Expenses</h6>
-                        <p class="card-text mb-0 fw-bold">@expenseCount</p>
-                    </div>
+                    <p class="small text-muted text-uppercase mb-1 mt-2">Monthly Expense</p>
+                    <p class="fw-bold mb-0 fs-5">@thisMonthSpend.ToString("N2") <small class="fw-normal text-muted">@displayCurrency</small></p>
                 </div>
             </div>
         </div>
         <div class="col-6 col-lg-3">
-            <div class="card dashboard-stat-card dashboard-stat-categories h-100">
-                <div class="card-body d-flex align-items-center py-3">
-                    <div class="dashboard-stat-icon">
-                        <i class="bi bi-tags"></i>
+            <div class="card dashboard-kpi-card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-start justify-content-between">
+                        <div class="dashboard-kpi-icon dashboard-kpi-icon-budget rounded-2"><i class="bi bi-pie-chart"></i></div>
+                        <span class="small text-muted">Stable</span>
                     </div>
-                    <div class="flex-grow-1 min-w-0">
-                        <h6 class="card-title mb-0 text-uppercase small opacity-85">Categories</h6>
-                        <p class="card-text mb-0 fw-bold">@categoryCount</p>
-                    </div>
+                    <p class="small text-muted text-uppercase mb-1 mt-2">Active Budgets</p>
+                    <p class="fw-bold mb-0 fs-5">@activeBudgetsCount</p>
                 </div>
             </div>
         </div>
         <div class="col-6 col-lg-3">
-            <div class="card dashboard-stat-card dashboard-stat-month h-100">
-                <div class="card-body d-flex align-items-center py-3">
-                    <div class="dashboard-stat-icon dashboard-cal-badge">
-                        <span class="dashboard-cal-month">@DateTime.Now.ToString("MMM").ToUpper()</span>
-                        <span class="dashboard-cal-day">@DateTime.Now.Day</span>
+            <div class="card dashboard-kpi-card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-start justify-content-between">
+                        <div class="dashboard-kpi-icon dashboard-kpi-icon-spend rounded-2"><i class="bi bi-currency-dollar"></i></div>
                     </div>
-                    <div class="flex-grow-1 min-w-0">
-                        <h6 class="card-title mb-0 text-uppercase small opacity-85">@DateTime.Now.ToString("MMMM yyyy")</h6>
-                        <p class="card-text mb-0 fw-bold">@thisMonthSpend.ToString("N0") <small class="fw-normal opacity-85">@displayCurrency</small></p>
-                    </div>
+                    <p class="small text-muted text-uppercase mb-1 mt-2">Total Spend</p>
+                    <p class="fw-bold mb-0 fs-5">@totalSpend.ToString("N0") <small class="fw-normal text-muted">@displayCurrency</small></p>
                 </div>
             </div>
         </div>
-        @if (budgetAmount.HasValue && budgetAmount > 0)
-        {
-            <div class="col-6 col-lg-3">
-                <div class="card dashboard-stat-card dashboard-stat-budget h-100 @(isOverBudget ? "dashboard-stat-over" : "")">
-                    <div class="card-body d-flex align-items-center py-3">
-                        <div class="dashboard-stat-icon">
-                            <i class="bi bi-wallet2"></i>
+        <div class="col-6 col-lg-3">
+            <div class="card dashboard-kpi-card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-start justify-content-between">
+                        <div class="dashboard-kpi-icon dashboard-kpi-icon-categories rounded-2"><i class="bi bi-tags"></i></div>
+                    </div>
+                    <p class="small text-muted text-uppercase mb-1 mt-2">Categories</p>
+                    <p class="fw-bold mb-0 fs-5">@categoryCount</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">Monthly Cash Flow</h5>
+                        <div class="dropdown">
+                            <button class="btn btn-link btn-sm p-0 text-secondary" type="button" data-bs-toggle="dropdown" aria-label="Options"><i class="bi bi-three-dots-vertical"></i></button>
+                            <ul class="dropdown-menu dropdown-menu-end"><li><a class="dropdown-item" asp-controller="Budget" asp-action="Index">View budget</a></li></ul>
                         </div>
-                        <div class="flex-grow-1 min-w-0">
-                            <h6 class="card-title mb-0 text-uppercase small opacity-85">Budget</h6>
-                            <p class="card-text mb-0 fw-bold">@thisMonthSpendInBudgetCurrency.ToString("N0")<small class="fw-normal opacity-85"> / @budgetAmount.Value.ToString("N0") @budgetCurrency</small></p>
-                            <small class="badge @(isOverBudget ? "bg-danger" : "bg-success") mt-1">@(isOverBudget ? "Over" : "On track")</small>
-                        </div>
                     </div>
-                    <div class="card-footer bg-transparent border-0 py-1 px-3">
-                        <a asp-controller="Budget" asp-action="Index" class="btn btn-sm btn-link p-0 text-decoration-none">Edit</a>
+                    <p class="fw-bold fs-4 mb-1">@cashFlowThisMonth.ToString("N2") <small class="fw-normal text-muted">@displayCurrency</small></p>
+                    @if (cashFlowMoMChange.HasValue)
+                    {
+                        <p class="small @(cashFlowMoMChange >= 0 ? "text-success" : "text-danger") mb-3">@(cashFlowMoMChange >= 0 ? "+" : "")@cashFlowMoMChange.Value.ToString("F0")% vs last month</p>
+                    }
+                    else
+                    {
+                        <p class="small text-muted mb-3">Income minus expenses this month</p>
+                    }
+                    <div class="dashboard-bar-chart-wrap" style="height: 140px;">
+                        <canvas id="cashFlowChart" height="140"></canvas>
                     </div>
                 </div>
             </div>
-        }
+        </div>
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">Recent Transactions</h5>
+                        <a asp-controller="Transaction" asp-action="Index" class="btn btn-link btn-sm p-0 text-decoration-none">View All</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-muted small text-uppercase">Date</th>
+                                    <th class="text-muted small text-uppercase">Category</th>
+                                    <th class="text-muted small text-uppercase text-end">Amount</th>
+                                    <th class="text-muted small text-uppercase" style="width: 40px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (recentActivity.Any())
+                                {
+                                    @foreach (var a in recentActivity.Take(5))
+                                    {
+                                        <tr>
+                                            <td class="small">@a.Date.ToString("MMM d, yyyy")</td>
+                                            <td>
+                                                <span class="d-inline-flex align-items-center gap-1">
+                                                    <span class="rounded-circle d-inline-block @(a.IsIncome ? "bg-success" : "bg-danger")" style="width: 8px; height: 8px;" aria-hidden="true"></span>
+                                                    @a.CategoryName
+                                                </span>
+                                            </td>
+                                            <td class="text-end fw-semibold @(a.IsIncome ? "text-success" : "text-danger")">@(a.IsIncome ? "+" : "-")@Math.Abs(a.Amount).ToString("N2") @a.Currency</td>
+                                            <td><button type="button" class="btn btn-link btn-sm p-0 text-secondary" aria-label="Actions"><i class="bi bi-three-dots-vertical"></i></button></td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr><td colspan="4" class="text-muted small text-center py-3">No recent transactions. <a asp-controller="Expense" asp-action="Index">Add an expense</a> or <a asp-controller="Transaction" asp-action="Create">new transaction</a>.</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row mt-3 mt-md-4 mb-3">
         <div class="col-12">
-            <div class="card expense-trend-card">
+            <div class="card expense-trend-card border-0 shadow-sm">
                 <div class="card-body py-3">
                     <h5 class="card-title mb-2">Expense Trend (Last 30 Days) — @chartCurrency</h5>
                     @if (expenseCount == 0)
@@ -178,21 +266,44 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         (function() {
+            function isDark() { return document.body.getAttribute('data-theme') === 'dark'; }
+            function chartColors() {
+                if (isDark()) {
+                    return { border: '#4da6ff', fill: 'rgba(77, 166, 255, 0.15)', grid: 'rgba(255,255,255,0.1)', text: '#e1e1e1', bar: 'rgba(77, 166, 255, 0.8)', barCurrent: '#4da6ff' };
+                }
+                return { border: '#0d6efd', fill: 'rgba(13, 110, 253, 0.1)', grid: 'rgba(0,0,0,0.1)', text: '#212529', bar: 'rgba(13, 110, 253, 0.5)', barCurrent: '#0d6efd' };
+            }
+
+            var cashFlowCanvas = document.getElementById('cashFlowChart');
+            if (cashFlowCanvas) {
+                var cfLabels = @Html.Raw(cashFlowSixMonthLabels);
+                var cfData = @Html.Raw(cashFlowSixMonthData);
+                var colors = chartColors();
+                var barColors = cfData.map(function(_, i) { return i === cfData.length - 1 ? colors.barCurrent : colors.bar; });
+                new Chart(cashFlowCanvas.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: cfLabels,
+                        datasets: [{ label: 'Cash Flow', data: cfData, backgroundColor: barColors, borderColor: barColors, borderWidth: 1 }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { ticks: { color: colors.text, maxRotation: 0 }, grid: { display: false } },
+                            y: { beginAtZero: true, ticks: { color: colors.text }, grid: { color: colors.grid } }
+                        }
+                    }
+                });
+            }
+
             var canvas = document.getElementById('expenseChart');
             if (!canvas) return;
             var ctx = canvas.getContext('2d');
             var labels = @Html.Raw(chartLabels);
             var data = @Html.Raw(chartData);
             var chartCurrency = '@chartCurrency';
-
-            function isDark() { return document.body.getAttribute('data-theme') === 'dark'; }
-            function chartColors() {
-                if (isDark()) {
-                    return { border: '#4da6ff', fill: 'rgba(77, 166, 255, 0.15)', grid: 'rgba(255,255,255,0.1)', text: '#e1e1e1' };
-                }
-                return { border: '#0d6efd', fill: 'rgba(13, 110, 253, 0.1)', grid: 'rgba(0,0,0,0.1)', text: '#212529' };
-            }
-
             var colors = chartColors();
             var chart = new Chart(ctx, {
                 type: 'line',
@@ -231,16 +342,18 @@
             document.getElementById('themeToggle')?.addEventListener('click', function() {
                 setTimeout(function() {
                     var c = chartColors();
-                    chart.options.plugins.legend.labels.color = c.text;
-                    chart.options.scales.x.ticks.color = c.text;
-                    chart.options.scales.x.grid.color = c.grid;
-                    chart.options.scales.y.ticks.color = c.text;
-                    chart.options.scales.y.grid.color = c.grid;
-                    chart.options.scales.y.title.color = c.text;
-                    chart.data.datasets[0].borderColor = c.border;
-                    chart.data.datasets[0].backgroundColor = c.fill;
-                    chart.data.datasets[0].pointBackgroundColor = c.border;
-                    chart.update();
+                    if (chart && chart.options && chart.options.plugins) {
+                        chart.options.plugins.legend.labels.color = c.text;
+                        chart.options.scales.x.ticks.color = c.text;
+                        chart.options.scales.x.grid.color = c.grid;
+                        chart.options.scales.y.ticks.color = c.text;
+                        chart.options.scales.y.grid.color = c.grid;
+                        chart.options.scales.y.title.color = c.text;
+                        chart.data.datasets[0].borderColor = c.border;
+                        chart.data.datasets[0].backgroundColor = c.fill;
+                        chart.data.datasets[0].pointBackgroundColor = c.border;
+                        chart.update();
+                    }
                 }, 50);
             });
         })();
