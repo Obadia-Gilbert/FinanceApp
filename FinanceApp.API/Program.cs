@@ -34,6 +34,7 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IIncomeService, IncomeService>();
 builder.Services.AddScoped<IRecurringTemplateService, RecurringTemplateService>();
+builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 builder.Services.AddHostedService<FinanceApp.Infrastructure.Services.RecurringTransactionJob>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();

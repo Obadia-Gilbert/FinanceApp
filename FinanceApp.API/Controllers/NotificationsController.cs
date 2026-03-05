@@ -1,6 +1,8 @@
 using System.Security.Claims;
 using FinanceApp.Application.Interfaces.Services;
+using FinanceApp.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceApp.API.Controllers;
@@ -11,10 +13,12 @@ namespace FinanceApp.API.Controllers;
 public class NotificationsController : ControllerBase
 {
     private readonly INotificationService _notificationService;
+    private readonly IWebHostEnvironment _env;
 
-    public NotificationsController(INotificationService notificationService)
+    public NotificationsController(INotificationService notificationService, IWebHostEnvironment env)
     {
         _notificationService = notificationService;
+        _env = env;
     }
 
     private string? UserId => User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -71,6 +75,34 @@ public class NotificationsController : ControllerBase
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
         await _notificationService.MarkAllAsReadAsync(userId);
         return Ok(new { success = true });
+    }
+
+    /// <summary>Creates a sample notification for testing. Only available in Development.</summary>
+    [HttpPost("sample")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> CreateSample()
+    {
+        if (!_env.IsDevelopment())
+            return NotFound();
+
+        var userId = UserId;
+        if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
+        var topicKey = "sample-notification-" + DateTime.UtcNow.Date.ToString("yyyy-MM-dd");
+        var n = await _notificationService.CreateIfNotExistsAsync(
+            userId,
+            "Test notification",
+            "This is a sample notification for testing the Notifications screen.",
+            NotificationType.Info,
+            "/Budget",
+            topicKey);
+
+        if (n == null)
+            return Ok(new { message = "Sample notification already exists for today." });
+
+        return CreatedAtAction(nameof(List), new { id = n.Id });
     }
 
     public record UnreadCountResponse(int Count);

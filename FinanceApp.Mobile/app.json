@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "FinanceApp",
+    "slug": "financeapp-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "financeapp",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0d6efd"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.financeapp.mobile",
+      "infoPlist": {
+        "NSCameraUsageDescription": "FinanceApp needs camera access to take photos of receipts and supporting documents for expenses and income.",
+        "NSPhotoLibraryUsageDescription": "FinanceApp needs photo library access to attach receipts and supporting documents for expenses and income."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0d6efd"
+      },
+      "package": "com.financeapp.mobile",
+      "permissions": ["android.permission.CAMERA", "android.permission.READ_MEDIA_IMAGES"]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": ["expo-router", "expo-secure-store"]
+  }
+}
