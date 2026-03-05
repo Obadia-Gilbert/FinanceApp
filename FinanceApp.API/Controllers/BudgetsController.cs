@@ -64,12 +64,13 @@ public class BudgetsController : ControllerBase
         if (UserId == null) return Unauthorized();
 
         var budgets = await _categoryBudgetService.GetForMonthAsync(UserId, month, year);
-        var dtos = new List<CategoryBudgetDto>();
+        var categorySpend = await _categoryBudgetService.GetCategorySpendForMonthAsync(UserId, month, year);
 
+        var dtos = new List<CategoryBudgetDto>();
         foreach (var cb in budgets)
         {
-            var spent = await _categoryBudgetService.GetCategorySpendAsync(
-                UserId, cb.CategoryId, month, year, cb.Currency);
+            var key = (cb.CategoryId, cb.Currency);
+            var spent = categorySpend.TryGetValue(key, out var s) ? s : 0;
             dtos.Add(new CategoryBudgetDto(
                 cb.Id,
                 cb.CategoryId,
