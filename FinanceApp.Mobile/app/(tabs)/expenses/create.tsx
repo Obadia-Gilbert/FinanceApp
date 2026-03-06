@@ -57,6 +57,7 @@ export default function CreateExpenseScreen() {
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       queryClient.invalidateQueries({ queryKey: ['budget'] });
       queryClient.invalidateQueries({ queryKey: ['categoryBudgets'] });
+      queryClient.invalidateQueries({ queryKey: ['notificationsUnreadCount'] });
       if (variables.attachedDoc) {
         try {
           await uploadSupportingDocument(

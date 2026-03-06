@@ -16,20 +16,20 @@ public class DashboardController : ControllerBase
     private readonly ICategoryService _categoryService;
     private readonly IBudgetService _budgetService;
     private readonly ICategoryBudgetService _categoryBudgetService;
-    private readonly INotificationService _notificationService;
+    private readonly IBudgetNotificationService _budgetNotificationService;
 
     public DashboardController(
         IExpenseQueryService expenseQueryService,
         ICategoryService categoryService,
         IBudgetService budgetService,
         ICategoryBudgetService categoryBudgetService,
-        INotificationService notificationService)
+        IBudgetNotificationService budgetNotificationService)
     {
         _expenseQueryService = expenseQueryService;
         _categoryService = categoryService;
         _budgetService = budgetService;
         _categoryBudgetService = categoryBudgetService;
-        _notificationService = notificationService;
+        _budgetNotificationService = budgetNotificationService;
     }
 
     private string? UserId => User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -81,33 +81,12 @@ public class DashboardController : ControllerBase
             var spent = categorySpendForMonth.GetValueOrDefault((cb.CategoryId, cb.Currency), 0);
             var catName = cb.Category?.Name ?? "Unknown";
             if (spent >= cb.Amount)
-            {
                 categoryBudgetAlerts.Add(new CategoryBudgetAlertDto(catName, spent, cb.Amount, cb.Currency.ToString(), true));
-                var topicKey = $"budget-category-{cb.CategoryId}-{currentYear}-{currentMonth}";
-                await _notificationService.CreateIfNotExistsAsync(UserId!,
-                    "Category budget exceeded",
-                    $"{catName}: {spent:N0} {cb.Currency} of {cb.Amount:N0} {cb.Currency} ({(spent / cb.Amount * 100):F0}%).",
-                    NotificationType.CategoryBudgetExceeded, "/Budget", topicKey);
-            }
             else if (cb.Amount > 0 && spent >= cb.Amount * 0.8m)
-            {
                 categoryBudgetAlerts.Add(new CategoryBudgetAlertDto(catName, spent, cb.Amount, cb.Currency.ToString(), false));
-                var topicKey = $"budget-category-{cb.CategoryId}-{currentYear}-{currentMonth}";
-                await _notificationService.CreateIfNotExistsAsync(UserId!,
-                    "Category budget warning",
-                    $"{catName}: {spent:N0} {cb.Currency} of {cb.Amount:N0} {cb.Currency} ({(spent / cb.Amount * 100):F0}%).",
-                    NotificationType.CategoryBudgetWarning, "/Budget", topicKey);
-            }
         }
 
-        if (isOverBudget && budgetAmount.HasValue)
-        {
-            var topicKey = $"budget-global-{currentYear}-{currentMonth}";
-            await _notificationService.CreateIfNotExistsAsync(UserId!,
-                "Monthly budget exceeded",
-                $"You've spent {thisMonthSpendInBudgetCurrency:N0} {budgetCurrency} against a budget of {budgetAmount.Value:N0} {budgetCurrency}.",
-                NotificationType.BudgetExceeded, "/Budget", topicKey);
-        }
+        await _budgetNotificationService.EvaluateAndCreateNotificationsAsync(UserId!, currentMonth, currentYear);
 
         var dto = new DashboardDto(
             totalSpend,
