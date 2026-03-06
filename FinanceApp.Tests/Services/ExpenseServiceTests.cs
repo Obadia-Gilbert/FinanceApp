@@ -12,13 +12,16 @@ public class ExpenseServiceTests
 {
     private readonly Mock<IRepository<Expense>> _repoMock;
     private readonly Mock<FinanceApp.Application.Interfaces.Services.ITransactionService> _txMock;
+    private readonly Mock<FinanceApp.Application.Interfaces.Services.IBudgetNotificationService> _budgetNotifMock;
     private readonly ExpenseService _sut;
 
     public ExpenseServiceTests()
     {
         _repoMock = new Mock<IRepository<Expense>>();
         _txMock = new Mock<FinanceApp.Application.Interfaces.Services.ITransactionService>();
-        _sut = new ExpenseService(_repoMock.Object, _txMock.Object);
+        _budgetNotifMock = new Mock<FinanceApp.Application.Interfaces.Services.IBudgetNotificationService>();
+        _budgetNotifMock.Setup(x => x.EvaluateAndCreateNotificationsAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>())).Returns(Task.CompletedTask);
+        _sut = new ExpenseService(_repoMock.Object, _txMock.Object, _budgetNotifMock.Object);
     }
 
     [Fact]

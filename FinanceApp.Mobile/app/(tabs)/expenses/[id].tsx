@@ -53,6 +53,7 @@ export default function ExpenseDetailScreen() {
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       queryClient.invalidateQueries({ queryKey: ['budget'] });
       queryClient.invalidateQueries({ queryKey: ['categoryBudgets'] });
+      queryClient.invalidateQueries({ queryKey: ['notificationsUnreadCount'] });
       router.back();
     },
     onError: (e) => {
@@ -67,6 +68,7 @@ export default function ExpenseDetailScreen() {
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       queryClient.invalidateQueries({ queryKey: ['budget'] });
       queryClient.invalidateQueries({ queryKey: ['categoryBudgets'] });
+      queryClient.invalidateQueries({ queryKey: ['notificationsUnreadCount'] });
       router.back();
     },
   });

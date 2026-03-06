@@ -7,13 +7,20 @@ import type {
   PagedResultDto,
 } from '../types/api';
 
-/** Build API payload: currency must be sent as enum index (number), not string. */
+/** Current time as HH:mm:ss in local timezone (for appending to date-only when creating expense). */
+function nowTimeString(): string {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
+}
+
+/** Build API payload: currency as enum index; expenseDate with current time if only date provided. */
 function toCreateExpensePayload(body: CreateExpenseRequest) {
-  const dateStr = body.expenseDate.includes('T') ? body.expenseDate.split('T')[0]! : body.expenseDate;
+  const dateOnly = body.expenseDate.includes('T') ? body.expenseDate.split('T')[0]! : body.expenseDate;
+  const expenseDate = body.expenseDate.includes('T') ? body.expenseDate : `${dateOnly}T${nowTimeString()}`;
   return {
     amount: body.amount,
     currency: typeof body.currency === 'number' ? body.currency : getCurrencyIndex(body.currency),
-    expenseDate: dateStr,
+    expenseDate,
     categoryId: body.categoryId,
     description: body.description ?? null,
   };

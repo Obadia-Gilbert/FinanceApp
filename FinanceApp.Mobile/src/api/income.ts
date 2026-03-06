@@ -1,10 +1,25 @@
 import { apiFetch } from './client';
+import { getCurrencyIndex } from '../utils/currency';
 import type {
   IncomeDto,
   CreateIncomeRequest,
   UpdateIncomeRequest,
   PagedResultDto,
 } from '../types/api';
+
+/** Build API payload: currency must be sent as enum index (number). */
+function toCreateIncomePayload(body: CreateIncomeRequest) {
+  const dateStr = body.incomeDate.includes('T') ? body.incomeDate.split('T')[0]! : body.incomeDate;
+  return {
+    accountId: body.accountId && body.accountId !== '' ? body.accountId : null,
+    categoryId: body.categoryId,
+    amount: body.amount,
+    currency: typeof body.currency === 'number' ? body.currency : getCurrencyIndex(body.currency),
+    incomeDate: dateStr,
+    description: body.description ?? null,
+    source: body.source ?? null,
+  };
+}
 
 export async function getIncomes(
   pageNumber = 1,
@@ -23,11 +38,7 @@ export async function getIncome(id: string): Promise<IncomeDto> {
 export async function createIncome(body: CreateIncomeRequest): Promise<IncomeDto> {
   return apiFetch<IncomeDto>('/api/income', {
     method: 'POST',
-    body: JSON.stringify({
-      ...body,
-      incomeDate: body.incomeDate.split('T')[0],
-      accountId: body.accountId && body.accountId !== '' ? body.accountId : null,
-    }),
+    body: JSON.stringify(toCreateIncomePayload(body)),
   });
 }
 

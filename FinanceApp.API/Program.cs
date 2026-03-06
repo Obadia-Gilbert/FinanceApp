@@ -38,6 +38,7 @@ builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 builder.Services.AddHostedService<FinanceApp.Infrastructure.Services.RecurringTransactionJob>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IBudgetNotificationService, BudgetNotificationService>();
 builder.Services.AddScoped<IExpenseQueryService, FinanceApp.Infrastructure.Services.ExpenseQueryService>();
 builder.Services.AddScoped<IMonthlyReportService, MonthlyReportService>();
 builder.Services.AddScoped<ISupportingDocumentService>(sp =>

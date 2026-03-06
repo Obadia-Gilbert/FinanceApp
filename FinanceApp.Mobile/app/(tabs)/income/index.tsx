@@ -14,27 +14,17 @@ import { useQuery } from '@tanstack/react-query';
 import { useTheme } from '../../../src/context/ThemeContext';
 import { Card } from '../../../src/components/Card';
 import { getIncomes } from '../../../src/api/income';
+import { getCategories } from '../../../src/api/categories';
 import { formatCurrencyCode } from '../../../src/utils/currency';
 import type { IncomeDto } from '../../../src/types/api';
 
 const MONTHS = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ');
-const INCOME_FILTERS = ['All Income', 'Salary', 'Side Hustles', 'Dividends'];
 
-function iconForCategory(name: string | null): string {
-  const n = (name || '').toLowerCase();
-  if (n.includes('salary')) return '💰';
-  if (n.includes('freelance') || n.includes('side')) return '💻';
-  if (n.includes('dividend')) return '📈';
-  if (n.includes('rental') || n.includes('rent')) return '🏠';
+function iconForCategory(_name: string | null): string {
   return '💰';
 }
 
-function bgForCategory(name: string | null): string {
-  const n = (name || '').toLowerCase();
-  if (n.includes('salary')) return '#10B981';
-  if (n.includes('freelance') || n.includes('side')) return '#3B82F6';
-  if (n.includes('dividend')) return '#8B5CF6';
-  if (n.includes('rental') || n.includes('rent')) return '#F59E0B';
+function bgForCategory(_name: string | null): string {
   return '#10B981';
 }
 
@@ -42,12 +32,16 @@ export default function IncomeListScreen() {
   const { colors } = useTheme();
   const router = useRouter();
   const [search, setSearch] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState(0); // 0 = All, 1 = Salary, etc.
+  const [categoryId, setCategoryId] = useState<string | null>(null);
 
   const now = new Date();
   const thisMonth = now.getMonth();
   const monthLabel = MONTHS[thisMonth];
-  const year = now.getFullYear();
+
+  const { data: categories = [] } = useQuery({ queryKey: ['categories'], queryFn: getCategories });
+  const incomeCategories = categories.filter((c) => c.type === 'Income' || c.type === 'Both');
+  const filterLabels = ['All Income', ...incomeCategories.map((c) => c.name)];
+  const selectedFilterIndex = categoryId === null ? 0 : incomeCategories.findIndex((c) => c.id === categoryId) + 1;
 
   const { data, isLoading, isError, error, refetch, isRefetching } = useQuery({
     queryKey: ['incomes'],
@@ -57,10 +51,8 @@ export default function IncomeListScreen() {
   const list = data?.items ?? [];
   const filtered = useMemo(() => {
     let f = list;
-    const filterLabel = INCOME_FILTERS[categoryFilter];
-    if (filterLabel !== 'All Income') {
-      const key = filterLabel === 'Side Hustles' ? 'side' : filterLabel === 'Dividends' ? 'dividend' : filterLabel.toLowerCase();
-      f = f.filter((i) => (i.categoryName || '').toLowerCase().includes(key));
+    if (categoryId) {
+      f = f.filter((i) => i.categoryId === categoryId);
     }
     if (search.trim()) {
       const q = search.trim().toLowerCase();
@@ -72,7 +64,7 @@ export default function IncomeListScreen() {
       );
     }
     return f;
-  }, [list, categoryFilter, search]);
+  }, [list, categoryId, search]);
 
   const totalIncome = useMemo(() => list.reduce((s, i) => s + Number(i.amount), 0), [list]);
 
@@ -105,21 +97,21 @@ export default function IncomeListScreen() {
           contentContainerStyle={styles.pills}
           style={styles.pillsScroll}
         >
-          {INCOME_FILTERS.map((label, i) => (
+          {filterLabels.map((label, i) => (
             <TouchableOpacity
-              key={label}
+              key={i === 0 ? 'all' : incomeCategories[i - 1]?.id ?? i}
               style={[
                 styles.pill,
                 {
-                  backgroundColor: categoryFilter === i ? colors.brand : colors.bg.default,
+                  backgroundColor: selectedFilterIndex === i ? colors.brand : colors.bg.default,
                   borderWidth: 1,
-                  borderColor: categoryFilter === i ? colors.brand : colors.border,
+                  borderColor: selectedFilterIndex === i ? colors.brand : colors.border,
                 },
               ]}
-              onPress={() => setCategoryFilter(i)}
+              onPress={() => setCategoryId(i === 0 ? null : incomeCategories[i - 1]?.id ?? null)}
             >
               <Text
-                style={[styles.pillText, { color: categoryFilter === i ? '#fff' : colors.text.primary }]}
+                style={[styles.pillText, { color: selectedFilterIndex === i ? '#fff' : colors.text.primary }]}
                 numberOfLines={1}
               >
                 {label}

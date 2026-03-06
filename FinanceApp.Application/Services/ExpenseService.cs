@@ -16,11 +16,16 @@ namespace FinanceApp.Application.Services
     {
         private readonly IRepository<Expense> _expenseRepository;
         private readonly ITransactionService _transactionService;
+        private readonly IBudgetNotificationService _budgetNotificationService;
 
-        public ExpenseService(IRepository<Expense> expenseRepository, ITransactionService transactionService)
+        public ExpenseService(
+            IRepository<Expense> expenseRepository,
+            ITransactionService transactionService,
+            IBudgetNotificationService budgetNotificationService)
         {
             _expenseRepository = expenseRepository;
             _transactionService = transactionService;
+            _budgetNotificationService = budgetNotificationService;
         }
 
         // -----------------------
@@ -61,6 +66,10 @@ namespace FinanceApp.Application.Services
                     expense.Description);
             }
             await _expenseRepository.SaveChangesAsync();
+
+            var month = expense.ExpenseDate.Month;
+            var year = expense.ExpenseDate.Year;
+            await _budgetNotificationService.EvaluateAndCreateNotificationsAsync(expense.UserId, month, year);
         }
 
         public async Task SoftDeleteExpenseAsync(Guid id)
@@ -68,11 +77,17 @@ namespace FinanceApp.Application.Services
             var expense = await _expenseRepository.GetByIdAsync(id);
             if (expense == null) return;
 
+            var userId = expense.UserId;
+            var month = expense.ExpenseDate.Month;
+            var year = expense.ExpenseDate.Year;
+
             if (expense.TransactionId.HasValue)
                 await _transactionService.DeleteAsync(expense.TransactionId.Value, expense.UserId);
 
             _expenseRepository.SoftDelete(expense);
             await _expenseRepository.SaveChangesAsync();
+
+            await _budgetNotificationService.EvaluateAndCreateNotificationsAsync(userId, month, year);
         }
 
         // -----------------------
@@ -128,6 +143,10 @@ namespace FinanceApp.Application.Services
 
             await _expenseRepository.AddAsync(expense);
             await _expenseRepository.SaveChangesAsync();
+
+            var month = expense.ExpenseDate.Month;
+            var year = expense.ExpenseDate.Year;
+            await _budgetNotificationService.EvaluateAndCreateNotificationsAsync(userId, month, year);
 
             return expense;
         }

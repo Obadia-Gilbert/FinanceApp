@@ -21,7 +21,7 @@ public class HomeController : Controller
     private readonly IAccountService _accountService;
     private readonly ITransactionService _transactionService;
     private readonly ICurrencyConversionService _currencyConversion;
-    private readonly INotificationService _notificationService;
+    private readonly IBudgetNotificationService _budgetNotificationService;
     private readonly UserManager<ApplicationUser> _userManager;
 
     public HomeController(
@@ -33,7 +33,7 @@ public class HomeController : Controller
         IAccountService accountService,
         ITransactionService transactionService,
         ICurrencyConversionService currencyConversion,
-        INotificationService notificationService,
+        IBudgetNotificationService budgetNotificationService,
         UserManager<ApplicationUser> userManager)
     {
         _expenseService = expenseService;
@@ -44,7 +44,7 @@ public class HomeController : Controller
         _accountService = accountService;
         _transactionService = transactionService;
         _currencyConversion = currencyConversion;
-        _notificationService = notificationService;
+        _budgetNotificationService = budgetNotificationService;
         _userManager = userManager;
     }
 
@@ -120,35 +120,12 @@ public class HomeController : Controller
             var spent = categorySpendForMonth.GetValueOrDefault((cb.CategoryId, cb.Currency), 0);
             var catName = cb.Category?.Name ?? "Unknown";
             if (spent >= cb.Amount)
-            {
                 categoryBudgetAlerts.Add(new CategoryBudgetAlertViewModel { CategoryName = catName, Spent = spent, Budget = cb.Amount, Currency = cb.Currency.ToString(), IsOver = true });
-                var topicKey = $"budget-category-{cb.CategoryId}-{currentYear}-{currentMonth}";
-                await _notificationService.CreateIfNotExistsAsync(userId, "Category budget exceeded",
-                    $"{catName}: {spent:N0} {cb.Currency} of {cb.Amount:N0} {cb.Currency} ({(spent / cb.Amount * 100):F0}%).",
-                    Domain.Enums.NotificationType.CategoryBudgetExceeded, "/Budget", topicKey);
-            }
             else if (cb.Amount > 0 && spent >= cb.Amount * 0.8m)
-            {
                 categoryBudgetAlerts.Add(new CategoryBudgetAlertViewModel { CategoryName = catName, Spent = spent, Budget = cb.Amount, Currency = cb.Currency.ToString(), IsOver = false });
-                var topicKey = $"budget-category-{cb.CategoryId}-{currentYear}-{currentMonth}";
-                await _notificationService.CreateIfNotExistsAsync(userId, "Category budget warning",
-                    $"{catName}: {spent:N0} {cb.Currency} of {cb.Amount:N0} {cb.Currency} ({(spent / cb.Amount * 100):F0}%).",
-                    Domain.Enums.NotificationType.CategoryBudgetWarning, "/Budget", topicKey);
-            }
         }
 
-        // ── Create in-app notification for global budget (once per month) ─
-        if (isOverBudget && budgetAmount.HasValue)
-        {
-            var topicKey = $"budget-global-{currentYear}-{currentMonth}";
-            await _notificationService.CreateIfNotExistsAsync(
-                userId,
-                "Monthly budget exceeded",
-                $"You've spent {thisMonthSpendInBudgetCurrency:N0} {budgetCurrency} against a budget of {budgetAmount.Value:N0} {budgetCurrency}.",
-                Domain.Enums.NotificationType.BudgetExceeded,
-                "/Budget",
-                topicKey);
-        }
+        await _budgetNotificationService.EvaluateAndCreateNotificationsAsync(userId, currentMonth, currentYear);
 
         // ── Account balances & total balance (in display currency only; no conversion) ─
         var accounts = (await _accountService.GetAllAsync(userId)).Where(a => a.IsActive).ToList();

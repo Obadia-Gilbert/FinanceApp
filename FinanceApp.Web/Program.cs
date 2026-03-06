@@ -43,6 +43,7 @@ builder.Services.AddScoped<ISupportingDocumentService>(sp =>
 builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IBudgetNotificationService, BudgetNotificationService>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 builder.Services.AddScoped<IExpenseQueryService, FinanceApp.Infrastructure.Services.ExpenseQueryService>();
 builder.Services.AddScoped<IMonthlyReportService, MonthlyReportService>();

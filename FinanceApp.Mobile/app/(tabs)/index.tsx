@@ -7,6 +7,7 @@ import { useTheme } from '../../src/context/ThemeContext';
 import { useAuth } from '../../src/context/AuthContext';
 import { Card } from '../../src/components/Card';
 import { getDashboard } from '../../src/api/dashboard';
+import { getUnreadCount } from '../../src/api/notifications';
 import { LineChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
 
@@ -22,6 +23,11 @@ export default function DashboardScreen() {
     queryKey: ['dashboard'],
     queryFn: getDashboard,
     staleTime: 60 * 1000, // 1 min: avoid refetch when switching back to tab
+  });
+  const { data: unreadCount = 0 } = useQuery({
+    queryKey: ['notificationsUnreadCount'],
+    queryFn: getUnreadCount,
+    staleTime: 60 * 1000,
   });
 
   const handleRefresh = async () => {
@@ -91,26 +97,33 @@ export default function DashboardScreen() {
         <Text style={[styles.headerTitle, { color: colors.text.primary }]}>Dashboard</Text>
         <TouchableOpacity onPress={() => router.push('/(tabs)/notifications')} style={styles.bellWrap}>
           <Text style={styles.bellIcon}>🔔</Text>
+          {unreadCount > 0 && (
+            <View style={styles.bellBadge}>
+              <Text style={styles.bellBadgeText} numberOfLines={1}>
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </Text>
+            </View>
+          )}
         </TouchableOpacity>
       </View>
 
       {data ? (
         <>
-          {/* Total Balance card (blue) */}
+          {/* This month's spending card (blue) — label matches the value shown */}
           <View style={[styles.balanceCard, { backgroundColor: colors.brand }]}>
-            <Text style={styles.balanceLabel}>Total Balance</Text>
+            <Text style={styles.balanceLabel}>This month&apos;s spending</Text>
             <Text style={styles.balanceAmount}>
               {data.displayCurrency} {data.thisMonthSpend.toLocaleString()}
             </Text>
             <View style={styles.balanceRow}>
               <View style={styles.balanceCol}>
-                <Text style={styles.balanceSubLabel}>Monthly Income</Text>
-                <Text style={styles.balanceSubValue}>—</Text>
+                <Text style={styles.balanceSubLabel}>Monthly expenses</Text>
+                <Text style={styles.balanceSubValue}>−{data.thisMonthSpend.toLocaleString()}</Text>
               </View>
               <View style={[styles.balanceDivider, { backgroundColor: 'rgba(255,255,255,0.4)' }]} />
               <View style={styles.balanceCol}>
-                <Text style={styles.balanceSubLabel}>Monthly Expenses</Text>
-                <Text style={styles.balanceSubValue}>−{data.thisMonthSpend.toLocaleString()}</Text>
+                <Text style={styles.balanceSubLabel}>Total spend (all time)</Text>
+                <Text style={styles.balanceSubValue}>{data.totalSpend.toLocaleString()}</Text>
               </View>
             </View>
           </View>
@@ -270,8 +283,21 @@ const styles = StyleSheet.create({
   },
   avatarText: { color: '#fff', fontSize: 18, fontWeight: '700' },
   headerTitle: { flex: 1, fontSize: 20, fontWeight: '700', textAlign: 'center' },
-  bellWrap: { padding: 8 },
+  bellWrap: { padding: 8, position: 'relative' },
   bellIcon: { fontSize: 22 },
+  bellBadge: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: '#DC2626',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 5,
+  },
+  bellBadgeText: { color: '#fff', fontSize: 11, fontWeight: '700' },
   balanceCard: {
     borderRadius: 16,
     padding: 20,
