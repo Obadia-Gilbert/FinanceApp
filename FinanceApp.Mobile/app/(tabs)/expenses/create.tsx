@@ -6,14 +6,13 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { useTheme } from '../../../src/context/ThemeContext';
 import { Input } from '../../../src/components/Input';
 import { Button } from '../../../src/components/Button';
-import { useQuery } from '@tanstack/react-query';
+import { Card } from '../../../src/components/Card';
 import { getCategories } from '../../../src/api/categories';
 import { createExpense } from '../../../src/api/expenses';
 import { uploadSupportingDocument } from '../../../src/api/supportingDocuments';
@@ -69,7 +68,7 @@ export default function CreateExpenseScreen() {
             'Receipt'
           );
         } catch (_e) {
-          // Expense created; document upload failed (user can add later from edit if needed)
+          // Document upload failed; expense was created
         }
       }
       router.back();
@@ -82,14 +81,8 @@ export default function CreateExpenseScreen() {
   const handleSubmit = () => {
     setError('');
     const num = parseFloat(amount.replace(/,/g, '.'));
-    if (isNaN(num) || num <= 0) {
-      setError('Enter a valid amount');
-      return;
-    }
-    if (!categoryId) {
-      setError('Select a category');
-      return;
-    }
+    if (isNaN(num) || num <= 0) { setError('Enter a valid amount'); return; }
+    if (!categoryId) { setError('Select a category'); return; }
     createMutation.mutate({
       amount: num,
       currency,
@@ -106,13 +99,18 @@ export default function CreateExpenseScreen() {
       contentContainerStyle={styles.content}
       keyboardShouldPersistTaps="handled"
     >
-      <Input
-        label="Amount"
-        value={amount}
-        onChangeText={setAmount}
-        placeholder="0.00"
-        keyboardType="decimal-pad"
-      />
+      {/* Amount with large display */}
+      <Card style={[styles.amountCard, { borderColor: colors.brand }]}>
+        <Text style={[styles.amountLabel, { color: colors.text.muted }]}>Amount</Text>
+        <Input
+          label=""
+          value={amount}
+          onChangeText={setAmount}
+          placeholder="0.00"
+          keyboardType="decimal-pad"
+        />
+      </Card>
+
       <View style={styles.row}>
         <View style={styles.half}>
           <Text style={[styles.label, { color: colors.text.body }]}>Currency</Text>
@@ -123,7 +121,7 @@ export default function CreateExpenseScreen() {
                 onPress={() => setCurrency(c)}
                 style={[
                   styles.chip,
-                  { borderColor: colors.border, backgroundColor: currency === c ? colors.brand : colors.bg.hover },
+                  { borderColor: colors.border, backgroundColor: currency === c ? colors.brand : colors.bg.default },
                 ]}
               >
                 <Text style={[styles.chipText, { color: currency === c ? '#fff' : colors.text.body }]}>
@@ -134,20 +132,13 @@ export default function CreateExpenseScreen() {
           </ScrollView>
         </View>
       </View>
-      <Input
-        label="Date"
-        value={date}
-        onChangeText={setDate}
-        placeholder="YYYY-MM-DD"
-      />
-      <Input
-        label="Description"
-        value={description}
-        onChangeText={setDescription}
-        placeholder="What was this for?"
-      />
+
+      <Input label="Date" value={date} onChangeText={setDate} placeholder="YYYY-MM-DD" />
+      <Input label="Description" value={description} onChangeText={setDescription} placeholder="What was this for?" />
+
+      {/* Supporting document */}
       <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text.body }]}>Supporting document (receipt)</Text>
+        <Text style={[styles.label, { color: colors.text.body }]}>Receipt (optional)</Text>
         {attachedDoc ? (
           <View style={[styles.docPreview, { backgroundColor: colors.bg.default, borderColor: colors.border }]}>
             <Image source={{ uri: attachedDoc.uri }} style={styles.docThumb} />
@@ -158,7 +149,7 @@ export default function CreateExpenseScreen() {
               onPress={() => setAttachedDoc(null)}
               style={[styles.docRemove, { backgroundColor: colors.danger }]}
             >
-              <Text style={styles.docRemoveText}>Remove</Text>
+              <Text style={styles.docRemoveText}>✕</Text>
             </TouchableOpacity>
           </View>
         ) : (
@@ -168,46 +159,53 @@ export default function CreateExpenseScreen() {
               if (picked) setAttachedDoc(picked);
             }}
             style={[styles.attachBtn, { borderColor: colors.border, backgroundColor: colors.bg.default }]}
+            activeOpacity={0.7}
           >
             <Text style={styles.attachIcon}>📷</Text>
-            <Text style={[styles.attachLabel, { color: colors.text.body }]}>
+            <Text style={[styles.attachLabel, { color: colors.text.muted }]}>
               Take photo or choose from library
             </Text>
           </TouchableOpacity>
         )}
       </View>
+
+      {/* Category selection */}
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.text.body }]}>Category</Text>
         <View style={styles.categoryWrap}>
-          {expenseCategories.map((c) => (
-            <TouchableOpacity
-              key={c.id}
-              onPress={() => setCategoryId(c.id)}
-              style={[
-                styles.catBtn,
-                {
-                  borderColor: colors.border,
-                  backgroundColor: categoryId === c.id ? colors.bg.hover : colors.bg.default,
-                  borderWidth: categoryId === c.id ? 2 : 1,
-                },
-              ]}
-            >
-              <Text
+          {expenseCategories.map((c) => {
+            const selected = categoryId === c.id;
+            return (
+              <TouchableOpacity
+                key={c.id}
+                onPress={() => setCategoryId(c.id)}
                 style={[
-                  styles.catText,
-                  { color: colors.text.primary },
+                  styles.catBtn,
+                  {
+                    borderColor: selected ? colors.brand : colors.border,
+                    backgroundColor: selected ? `${colors.brand}15` : colors.bg.default,
+                    borderWidth: selected ? 2 : 1,
+                  },
                 ]}
-                numberOfLines={1}
+                activeOpacity={0.7}
               >
-                {c.name}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <Text style={[styles.catText, { color: selected ? colors.brand : colors.text.primary, fontWeight: selected ? '700' : '500' }]} numberOfLines={1}>
+                  {c.name}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
       </View>
-      {error ? <Text style={[styles.err, { color: colors.danger }]}>{error}</Text> : null}
+
+      {error ? (
+        <View style={[styles.errorCard, { backgroundColor: `${colors.danger}10` }]}>
+          <Text style={[styles.err, { color: colors.danger }]}>{error}</Text>
+        </View>
+      ) : null}
+
       <Button
-        title="Add expense"
+        title="Add Expense"
         onPress={handleSubmit}
         loading={createMutation.isPending}
         style={styles.submit}
@@ -219,6 +217,8 @@ export default function CreateExpenseScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   content: { padding: 16, paddingBottom: 40 },
+  amountCard: { marginBottom: 16, borderWidth: 2 },
+  amountLabel: { fontSize: 13, fontWeight: '600', letterSpacing: 0.3, marginBottom: 4 },
   label: { fontSize: 14, fontWeight: '500', marginBottom: 8 },
   row: { marginBottom: 16 },
   half: { marginBottom: 16 },
@@ -226,22 +226,25 @@ const styles = StyleSheet.create({
   chip: {
     paddingHorizontal: 14,
     paddingVertical: 10,
-    borderRadius: 8,
+    borderRadius: 10,
     marginRight: 8,
+    borderWidth: 1,
   },
   chipText: { fontSize: 15, fontWeight: '500' },
   field: { marginBottom: 16 },
   categoryWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  catBtn: { paddingHorizontal: 14, paddingVertical: 10, borderRadius: 8 },
+  catBtn: { paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10 },
   catText: { fontSize: 14 },
-  err: { marginBottom: 12, fontSize: 14 },
+  errorCard: { borderRadius: 10, padding: 12, marginBottom: 12 },
+  err: { fontSize: 14 },
   submit: { marginTop: 8 },
   attachBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 14,
-    borderRadius: 8,
+    borderRadius: 10,
     borderWidth: 1,
+    borderStyle: 'dashed',
     gap: 10,
   },
   attachIcon: { fontSize: 22 },
@@ -250,12 +253,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 10,
-    borderRadius: 8,
+    borderRadius: 10,
     borderWidth: 1,
     gap: 10,
   },
-  docThumb: { width: 48, height: 48, borderRadius: 6 },
+  docThumb: { width: 48, height: 48, borderRadius: 8 },
   docName: { flex: 1, fontSize: 14 },
-  docRemove: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6 },
-  docRemoveText: { color: '#fff', fontSize: 14, fontWeight: '500' },
+  docRemove: { width: 28, height: 28, borderRadius: 14, justifyContent: 'center', alignItems: 'center' },
+  docRemoveText: { color: '#fff', fontSize: 14, fontWeight: '600' },
 });

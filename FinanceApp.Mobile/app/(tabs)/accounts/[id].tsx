@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTheme } from '../../../src/context/ThemeContext';
@@ -59,7 +59,7 @@ export default function EditAccountScreen() {
   if (!id || !account) {
     return (
       <View style={[styles.centered, { backgroundColor: colors.bg.alt }]}>
-        <Text style={{ color: colors.text.muted }}>Loading...</Text>
+        <ActivityIndicator size="large" color={colors.brand} />
       </View>
     );
   }

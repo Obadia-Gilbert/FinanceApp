@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   TextInput,
@@ -23,6 +23,8 @@ export function Input({
   ...rest
 }: InputProps) {
   const { colors } = useTheme();
+  const [focused, setFocused] = useState(false);
+
   return (
     <View style={[styles.wrap, containerStyle]}>
       {label ? (
@@ -30,11 +32,13 @@ export function Input({
       ) : null}
       <TextInput
         placeholderTextColor={colors.text.subtle}
+        onFocus={(e) => { setFocused(true); rest.onFocus?.(e); }}
+        onBlur={(e) => { setFocused(false); rest.onBlur?.(e); }}
         style={[
           styles.input,
           {
-            backgroundColor: colors.bg.hover,
-            borderColor: error ? colors.danger : colors.border,
+            backgroundColor: colors.bg.default,
+            borderColor: error ? colors.danger : focused ? colors.borderFocus : colors.border,
             color: colors.text.primary,
           },
           style,
@@ -53,9 +57,9 @@ const styles = StyleSheet.create({
   label: { fontSize: 14, fontWeight: '500', marginBottom: 6 },
   input: {
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 12,
     paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingVertical: 13,
     fontSize: 16,
   },
   error: { fontSize: 12, marginTop: 4 },

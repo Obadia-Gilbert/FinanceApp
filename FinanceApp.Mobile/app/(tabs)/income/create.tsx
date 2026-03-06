@@ -91,7 +91,7 @@ export default function CreateIncomeScreen() {
             <TouchableOpacity
               key={c}
               onPress={() => setCurrency(c)}
-              style={[styles.chip, { backgroundColor: currency === c ? colors.brand : colors.bg.hover }]}
+              style={[styles.chip, { backgroundColor: currency === c ? colors.brand : colors.bg.default, borderColor: colors.border, borderWidth: 1 }]}
             >
               <Text style={[styles.chipText, { color: currency === c ? '#fff' : colors.text.body }]}>{c}</Text>
             </TouchableOpacity>
@@ -138,7 +138,7 @@ export default function CreateIncomeScreen() {
             <TouchableOpacity
               key={c.id}
               onPress={() => setCategoryId(c.id)}
-              style={[styles.catBtn, { backgroundColor: categoryId === c.id ? colors.bg.hover : colors.bg.default, borderColor: colors.border }]}
+              style={[styles.catBtn, { backgroundColor: categoryId === c.id ? `${colors.brand}15` : colors.bg.default, borderColor: categoryId === c.id ? colors.brand : colors.border, borderWidth: categoryId === c.id ? 2 : 1 }]}
             >
               <Text style={[styles.catText, { color: colors.text.primary }]}>{c.name}</Text>
             </TouchableOpacity>
@@ -150,7 +150,7 @@ export default function CreateIncomeScreen() {
         <View style={styles.wrap}>
           <TouchableOpacity
             onPress={() => setAccountId('')}
-            style={[styles.catBtn, { backgroundColor: !accountId ? colors.bg.hover : colors.bg.default, borderColor: colors.border }]}
+            style={[styles.catBtn, { backgroundColor: !accountId ? `${colors.brand}15` : colors.bg.default, borderColor: !accountId ? colors.brand : colors.border, borderWidth: !accountId ? 2 : 1 }]}
           >
             <Text style={[styles.catText, { color: colors.text.primary }]}>None</Text>
           </TouchableOpacity>
@@ -158,7 +158,7 @@ export default function CreateIncomeScreen() {
             <TouchableOpacity
               key={a.id}
               onPress={() => setAccountId(a.id)}
-              style={[styles.catBtn, { backgroundColor: accountId === a.id ? colors.bg.hover : colors.bg.default, borderColor: colors.border }]}
+              style={[styles.catBtn, { backgroundColor: accountId === a.id ? `${colors.brand}15` : colors.bg.default, borderColor: accountId === a.id ? colors.brand : colors.border, borderWidth: accountId === a.id ? 2 : 1 }]}
             >
               <Text style={[styles.catText, { color: colors.text.primary }]}>{a.name}</Text>
             </TouchableOpacity>

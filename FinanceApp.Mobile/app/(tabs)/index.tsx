@@ -1,5 +1,14 @@
-import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
+import { useState, useRef, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  RefreshControl,
+  TouchableOpacity,
+  ActivityIndicator,
+  Animated,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -19,10 +28,12 @@ export default function DashboardScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [userRefreshing, setUserRefreshing] = useState(false);
+  const fadeIn = useRef(new Animated.Value(0)).current;
+
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['dashboard'],
     queryFn: getDashboard,
-    staleTime: 60 * 1000, // 1 min: avoid refetch when switching back to tab
+    staleTime: 60 * 1000,
   });
   const { data: unreadCount = 0 } = useQuery({
     queryKey: ['notificationsUnreadCount'],
@@ -30,13 +41,15 @@ export default function DashboardScreen() {
     staleTime: 60 * 1000,
   });
 
+  useEffect(() => {
+    if (data) {
+      Animated.timing(fadeIn, { toValue: 1, duration: 400, useNativeDriver: true }).start();
+    }
+  }, [data]);
+
   const handleRefresh = async () => {
     setUserRefreshing(true);
-    try {
-      await refetch();
-    } finally {
-      setUserRefreshing(false);
-    }
+    try { await refetch(); } finally { setUserRefreshing(false); }
   };
 
   const chartConfig = {
@@ -44,7 +57,7 @@ export default function DashboardScreen() {
     backgroundGradientFrom: colors.bg.default,
     backgroundGradientTo: colors.bg.alt,
     decimalPlaces: 0,
-    color: (opacity = 1) => (isDark ? `rgba(59, 130, 246, ${opacity})` : `rgba(37, 99, 235, ${opacity})`),
+    color: (opacity = 1) => isDark ? `rgba(59, 130, 246, ${opacity})` : `rgba(37, 99, 235, ${opacity})`,
     labelColor: () => colors.text.muted,
     style: { borderRadius: 12, paddingRight: 0 },
   };
@@ -61,11 +74,13 @@ export default function DashboardScreen() {
         <ScrollView
           style={[styles.container, { backgroundColor: colors.bg.alt }]}
           contentContainerStyle={[styles.centered, { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 24 }]}
+          refreshControl={<RefreshControl refreshing={false} onRefresh={() => refetch()} tintColor={colors.brand} />}
         >
-        <Text style={[styles.errorText, { color: colors.danger }]}>
-          {(error as Error)?.message ?? 'Failed to load dashboard'}
-        </Text>
-        <Text style={[styles.retryHint, { color: colors.text.muted }]}>Pull down to retry</Text>
+          <Text style={{ fontSize: 48, marginBottom: 16 }}>📊</Text>
+          <Text style={[styles.errorText, { color: colors.danger }]}>
+            {(error as Error)?.message ?? 'Failed to load dashboard'}
+          </Text>
+          <Text style={[styles.retryHint, { color: colors.text.muted }]}>Pull down to retry</Text>
         </ScrollView>
       </View>
     );
@@ -75,188 +90,219 @@ export default function DashboardScreen() {
     <View style={styles.wrapper}>
       <ScrollView
         style={[styles.container, { backgroundColor: colors.bg.alt }]}
-        contentContainerStyle={[
-          styles.content,
-          { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 24 },
-        ]}
+        contentContainerStyle={[styles.content, { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 24 }]}
         refreshControl={
-        <RefreshControl
-          refreshing={userRefreshing}
-          onRefresh={handleRefresh}
-          tintColor={colors.brand}
-        />
-      }
-    >
-      {/* Header: profile (left) | Dashboard (center) | notifications (right) */}
-      <View style={styles.header}>
-        <View style={[styles.avatar, { backgroundColor: colors.brand }]}>
-          <Text style={styles.avatarText}>
-            {user?.firstName?.[0] ?? user?.email?.[0] ?? '?'}
-          </Text>
-        </View>
-        <Text style={[styles.headerTitle, { color: colors.text.primary }]}>Dashboard</Text>
-        <TouchableOpacity onPress={() => router.push('/(tabs)/notifications')} style={styles.bellWrap}>
-          <Text style={styles.bellIcon}>🔔</Text>
-          {unreadCount > 0 && (
-            <View style={styles.bellBadge}>
-              <Text style={styles.bellBadgeText} numberOfLines={1}>
-                {unreadCount > 99 ? '99+' : unreadCount}
-              </Text>
-            </View>
-          )}
-        </TouchableOpacity>
-      </View>
-
-      {data ? (
-        <>
-          {/* This month's spending card (blue) — label matches the value shown */}
-          <View style={[styles.balanceCard, { backgroundColor: colors.brand }]}>
-            <Text style={styles.balanceLabel}>This month&apos;s spending</Text>
-            <Text style={styles.balanceAmount}>
-              {data.displayCurrency} {data.thisMonthSpend.toLocaleString()}
+          <RefreshControl refreshing={userRefreshing} onRefresh={handleRefresh} tintColor={colors.brand} />
+        }
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={[styles.avatar, { backgroundColor: colors.brand }]}
+            onPress={() => router.push('/(tabs)/profile')}
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.avatarText, { color: isDark ? '#0F172A' : '#fff' }]}>
+              {user?.firstName?.[0] ?? user?.email?.[0] ?? '?'}
             </Text>
-            <View style={styles.balanceRow}>
-              <View style={styles.balanceCol}>
-                <Text style={styles.balanceSubLabel}>Monthly expenses</Text>
-                <Text style={styles.balanceSubValue}>−{data.thisMonthSpend.toLocaleString()}</Text>
-              </View>
-              <View style={[styles.balanceDivider, { backgroundColor: 'rgba(255,255,255,0.4)' }]} />
-              <View style={styles.balanceCol}>
-                <Text style={styles.balanceSubLabel}>Total spend (all time)</Text>
-                <Text style={styles.balanceSubValue}>{data.totalSpend.toLocaleString()}</Text>
-              </View>
-            </View>
-          </View>
-
-          {/* Alerts */}
-          {data.isOverBudget && data.budgetAmount != null && (
-            <Card style={[styles.alert, { borderLeftWidth: 4, borderLeftColor: colors.danger }]}>
-              <Text style={[styles.alertTitle, { color: colors.danger }]}>Budget exceeded</Text>
-              <Text style={[styles.alertBody, { color: colors.text.body }]}>
-                This month you've spent {data.thisMonthSpend.toLocaleString()} {data.displayCurrency} against a budget of {data.budgetAmount.toLocaleString()}.
-              </Text>
-            </Card>
-          )}
-
-          {/* Spending Trend */}
-          <Card style={styles.trendCard}>
-            <View style={styles.trendHeader}>
-              <View>
-                <Text style={[styles.trendTitle, { color: colors.text.primary }]}>Spending Trend</Text>
-                <Text style={[styles.trendAmount, { color: colors.text.primary }]}>
-                  {data.displayCurrency} {data.thisMonthSpend.toLocaleString()}
+          </TouchableOpacity>
+          <Text style={[styles.headerTitle, { color: colors.text.primary }]}>Dashboard</Text>
+          <TouchableOpacity
+            onPress={() => router.push('/(tabs)/notifications')}
+            style={styles.bellWrap}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.bellIcon}>🔔</Text>
+            {unreadCount > 0 && (
+              <View style={[styles.bellBadge, { backgroundColor: colors.danger }]}>
+                <Text style={styles.bellBadgeText} numberOfLines={1}>
+                  {unreadCount > 99 ? '99+' : unreadCount}
                 </Text>
-                <Text style={[styles.trendVs, { color: colors.danger }]}>— vs last week</Text>
               </View>
-              <View style={[styles.trendPill, { backgroundColor: colors.brandLight ?? colors.bg.alt }]}>
-                <Text style={[styles.trendPillText, { color: colors.brand }]}>Last 7 days</Text>
+            )}
+          </TouchableOpacity>
+        </View>
+
+        {data ? (
+          <Animated.View style={{ opacity: fadeIn }}>
+            {/* Spending card */}
+            <View style={[styles.balanceCard, { backgroundColor: colors.brand }]}>
+              <Text style={styles.balanceLabel}>This month&apos;s spending</Text>
+              <Text style={styles.balanceAmount}>
+                {data.displayCurrency} {data.thisMonthSpend.toLocaleString()}
+              </Text>
+              <View style={styles.balanceRow}>
+                <View style={styles.balanceCol}>
+                  <Text style={styles.balanceSubLabel}>Monthly expenses</Text>
+                  <Text style={styles.balanceSubValue}>−{data.thisMonthSpend.toLocaleString()}</Text>
+                </View>
+                <View style={styles.balanceDivider} />
+                <View style={styles.balanceCol}>
+                  <Text style={styles.balanceSubLabel}>Total spend (all time)</Text>
+                  <Text style={styles.balanceSubValue}>{data.totalSpend.toLocaleString()}</Text>
+                </View>
               </View>
             </View>
-            {last7.length > 0 && (
-              <LineChart
-                data={{
-                  labels: chartLabels,
-                  datasets: [{ data: last7.map((d) => Math.max(0, Number(d.amount))) }],
-                }}
-                width={screenWidth}
-                height={160}
-                chartConfig={chartConfig}
-                bezier
-                style={{ marginLeft: -8 }}
-                withDots={false}
-                withInnerLines
-                withOuterLines
-                fromZero
-              />
-            )}
-          </Card>
 
-          {/* Active Budgets */}
-          {(data.categoryBudgetAlerts?.length > 0 || (data.budgetAmount != null && data.budgetAmount > 0)) && (
+            {/* Budget alert */}
+            {data.isOverBudget && data.budgetAmount != null && (
+              <Card style={[styles.alert, { borderLeftWidth: 4, borderLeftColor: colors.danger }]}>
+                <Text style={[styles.alertTitle, { color: colors.danger }]}>⚠ Budget exceeded</Text>
+                <Text style={[styles.alertBody, { color: colors.text.body }]}>
+                  This month you've spent {data.thisMonthSpend.toLocaleString()} {data.displayCurrency} against a budget of {data.budgetAmount.toLocaleString()}.
+                </Text>
+              </Card>
+            )}
+
+            {/* Spending Trend */}
+            {last7.length > 0 && (
+              <Card style={styles.trendCard}>
+                <View style={styles.trendHeader}>
+                  <View>
+                    <Text style={[styles.trendTitle, { color: colors.text.primary }]}>Spending Trend</Text>
+                    <Text style={[styles.trendAmount, { color: colors.text.primary }]}>
+                      {data.displayCurrency} {data.thisMonthSpend.toLocaleString()}
+                    </Text>
+                  </View>
+                  <View style={[styles.trendPill, { backgroundColor: colors.brandLight ?? colors.bg.alt }]}>
+                    <Text style={[styles.trendPillText, { color: colors.brand }]}>Last 7 days</Text>
+                  </View>
+                </View>
+                <LineChart
+                  data={{
+                    labels: chartLabels,
+                    datasets: [{ data: last7.map((d) => Math.max(0, Number(d.amount))) }],
+                  }}
+                  width={screenWidth}
+                  height={160}
+                  chartConfig={chartConfig}
+                  bezier
+                  style={{ marginLeft: -8 }}
+                  withDots={false}
+                  withInnerLines
+                  withOuterLines
+                  fromZero
+                />
+              </Card>
+            )}
+
+            {/* Active Budgets */}
+            {(data.categoryBudgetAlerts?.length > 0 || (data.budgetAmount != null && data.budgetAmount > 0)) && (
+              <View style={styles.section}>
+                <View style={styles.sectionHeader}>
+                  <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>Active Budgets</Text>
+                  <TouchableOpacity onPress={() => router.push('/(tabs)/budget')}>
+                    <Text style={[styles.viewAll, { color: colors.brand }]}>View all</Text>
+                  </TouchableOpacity>
+                </View>
+                {data.budgetAmount != null && data.budgetAmount > 0 && (
+                  <Card style={styles.budgetItem}>
+                    <View style={styles.budgetItemLeft}>
+                      <View style={[styles.budgetIconWrap, { backgroundColor: colors.brandLight ?? colors.bg.alt }]}>
+                        <Text style={styles.budgetEmoji}>📊</Text>
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={[styles.budgetName, { color: colors.text.primary }]}>Total</Text>
+                        <Text style={[styles.budgetMeta, { color: colors.text.muted }]}>
+                          {data.thisMonthSpend.toLocaleString()} / {data.budgetAmount.toLocaleString()} {data.displayCurrency}
+                        </Text>
+                        <View style={[styles.progressTrack, { backgroundColor: colors.border }]}>
+                          <View
+                            style={[
+                              styles.progressFill,
+                              {
+                                width: `${Math.min(100, (data.thisMonthSpend / data.budgetAmount) * 100)}%`,
+                                backgroundColor: data.isOverBudget ? colors.danger : colors.brand,
+                              },
+                            ]}
+                          />
+                        </View>
+                      </View>
+                    </View>
+                  </Card>
+                )}
+                {data.categoryBudgetAlerts?.slice(0, 3).map((a, i) => (
+                  <Card key={i} style={styles.budgetItem}>
+                    <View style={styles.budgetItemLeft}>
+                      <View style={[styles.budgetIconWrap, { backgroundColor: a.isOver ? `${colors.danger}20` : `${colors.warning}20` }]}>
+                        <Text style={styles.budgetEmoji}>{a.isOver ? '⚠️' : '📌'}</Text>
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={[styles.budgetName, { color: colors.text.primary }]}>{a.categoryName}</Text>
+                        <Text style={[styles.budgetMeta, { color: colors.text.muted }]}>
+                          {a.spent.toLocaleString()} / {a.budget.toLocaleString()} {a.currency}
+                        </Text>
+                        <View style={[styles.progressTrack, { backgroundColor: colors.border }]}>
+                          <View
+                            style={[
+                              styles.progressFill,
+                              {
+                                width: `${Math.min(100, (a.spent / a.budget) * 100)}%`,
+                                backgroundColor: a.isOver ? colors.danger : colors.warning,
+                              },
+                            ]}
+                          />
+                        </View>
+                      </View>
+                    </View>
+                  </Card>
+                ))}
+              </View>
+            )}
+
+            {/* Quick Actions */}
             <View style={styles.section}>
-              <View style={styles.sectionHeader}>
-                <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>Active Budgets</Text>
-                <TouchableOpacity onPress={() => router.push('/(tabs)/budget')}>
-                  <Text style={[styles.viewAll, { color: colors.brand }]}>View all</Text>
+              <Text style={[styles.sectionTitle, { color: colors.text.primary, marginBottom: 12 }]}>Quick Actions</Text>
+              <View style={styles.quickActions}>
+                <TouchableOpacity
+                  style={[styles.quickAction, { backgroundColor: colors.bg.default, borderColor: colors.border }]}
+                  onPress={() => router.push(`/(tabs)/expenses/create?t=${Date.now()}`)}
+                  activeOpacity={0.7}
+                >
+                  <View style={[styles.quickActionIcon, { backgroundColor: `${colors.danger}15` }]}>
+                    <Text style={{ fontSize: 20 }}>💸</Text>
+                  </View>
+                  <Text style={[styles.quickActionLabel, { color: colors.text.primary }]}>Add Expense</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.quickAction, { backgroundColor: colors.bg.default, borderColor: colors.border }]}
+                  onPress={() => router.push('/(tabs)/income/create')}
+                  activeOpacity={0.7}
+                >
+                  <View style={[styles.quickActionIcon, { backgroundColor: `${colors.success}15` }]}>
+                    <Text style={{ fontSize: 20 }}>💰</Text>
+                  </View>
+                  <Text style={[styles.quickActionLabel, { color: colors.text.primary }]}>Add Income</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.quickAction, { backgroundColor: colors.bg.default, borderColor: colors.border }]}
+                  onPress={() => router.push('/(tabs)/reports')}
+                  activeOpacity={0.7}
+                >
+                  <View style={[styles.quickActionIcon, { backgroundColor: `${colors.info}15` }]}>
+                    <Text style={{ fontSize: 20 }}>📊</Text>
+                  </View>
+                  <Text style={[styles.quickActionLabel, { color: colors.text.primary }]}>Reports</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.quickAction, { backgroundColor: colors.bg.default, borderColor: colors.border }]}
+                  onPress={() => router.push('/(tabs)/budget')}
+                  activeOpacity={0.7}
+                >
+                  <View style={[styles.quickActionIcon, { backgroundColor: `${colors.brand}15` }]}>
+                    <Text style={{ fontSize: 20 }}>🎯</Text>
+                  </View>
+                  <Text style={[styles.quickActionLabel, { color: colors.text.primary }]}>Budget</Text>
                 </TouchableOpacity>
               </View>
-              {data.budgetAmount != null && data.budgetAmount > 0 && (
-                <Card style={styles.budgetItem}>
-                  <View style={styles.budgetItemLeft}>
-                    <Text style={styles.budgetEmoji}>📊</Text>
-                    <View>
-                      <Text style={[styles.budgetName, { color: colors.text.primary }]}>Total</Text>
-                      <Text style={[styles.budgetMeta, { color: colors.text.muted }]}>
-                        {data.thisMonthSpend.toLocaleString()} / {data.budgetAmount.toLocaleString()} {data.displayCurrency}
-                      </Text>
-                      <View style={[styles.progressTrack, { backgroundColor: colors.border }]}>
-                        <View
-                          style={[
-                            styles.progressFill,
-                            {
-                              width: `${Math.min(100, (data.thisMonthSpend / data.budgetAmount) * 100)}%`,
-                              backgroundColor: data.isOverBudget ? colors.danger : colors.brand,
-                            },
-                          ]}
-                        />
-                      </View>
-                    </View>
-                  </View>
-                </Card>
-              )}
-              {data.categoryBudgetAlerts?.slice(0, 2).map((a, i) => (
-                <Card key={i} style={styles.budgetItem}>
-                  <View style={styles.budgetItemLeft}>
-                    <Text style={styles.budgetEmoji}>{a.isOver ? '⚠️' : '📌'}</Text>
-                    <View>
-                      <Text style={[styles.budgetName, { color: colors.text.primary }]}>{a.categoryName}</Text>
-                      <Text style={[styles.budgetMeta, { color: colors.text.muted }]}>
-                        {a.spent.toLocaleString()} / {a.budget.toLocaleString()} {a.currency}
-                      </Text>
-                      <View style={[styles.progressTrack, { backgroundColor: colors.border }]}>
-                        <View
-                          style={[
-                            styles.progressFill,
-                            {
-                              width: `${Math.min(100, (a.spent / a.budget) * 100)}%`,
-                              backgroundColor: a.isOver ? colors.danger : colors.warning,
-                            },
-                          ]}
-                        />
-                      </View>
-                    </View>
-                  </View>
-                </Card>
-              ))}
             </View>
-          )}
-
-          {/* Recent — link to expenses */}
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>Recent Transactions</Text>
-              <TouchableOpacity onPress={() => router.push('/(tabs)/expenses')}>
-                <Text style={[styles.viewAll, { color: colors.brand }]}>See all</Text>
-              </TouchableOpacity>
-            </View>
-            <Card style={styles.recentCard}>
-              <Text style={[styles.recentHint, { color: colors.text.muted }]}>
-                Your latest expenses appear on the Expenses tab.
-              </Text>
-              <TouchableOpacity
-                style={[styles.recentBtn, { backgroundColor: colors.brandLight ?? colors.bg.alt }]}
-                onPress={() => router.push('/(tabs)/expenses')}
-              >
-                <Text style={[styles.recentBtnText, { color: colors.brand }]}>Open Expenses</Text>
-              </TouchableOpacity>
-            </Card>
+          </Animated.View>
+        ) : isLoading ? (
+          <View style={styles.loadingWrap}>
+            <ActivityIndicator size="large" color={colors.brand} />
+            <Text style={[styles.loadingText, { color: colors.text.muted }]}>Loading your dashboard...</Text>
           </View>
-        </>
-      ) : isLoading ? (
-        <View style={styles.loadingWrap}>
-          <Text style={[styles.loadingText, { color: colors.text.muted }]}>Loading...</Text>
-        </View>
-      ) : null}
+        ) : null}
       </ScrollView>
     </View>
   );
@@ -275,24 +321,23 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  avatarText: { color: '#fff', fontSize: 18, fontWeight: '700' },
+  avatarText: { fontSize: 18, fontWeight: '700' },
   headerTitle: { flex: 1, fontSize: 20, fontWeight: '700', textAlign: 'center' },
   bellWrap: { padding: 8, position: 'relative' },
   bellIcon: { fontSize: 22 },
   bellBadge: {
     position: 'absolute',
-    top: 0,
+    top: 2,
     right: 0,
     minWidth: 18,
     height: 18,
     borderRadius: 9,
-    backgroundColor: '#DC2626',
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 5,
@@ -307,7 +352,7 @@ const styles = StyleSheet.create({
   balanceAmount: { color: '#fff', fontSize: 28, fontWeight: '700', marginBottom: 16 },
   balanceRow: { flexDirection: 'row', alignItems: 'center' },
   balanceCol: { flex: 1 },
-  balanceDivider: { width: 1, height: 32 },
+  balanceDivider: { width: 1, height: 32, backgroundColor: 'rgba(255,255,255,0.3)' },
   balanceSubLabel: { color: 'rgba(255,255,255,0.8)', fontSize: 12 },
   balanceSubValue: { color: '#fff', fontSize: 15, fontWeight: '600' },
   alert: { marginBottom: 12 },
@@ -317,7 +362,6 @@ const styles = StyleSheet.create({
   trendHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 },
   trendTitle: { fontSize: 16, fontWeight: '700', marginBottom: 4 },
   trendAmount: { fontSize: 22, fontWeight: '700' },
-  trendVs: { fontSize: 13, marginTop: 2 },
   trendPill: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
   trendPillText: { fontSize: 13, fontWeight: '600' },
   section: { marginBottom: 20 },
@@ -326,15 +370,41 @@ const styles = StyleSheet.create({
   viewAll: { fontSize: 14, fontWeight: '600' },
   budgetItem: { marginBottom: 10 },
   budgetItemLeft: { flexDirection: 'row', alignItems: 'center' },
-  budgetEmoji: { fontSize: 24, marginRight: 12 },
+  budgetIconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  budgetEmoji: { fontSize: 20 },
   budgetName: { fontSize: 16, fontWeight: '600' },
   budgetMeta: { fontSize: 13, marginTop: 2 },
   progressTrack: { height: 6, borderRadius: 3, marginTop: 8, overflow: 'hidden' },
   progressFill: { height: '100%', borderRadius: 3 },
-  recentCard: { padding: 16 },
-  recentHint: { fontSize: 14, marginBottom: 12 },
-  recentBtn: { alignSelf: 'flex-start', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10 },
-  recentBtnText: { fontSize: 14, fontWeight: '600' },
-  loadingWrap: { padding: 24, alignItems: 'center' },
+  quickActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  quickAction: {
+    width: '48%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    gap: 10,
+  },
+  quickActionIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  quickActionLabel: { fontSize: 14, fontWeight: '600', flex: 1 },
+  loadingWrap: { padding: 60, alignItems: 'center', gap: 16 },
   loadingText: { fontSize: 15 },
 });

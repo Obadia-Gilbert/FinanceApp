@@ -2,6 +2,7 @@ import { useState } from 'react';
 import {
   View,
   Text,
+  Image,
   StyleSheet,
   TouchableOpacity,
   KeyboardAvoidingView,
@@ -9,6 +10,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Link, router } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../src/context/ThemeContext';
 import { Input } from '../../src/components/Input';
 import { Button } from '../../src/components/Button';
@@ -16,7 +18,8 @@ import { login } from '../../src/api/auth';
 import { ApiError } from '../../src/api/client';
 
 export default function LoginScreen() {
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
+  const insets = useSafeAreaInsets();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -25,14 +28,8 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     setError('');
-    if (!email.trim()) {
-      setError('Email is required');
-      return;
-    }
-    if (!password) {
-      setError('Password is required');
-      return;
-    }
+    if (!email.trim()) { setError('Email is required'); return; }
+    if (!password) { setError('Password is required'); return; }
     setLoading(true);
     try {
       await login({ email: email.trim(), password });
@@ -55,16 +52,18 @@ export default function LoginScreen() {
       style={[styles.container, { backgroundColor: colors.bg.alt }]}
     >
       <ScrollView
-        contentContainerStyle={styles.scroll}
+        contentContainerStyle={[styles.scroll, { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24 }]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <Text style={[styles.appTitle, { color: colors.text.primary }]}>FinanceApp</Text>
-
-        {/* Welcome card */}
-        <View style={[styles.welcomeCard, { backgroundColor: colors.brandLight ?? '#EFF6FF' }]}>
-          <View style={[styles.welcomeIconWrap, { backgroundColor: colors.brand }]}>
-            <Text style={styles.welcomeIcon}>💰</Text>
+        {/* Welcome card with logo */}
+        <View style={[styles.welcomeCard, { backgroundColor: colors.brandLight ?? colors.bg.default }]}>
+          <View style={styles.logoWrap}>
+            <Image
+              source={require('../../assets/logo.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
           </View>
           <Text style={[styles.welcomeTitle, { color: colors.text.primary }]}>Welcome Back</Text>
           <Text style={[styles.welcomeSubtitle, { color: colors.text.muted }]}>
@@ -96,7 +95,9 @@ export default function LoginScreen() {
             <Text style={[styles.forgotLink, { color: colors.brand }]}>Forgot Password?</Text>
           </TouchableOpacity>
           {error ? (
-            <Text style={[styles.errText, { color: colors.danger }]}>{error}</Text>
+            <View style={[styles.errorCard, { backgroundColor: `${colors.danger}10` }]}>
+              <Text style={[styles.errText, { color: colors.danger }]}>{error}</Text>
+            </View>
           ) : null}
           <Button title="Sign In" onPress={handleLogin} loading={loading} style={styles.btn} />
         </View>
@@ -111,14 +112,14 @@ export default function LoginScreen() {
             style={[styles.socialBtn, { backgroundColor: colors.bg.default, borderColor: colors.border }]}
             onPress={() => {}}
           >
-            <Text style={styles.socialIcon}>G</Text>
+            <Text style={[styles.socialIcon, { color: colors.text.primary }]}>G</Text>
             <Text style={[styles.socialLabel, { color: colors.text.primary }]}>Google</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.socialBtn, { backgroundColor: colors.bg.default, borderColor: colors.border }]}
             onPress={() => {}}
           >
-            <Text style={styles.socialIcon}>f</Text>
+            <Text style={[styles.socialIcon, { color: colors.text.primary }]}>f</Text>
             <Text style={[styles.socialLabel, { color: colors.text.primary }]}>Facebook</Text>
           </TouchableOpacity>
         </View>
@@ -143,32 +144,34 @@ const styles = StyleSheet.create({
   scroll: {
     flexGrow: 1,
     paddingHorizontal: 24,
-    paddingTop: 48,
-    paddingBottom: 40,
   },
-  appTitle: { fontSize: 20, fontWeight: '700', textAlign: 'center', marginBottom: 24 },
   welcomeCard: {
-    borderRadius: 16,
-    paddingVertical: 28,
+    borderRadius: 20,
+    paddingVertical: 32,
     paddingHorizontal: 24,
     alignItems: 'center',
     marginBottom: 28,
   },
-  welcomeIconWrap: {
-    width: 64,
-    height: 64,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 12,
+  logoWrap: {
+    width: 72,
+    height: 72,
+    borderRadius: 18,
+    overflow: 'hidden',
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 4,
   },
-  welcomeIcon: { fontSize: 32 },
-  welcomeTitle: { fontSize: 22, fontWeight: '700', marginBottom: 6 },
+  logo: { width: 72, height: 72 },
+  welcomeTitle: { fontSize: 24, fontWeight: '700', marginBottom: 6 },
   welcomeSubtitle: { fontSize: 15 },
   form: { marginBottom: 20 },
   forgotWrap: { alignSelf: 'flex-end', marginTop: -8, marginBottom: 16 },
   forgotLink: { fontSize: 14, fontWeight: '500' },
-  errText: { fontSize: 14, marginBottom: 12 },
+  errorCard: { borderRadius: 10, padding: 12, marginBottom: 12 },
+  errText: { fontSize: 14 },
   btn: { marginTop: 4 },
   divider: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
   dividerLine: { flex: 1, height: 1 },

@@ -4,13 +4,23 @@ import { useTheme } from '../context/ThemeContext';
 
 interface CardProps {
   children: React.ReactNode;
-  style?: ViewStyle;
+  style?: ViewStyle | ViewStyle[];
 }
 
 export function Card({ children, style }: CardProps) {
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   return (
-    <View style={[styles.card, { backgroundColor: colors.bg.default, borderColor: colors.border }, style]}>
+    <View
+      style={[
+        styles.card,
+        {
+          backgroundColor: colors.bg.default,
+          borderColor: colors.border,
+          shadowOpacity: isDark ? 0 : 0.06,
+        },
+        style,
+      ]}
+    >
       {children}
     </View>
   );
@@ -18,13 +28,12 @@ export function Card({ children, style }: CardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 12,
+    borderRadius: 14,
     borderWidth: 1,
     padding: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 6,
     elevation: 2,
   },
 });

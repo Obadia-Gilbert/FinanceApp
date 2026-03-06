@@ -6,8 +6,8 @@ import {
   FlatList,
   TouchableOpacity,
   RefreshControl,
-  TextInput,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
@@ -20,12 +20,21 @@ import type { IncomeDto } from '../../../src/types/api';
 
 const MONTHS = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ');
 
-function iconForCategory(_name: string | null): string {
-  return '💰';
-}
+const CATEGORY_ICONS: Record<string, string> = {
+  salary: '💼',
+  freelance: '💻',
+  investment: '📈',
+  gift: '🎁',
+  rental: '🏠',
+  business: '🏢',
+  dividend: '💵',
+  default: '💰',
+};
 
-function bgForCategory(_name: string | null): string {
-  return '#10B981';
+function iconForCategory(name: string | null): string {
+  if (!name) return CATEGORY_ICONS.default;
+  const key = Object.keys(CATEGORY_ICONS).find((k) => name.toLowerCase().includes(k));
+  return key ? CATEGORY_ICONS[key] : CATEGORY_ICONS.default;
 }
 
 export default function IncomeListScreen() {
@@ -71,23 +80,27 @@ export default function IncomeListScreen() {
   if (isError) {
     return (
       <View style={[styles.centered, { backgroundColor: colors.bg.alt }]}>
+        <Text style={{ fontSize: 48, marginBottom: 12 }}>📥</Text>
         <Text style={[styles.errorText, { color: colors.danger }]}>
           {(error as Error)?.message ?? 'Failed to load income'}
         </Text>
+        <Text style={[{ fontSize: 14, marginTop: 8, color: colors.text.muted }]}>Pull down to retry</Text>
       </View>
     );
   }
 
   const ListHeader = () => (
     <>
-      <View style={[styles.totalCard, { backgroundColor: colors.brandLight ?? '#EFF6FF' }]}>
+      <View style={[styles.totalCard, { backgroundColor: colors.brandLight ?? colors.bg.alt }]}>
         <Text style={[styles.totalLabel, { color: colors.text.muted }]}>TOTAL INCOME ({monthLabel.toUpperCase()})</Text>
         <Text style={[styles.totalAmount, { color: colors.text.primary }]}>
           {formatCurrencyCode(list[0]?.currency ?? 'USD')} {totalIncome.toLocaleString()}
         </Text>
         <View style={styles.totalTrend}>
-          <Text style={styles.trendIcon}>↗</Text>
-          <Text style={[styles.trendText, { color: colors.success }]}>+12.5%</Text>
+          <Text style={[styles.trendIcon, { color: colors.success }]}>↗</Text>
+          <Text style={[styles.trendText, { color: colors.success }]}>
+            {filtered.length} transaction{filtered.length !== 1 ? 's' : ''}
+          </Text>
         </View>
       </View>
       <View style={styles.pillsSection}>
@@ -120,7 +133,7 @@ export default function IncomeListScreen() {
           ))}
         </ScrollView>
       </View>
-      <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>RECENT TRANSACTIONS</Text>
+      <Text style={[styles.sectionTitle, { color: colors.text.muted }]}>RECENT TRANSACTIONS</Text>
     </>
   );
 
@@ -135,17 +148,22 @@ export default function IncomeListScreen() {
           <RefreshControl refreshing={isRefetching && !isLoading} onRefresh={() => refetch()} tintColor={colors.brand} />
         }
         ListEmptyComponent={
-          !isLoading ? (
+          isLoading ? (
+            <View style={styles.loadingWrap}>
+              <ActivityIndicator size="large" color={colors.brand} />
+            </View>
+          ) : (
             <Card style={styles.empty}>
+              <Text style={{ fontSize: 48, textAlign: 'center', marginBottom: 12 }}>📥</Text>
               <Text style={[styles.emptyTitle, { color: colors.text.primary }]}>No income yet</Text>
-              <Text style={[styles.emptyBody, { color: colors.text.muted }]}>Tap + to add income</Text>
+              <Text style={[styles.emptyBody, { color: colors.text.muted }]}>Tap + to add your first income</Text>
             </Card>
-          ) : null
+          )
         }
         renderItem={({ item }) => (
           <TouchableOpacity onPress={() => router.push(`/(tabs)/income/${item.id}`)} activeOpacity={0.7}>
             <Card style={[styles.row, { borderColor: colors.border }]}>
-              <View style={[styles.rowIcon, { backgroundColor: bgForCategory(item.categoryName) }]}>
+              <View style={[styles.rowIcon, { backgroundColor: `${colors.success}15` }]}>
                 <Text style={styles.rowIconText}>{iconForCategory(item.categoryName)}</Text>
               </View>
               <View style={styles.rowBody}>
@@ -168,6 +186,7 @@ export default function IncomeListScreen() {
         style={[styles.fab, { backgroundColor: colors.brand }]}
         onPress={() => router.push('/(tabs)/income/create')}
         activeOpacity={0.9}
+        hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
       >
         <Text style={styles.fabText}>+</Text>
       </TouchableOpacity>
@@ -178,7 +197,7 @@ export default function IncomeListScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
-  errorText: { fontSize: 16 },
+  errorText: { fontSize: 16, textAlign: 'center' },
   totalCard: { borderRadius: 16, padding: 20, marginHorizontal: 16, marginTop: 16, marginBottom: 16 },
   totalLabel: { fontSize: 12, letterSpacing: 0.5, marginBottom: 6 },
   totalAmount: { fontSize: 28, fontWeight: '700' },
@@ -209,9 +228,10 @@ const styles = StyleSheet.create({
   rowTitle: { fontSize: 16, fontWeight: '600' },
   rowSub: { fontSize: 13, marginTop: 2 },
   rowAmount: { fontSize: 16, fontWeight: '600' },
-  empty: { marginTop: 24 },
+  empty: { marginTop: 24, padding: 24, alignItems: 'center' },
   emptyTitle: { fontSize: 16, fontWeight: '600', marginBottom: 8 },
   emptyBody: { fontSize: 14 },
+  loadingWrap: { padding: 40, alignItems: 'center' },
   fab: {
     position: 'absolute',
     right: 20,
@@ -226,6 +246,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+    zIndex: 10,
   },
   fabText: { color: '#fff', fontSize: 28, fontWeight: '300' },
 });

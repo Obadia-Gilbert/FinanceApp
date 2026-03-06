@@ -21,6 +21,28 @@ import type { ExpenseDto } from '../../../src/types/api';
 
 type DateGroup = { label: string; data: ExpenseDto[] };
 
+const CATEGORY_ICONS: Record<string, string> = {
+  food: '🍽️',
+  transport: '🚗',
+  entertainment: '🎬',
+  shopping: '🛒',
+  health: '❤️',
+  bills: '📄',
+  rent: '🏠',
+  utility: '⚡',
+  education: '📚',
+  travel: '✈️',
+  personal: '👤',
+  insurance: '🛡',
+  default: '💸',
+};
+
+function categoryIcon(name: string | null): string {
+  if (!name) return CATEGORY_ICONS.default;
+  const key = Object.keys(CATEGORY_ICONS).find((k) => name.toLowerCase().includes(k));
+  return key ? CATEGORY_ICONS[key] : CATEGORY_ICONS.default;
+}
+
 function groupByDate(items: ExpenseDto[]): DateGroup[] {
   const today = new Date().toDateString();
   const yesterday = new Date(Date.now() - 864e5).toDateString();
@@ -47,7 +69,7 @@ function groupByDate(items: ExpenseDto[]): DateGroup[] {
 }
 
 export default function ExpensesListScreen() {
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   const router = useRouter();
   const [search, setSearch] = useState('');
   const [categoryId, setCategoryId] = useState<string | null>(null);
@@ -78,31 +100,37 @@ export default function ExpensesListScreen() {
   if (isError) {
     return (
       <View style={[styles.centered, { backgroundColor: colors.bg.alt }]}>
+        <Text style={{ fontSize: 48, marginBottom: 12 }}>💸</Text>
         <Text style={[styles.errorText, { color: colors.danger }]}>
           {(error as Error)?.message ?? 'Failed to load expenses'}
         </Text>
+        <Text style={{ fontSize: 14, marginTop: 8, color: colors.text.muted }}>Pull down to retry</Text>
       </View>
     );
   }
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bg.alt }]}>
-      {/* Search and filters */}
+      {/* Search */}
       <View style={styles.searchRow}>
         <View style={[styles.searchWrap, { backgroundColor: colors.bg.default, borderColor: colors.border }]}>
           <Text style={styles.searchIcon}>🔍</Text>
           <TextInput
             style={[styles.searchInput, { color: colors.text.primary }]}
-            placeholder="Search merchant or category"
+            placeholder="Search expenses..."
             placeholderTextColor={colors.text.subtle}
             value={search}
             onChangeText={setSearch}
           />
+          {search.length > 0 && (
+            <TouchableOpacity onPress={() => setSearch('')}>
+              <Text style={[{ fontSize: 16, color: colors.text.subtle }]}>✕</Text>
+            </TouchableOpacity>
+          )}
         </View>
-        <TouchableOpacity style={[styles.filterBtn, { backgroundColor: colors.bg.default, borderColor: colors.border }]}>
-          <Text style={styles.filterIcon}>☰</Text>
-        </TouchableOpacity>
       </View>
+
+      {/* Category pills */}
       <View style={styles.pillsSection}>
         <ScrollView
           horizontal
@@ -117,11 +145,9 @@ export default function ExpensesListScreen() {
             ]}
             onPress={() => setCategoryId(null)}
           >
-            <Text style={[styles.pillText, { color: categoryId === null ? '#fff' : colors.text.primary }]}>
-              All
-            </Text>
+            <Text style={[styles.pillText, { color: categoryId === null ? '#fff' : colors.text.primary }]}>All</Text>
           </TouchableOpacity>
-          {categories.slice(0, 8).map((c) => (
+          {categories.filter(c => c.type === 'Expense' || c.type === 'Both').map((c) => (
             <TouchableOpacity
               key={c.id}
               style={[
@@ -133,7 +159,6 @@ export default function ExpensesListScreen() {
               <Text style={[styles.pillText, { color: categoryId === c.id ? '#fff' : colors.text.primary }]}>
                 {c.name}
               </Text>
-              <Text style={[styles.pillChevron, { color: categoryId === c.id ? 'rgba(255,255,255,0.9)' : colors.text.muted }]}>▼</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -144,11 +169,7 @@ export default function ExpensesListScreen() {
         keyExtractor={(g) => g.label}
         contentContainerStyle={styles.listContent}
         refreshControl={
-          <RefreshControl
-            refreshing={isRefetching && !isLoading}
-            onRefresh={() => refetch()}
-            tintColor={colors.brand}
-          />
+          <RefreshControl refreshing={isRefetching && !isLoading} onRefresh={() => refetch()} tintColor={colors.brand} />
         }
         ListEmptyComponent={
           isLoading ? (
@@ -156,10 +177,11 @@ export default function ExpensesListScreen() {
               <ActivityIndicator size="large" color={colors.brand} />
             </View>
           ) : (
-            <Card style={styles.empty}>
+            <View style={styles.emptyWrap}>
+              <Text style={{ fontSize: 48, marginBottom: 12 }}>💸</Text>
               <Text style={[styles.emptyTitle, { color: colors.text.primary }]}>No expenses yet</Text>
               <Text style={[styles.emptyBody, { color: colors.text.muted }]}>Tap + to add your first expense</Text>
-            </Card>
+            </View>
           )
         }
         renderItem={({ item: group }) => (
@@ -176,6 +198,7 @@ export default function ExpensesListScreen() {
           </View>
         )}
       />
+
       <TouchableOpacity
         style={[styles.fab, { backgroundColor: colors.brand }]}
         onPress={() => router.push(`/(tabs)/expenses/create?t=${Date.now()}`)}
@@ -201,11 +224,12 @@ function ExpenseRow({
 }) {
   const date = item.expenseDate ? new Date(item.expenseDate) : null;
   const time = date ? date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : '—';
-  const categoryIcon = '📝';
+  const icon = categoryIcon(item.categoryName);
+
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.7} style={[styles.rowTouch, { borderBottomColor: colors.border }]}>
-      <View style={[styles.rowIcon, { backgroundColor: colors.brandLight ?? colors.bg.alt }]}>
-        <Text style={styles.rowIconText}>{categoryIcon}</Text>
+      <View style={[styles.rowIcon, { backgroundColor: `${colors.danger}12` }]}>
+        <Text style={styles.rowIconText}>{icon}</Text>
       </View>
       <View style={styles.rowCenter}>
         <Text style={[styles.rowMerchant, { color: colors.text.primary }]} numberOfLines={1}>
@@ -216,10 +240,10 @@ function ExpenseRow({
         </Text>
       </View>
       <View style={styles.rowRight}>
-        <Text style={[styles.rowAmount, { color: colors.text.primary }]}>
+        <Text style={[styles.rowAmount, { color: colors.danger }]}>
           −{Number(item.amount).toLocaleString()} {formatCurrencyCode(item.currency)}
         </Text>
-        <Text style={[styles.rowTime, { color: colors.text.muted }]}>{time}</Text>
+        <Text style={[styles.rowTime, { color: colors.text.subtle }]}>{time}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -227,28 +251,21 @@ function ExpenseRow({
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
+  errorText: { fontSize: 16, textAlign: 'center' },
   searchRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: 12, gap: 10 },
   searchWrap: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 20,
+    borderRadius: 12,
     borderWidth: 1,
     paddingHorizontal: 14,
     paddingVertical: 10,
   },
   searchIcon: { fontSize: 16, marginRight: 8 },
   searchInput: { flex: 1, fontSize: 15, paddingVertical: 0 },
-  filterBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    borderWidth: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  filterIcon: { fontSize: 18 },
-  pillsSection: { minHeight: 52, marginBottom: 12 },
+  pillsSection: { minHeight: 52, marginBottom: 8 },
   pillsScroll: { flexGrow: 0, minHeight: 44 },
   pillsContent: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12 },
   pill: {
@@ -257,16 +274,15 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     paddingHorizontal: 16,
     paddingVertical: 10,
-    borderRadius: 22,
-    marginRight: 10,
+    borderRadius: 20,
+    marginRight: 8,
     borderWidth: 1,
   },
   pillText: { fontSize: 14, fontWeight: '600' },
-  pillChevron: { fontSize: 10, marginLeft: 4 },
   listContent: { padding: 16, paddingBottom: 88 },
   loading: { padding: 40, alignItems: 'center' },
-  empty: { marginTop: 24 },
-  emptyTitle: { fontSize: 16, fontWeight: '600', marginBottom: 8 },
+  emptyWrap: { paddingTop: 60, alignItems: 'center', paddingHorizontal: 24 },
+  emptyTitle: { fontSize: 18, fontWeight: '600', marginBottom: 8 },
   emptyBody: { fontSize: 14 },
   group: { marginBottom: 20 },
   groupLabel: { fontSize: 12, fontWeight: '700', marginBottom: 10, letterSpacing: 0.5 },
@@ -279,7 +295,7 @@ const styles = StyleSheet.create({
   rowIcon: {
     width: 44,
     height: 44,
-    borderRadius: 22,
+    borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
