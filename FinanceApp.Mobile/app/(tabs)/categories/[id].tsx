@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTheme } from '../../../src/context/ThemeContext';
@@ -60,7 +60,7 @@ export default function EditCategoryScreen() {
   if (!id || (category === undefined && !isLoading)) {
     return (
       <View style={[styles.container, { backgroundColor: colors.bg.alt }]}>
-        <Text style={[styles.loading, { color: colors.text.muted }]}>Loading...</Text>
+        <ActivityIndicator size="large" color={colors.brand} />
       </View>
     );
   }
@@ -92,7 +92,6 @@ export default function EditCategoryScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   content: { padding: 16, paddingBottom: 40 },
-  loading: { padding: 24, textAlign: 'center' },
   card: { marginBottom: 16 },
   colorRow: { marginBottom: 20 },
   colorLabel: { fontSize: 14, fontWeight: '500', marginBottom: 8 },

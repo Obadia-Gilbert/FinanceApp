@@ -4,7 +4,7 @@ import { useTheme } from '../../src/context/ThemeContext';
 import { useAuth } from '../../src/context/AuthContext';
 import { Card } from '../../src/components/Card';
 
-type MenuItem = { label: string; href: string; icon: string };
+type MenuItem = { label: string; href: string; icon: string; iconBg: string };
 
 function MenuSection({
   title,
@@ -32,7 +32,9 @@ function MenuSection({
             onPress={() => onPress(item.href)}
             activeOpacity={0.7}
           >
-            <Text style={styles.menuIcon}>{item.icon}</Text>
+            <View style={[styles.menuIconWrap, { backgroundColor: item.iconBg }]}>
+              <Text style={styles.menuIcon}>{item.icon}</Text>
+            </View>
             <Text style={[styles.menuLabel, { color: colors.text.primary }]}>{item.label}</Text>
             <Text style={[styles.menuArrow, { color: colors.text.subtle }]}>›</Text>
           </TouchableOpacity>
@@ -62,20 +64,20 @@ export default function MoreScreen() {
   };
 
   const features: MenuItem[] = [
-    { label: 'Income', href: '/(tabs)/income', icon: '📥' },
-    { label: 'Accounts', href: '/(tabs)/accounts', icon: '🏦' },
-    { label: 'Transactions', href: '/(tabs)/transactions', icon: '↔' },
-    { label: 'Recurring', href: '/(tabs)/recurring', icon: '🔄' },
-    { label: 'Categories', href: '/(tabs)/categories', icon: '🏷' },
-    { label: 'Monthly report', href: '/(tabs)/reports', icon: '📊' },
-    { label: 'Notifications', href: '/(tabs)/notifications', icon: '🔔' },
-    { label: 'Subscription', href: '/(tabs)/subscription', icon: '⭐' },
+    { label: 'Income', href: '/(tabs)/income', icon: '📥', iconBg: `${colors.success}15` },
+    { label: 'Accounts', href: '/(tabs)/accounts', icon: '🏦', iconBg: `${colors.brand}15` },
+    { label: 'Transactions', href: '/(tabs)/transactions', icon: '↔', iconBg: `${colors.info}15` },
+    { label: 'Recurring', href: '/(tabs)/recurring', icon: '🔄', iconBg: `${colors.warning}15` },
+    { label: 'Categories', href: '/(tabs)/categories', icon: '🏷', iconBg: `${colors.brand}15` },
+    { label: 'Monthly Report', href: '/(tabs)/reports', icon: '📊', iconBg: `${colors.success}15` },
+    { label: 'Notifications', href: '/(tabs)/notifications', icon: '🔔', iconBg: `${colors.danger}15` },
+    { label: 'Subscription', href: '/(tabs)/subscription', icon: '⭐', iconBg: `${colors.warning}15` },
   ];
 
   const general: MenuItem[] = [
-    { label: 'Profile', href: '/(tabs)/profile', icon: '👤' },
-    { label: 'Feedback', href: '/(tabs)/feedback', icon: '💬' },
-    { label: 'Privacy policy', href: '/(tabs)/privacy', icon: '🔒' },
+    { label: 'Profile', href: '/(tabs)/profile', icon: '👤', iconBg: `${colors.brand}15` },
+    { label: 'Feedback', href: '/(tabs)/feedback', icon: '💬', iconBg: `${colors.info}15` },
+    { label: 'Privacy Policy', href: '/(tabs)/privacy', icon: '🔒', iconBg: `${colors.text.subtle}20` },
   ];
 
   return (
@@ -87,10 +89,11 @@ export default function MoreScreen() {
       <MenuSection title="GENERAL" items={general} colors={colors} onPress={(href) => router.push(href as any)} />
 
       <TouchableOpacity
-        style={[styles.signOut, { borderColor: colors.border }]}
+        style={[styles.signOut, { borderColor: colors.danger }]}
         onPress={handleSignOut}
         activeOpacity={0.7}
       >
+        <Text style={{ fontSize: 18, marginRight: 8 }}>🚪</Text>
         <Text style={[styles.signOutText, { color: colors.danger }]}>Sign out</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -117,15 +120,25 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   menuRowLast: { borderBottomWidth: 0 },
-  menuIcon: { fontSize: 20, marginRight: 12 },
+  menuIconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  menuIcon: { fontSize: 18 },
   menuLabel: { flex: 1, fontSize: 16 },
   menuArrow: { fontSize: 20 },
   signOut: {
     marginTop: 8,
     paddingVertical: 14,
-    borderRadius: 8,
-    borderWidth: 1,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   signOutText: { fontSize: 16, fontWeight: '600' },
 });

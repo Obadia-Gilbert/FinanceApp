@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTheme } from '../../../src/context/ThemeContext';
@@ -111,7 +111,7 @@ export default function ExpenseDetailScreen() {
   if (isLoading || !expense) {
     return (
       <View style={[styles.centered, { backgroundColor: colors.bg.alt }]}>
-        <Text style={{ color: colors.text.muted }}>Loading...</Text>
+        <ActivityIndicator size="large" color={colors.brand} />
       </View>
     );
   }
@@ -132,7 +132,7 @@ export default function ExpenseDetailScreen() {
               onPress={() => setCurrency(c)}
               style={[
                 styles.chip,
-                { borderColor: colors.border, backgroundColor: currency === c ? colors.brand : colors.bg.hover },
+                { borderColor: colors.border, backgroundColor: currency === c ? colors.brand : colors.bg.default },
               ]}
             >
               <Text style={[styles.chipText, { color: currency === c ? '#fff' : colors.text.body }]}>{c}</Text>
@@ -152,8 +152,8 @@ export default function ExpenseDetailScreen() {
               style={[
                 styles.catBtn,
                 {
-                  borderColor: colors.border,
-                  backgroundColor: categoryId === c.id ? colors.bg.hover : colors.bg.default,
+                  borderColor: categoryId === c.id ? colors.brand : colors.border,
+                  backgroundColor: categoryId === c.id ? `${colors.brand}15` : colors.bg.default,
                   borderWidth: categoryId === c.id ? 2 : 1,
                 },
               ]}

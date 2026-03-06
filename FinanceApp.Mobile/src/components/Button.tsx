@@ -30,7 +30,7 @@ export function Button({
   style,
   textStyle,
 }: ButtonProps) {
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
 
   const bg =
     variant === 'primary'
@@ -38,15 +38,22 @@ export function Button({
       : variant === 'danger'
         ? colors.danger
         : variant === 'secondary'
-          ? 'transparent'
+          ? colors.bg.default
           : 'transparent';
-  const border = variant === 'secondary' || variant === 'ghost' ? colors.border : undefined;
+
+  const border =
+    variant === 'secondary'
+      ? colors.border
+      : variant === 'ghost'
+        ? 'transparent'
+        : undefined;
+
   const textColor =
     variant === 'primary' || variant === 'danger'
       ? '#fff'
-      : variant === 'secondary' || variant === 'ghost'
-        ? colors.text.body
-        : colors.text.body;
+      : variant === 'ghost'
+        ? colors.brand
+        : colors.text.primary;
 
   return (
     <TouchableOpacity
@@ -71,12 +78,12 @@ export function Button({
 
 const styles = StyleSheet.create({
   btn: {
-    minHeight: 44,
-    borderRadius: 8,
+    minHeight: 48,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
   },
-  disabled: { opacity: 0.6 },
+  disabled: { opacity: 0.5 },
   text: { fontSize: 16, fontWeight: '600' },
 });
