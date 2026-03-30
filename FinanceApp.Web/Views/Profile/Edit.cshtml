@@ -72,13 +72,13 @@
                         <label asp-for="CountryCode" class="form-label fw-600">Country</label>
                         <select asp-for="CountryCode" asp-items="ViewBag.Countries" class="form-select" id="profileCountryCode">
                         </select>
-                        <small class="text-muted">Select country first — phone will format automatically.</small>
+                        <small class="text-muted">Select country first — dialing prefix is inserted, then you type the remaining digits.</small>
                         <span asp-validation-for="CountryCode" class="invalid-feedback d-block small"></span>
                     </div>
                     <div class="mb-3">
                         <label asp-for="PhoneNumber" class="form-label fw-600">Phone Number</label>
-                        <input asp-for="PhoneNumber" class="form-control" type="tel" id="profilePhoneNumber" placeholder="e.g. 0712 345 678" autocomplete="tel" />
-                        <small class="text-muted">Formatted by country. Include national number or full international.</small>
+                        <input asp-for="PhoneNumber" class="form-control" type="tel" id="profilePhoneNumber" placeholder="e.g. +255 712 345 678" autocomplete="tel" />
+                        <small class="text-muted">Prefix is derived from country. You can edit only the part after the prefix.</small>
                         <span asp-validation-for="PhoneNumber" class="invalid-feedback d-block small"></span>
                     </div>
                     <div class="d-flex gap-2">
@@ -109,27 +109,153 @@
             return code || null;
         }
 
-        function formatPhone() {
-            var country = getCountry();
-            var value = (phoneInput.value || '').trim().replace(/\s+/g, '');
-            if (!value) return;
+        function getCallingCode(country) {
+            if (!country) return null;
+            if (typeof lib.getCountryCallingCode === 'function') {
+                try { return lib.getCountryCallingCode(country) || null; } catch (e) { return null; }
+            }
+            // Fallback: derive calling code by parsing a dummy value in the selected region.
+            // This keeps behavior working even if the CDN global doesn't expose getCountryCallingCode.
             try {
-                if (country) {
-                    var formatter = new lib.AsYouType(country);
-                    var digits = value.replace(/\D/g, '');
-                    if (digits.length > 0) formatter.input(digits);
-                    var num = formatter.getNumber();
-                    if (num) phoneInput.value = num.formatInternational();
-                } else {
-                    var parsed = lib.parsePhoneNumber(value);
-                    if (parsed) phoneInput.value = parsed.formatInternational();
-                }
-            } catch (e) {}
+                var formatter = new lib.AsYouType(country);
+                formatter.input('0');
+                var num = formatter.getNumber();
+                return num && num.countryCallingCode ? String(num.countryCallingCode) : null;
+            } catch (e2) {
+                return null;
+            }
         }
 
-        countrySelect.addEventListener('change', formatPhone);
-        phoneInput.addEventListener('blur', formatPhone);
-        if (phoneInput.value && getCountry()) formatPhone();
+        function normalizeDigits(str) {
+            return (str || '').replace(/\D/g, '');
+        }
+
+        function getNationalDigits(country, rawValue) {
+            var callingCode = getCallingCode(country);
+            var normalized = (rawValue || '').replace(/\s+/g, '').trim();
+            var digits = normalizeDigits(normalized);
+            if (!callingCode) return digits;
+
+            // If user already has an international prefix, strip it to get national digits.
+            var plusPrefix = '+' + callingCode;
+            if (normalized.startsWith(plusPrefix)) {
+                var after = normalized.slice(plusPrefix.length);
+                return normalizeDigits(after);
+            }
+            if (normalized.startsWith(callingCode)) {
+                var afterNoPlus = normalized.slice(callingCode.length);
+                return normalizeDigits(afterNoPlus);
+            }
+            // Otherwise assume it's already the national number digits.
+            return digits;
+        }
+
+        function setCaretAfterCallingCode(country) {
+            // Lock prefix as whatever "+<digits><optional spaces>" is currently in the input.
+            // (Avoids relying on a specific callingCode extraction API.)
+            var value = phoneInput.value || '';
+            var m = value.match(/^\+\d+\s*/);
+            if (m && typeof phoneInput.setSelectionRange === 'function') {
+                var pos = m[0].length;
+                phoneInput.setSelectionRange(pos, pos);
+            }
+        }
+
+        function formatPhone(insertPrefixIfEmpty) {
+            var country = getCountry();
+            var callingCode = getCallingCode(country);
+
+            if (!country || !callingCode) {
+                // No country selected: keep existing behavior as a best-effort parse/format.
+                var value = (phoneInput.value || '').trim().replace(/\s+/g, '');
+                if (!value) return;
+                try {
+                    var parsed = lib.parsePhoneNumber(value);
+                    if (parsed) phoneInput.value = parsed.formatInternational();
+                } catch (e) {}
+                return;
+            }
+
+            var rawValue = phoneInput.value || '';
+            var nationalDigits = getNationalDigits(country, rawValue);
+
+            var prefix = '+' + callingCode + ' ';
+            if (!nationalDigits) {
+                if (insertPrefixIfEmpty) {
+                    phoneInput.value = prefix;
+                    setCaretAfterCallingCode(country);
+                }
+                return;
+            }
+
+            try {
+                var formatter = new lib.AsYouType(country);
+                var formattedSoFar = formatter.input(nationalDigits);
+                var num = formatter.getNumber();
+                phoneInput.value = num ? num.formatInternational() : (formattedSoFar || (prefix + nationalDigits));
+                setCaretAfterCallingCode(country);
+            } catch (e) {
+                // Fallback: still show prefix + digits so the UX remains consistent.
+                phoneInput.value = prefix + nationalDigits;
+                setCaretAfterCallingCode(country);
+            }
+        }
+
+        // Prevent the user from deleting/changing the prefix part.
+        // We compute the *actual* end index of "+<callingCode><optional spaces>" in the current value.
+        function getPrefixLengthForCurrentCountry() {
+            var value = phoneInput.value || '';
+            var m = value.match(/^\+\d+\s*/);
+            return m ? m[0].length : 0;
+        }
+
+        countrySelect.addEventListener('change', function() {
+            // On country change: always insert prefix and keep cursor after it.
+            formatPhone(true);
+        });
+
+        // Keep formatting on blur so partially typed input becomes nicely formatted.
+        phoneInput.addEventListener('blur', function() {
+            formatPhone(false);
+        });
+
+        // Hard UX guard: disallow deleting before prefix and keep caret after prefix.
+        phoneInput.addEventListener('focus', function() {
+            var prefixLen = getPrefixLengthForCurrentCountry();
+            if (!prefixLen) return;
+            var pos = phoneInput.selectionStart || 0;
+            if (pos < prefixLen) phoneInput.setSelectionRange(prefixLen, prefixLen);
+        });
+        phoneInput.addEventListener('click', function() {
+            var prefixLen = getPrefixLengthForCurrentCountry();
+            if (!prefixLen) return;
+            var pos = phoneInput.selectionStart || 0;
+            if (pos < prefixLen) phoneInput.setSelectionRange(prefixLen, prefixLen);
+        });
+        phoneInput.addEventListener('keydown', function(e) {
+            var prefixLen = getPrefixLengthForCurrentCountry();
+            if (!prefixLen) return;
+
+            var start = phoneInput.selectionStart || 0;
+            var end = phoneInput.selectionEnd || start;
+
+            // Block Backspace/Delete actions that would touch prefix.
+            if ((e.key === 'Backspace' || e.key === 'Delete') && start <= prefixLen) {
+                e.preventDefault();
+                return;
+            }
+
+            // If user tries to select text that includes prefix, force caret after prefix.
+            if (start < prefixLen || end < prefixLen) {
+                // Let normal typing happen after the caret.
+                phoneInput.setSelectionRange(prefixLen, prefixLen);
+            }
+        });
+
+        // Initial load: if we already have phone + a selected country, ensure the prefix UX is applied.
+        if (getCountry()) {
+            formatPhone(true);
+        }
     })();
     </script>
 }
