@@ -10,21 +10,21 @@
 
     <!-- Category Name -->
     <div class="mb-4">
-        <label asp-for="Name" class="form-label fw-600">Category Name</label>
-        <input asp-for="Name" class="form-control form-control-lg" placeholder="e.g. Groceries" />
+        <label asp-for="Name" class="form-label fw-600">@L["Cat_NameLabel"]</label>
+        <input asp-for="Name" class="form-control form-control-lg" placeholder="@L["Cat_PlaceholderName"]" />
         <span asp-validation-for="Name" class="invalid-feedback d-block small"></span>
     </div>
 
     <!-- Use for: explicit so user knows where this category appears -->
     <div class="mb-4">
-        <label asp-for="Type" class="form-label fw-600">Use for</label>
+        <label asp-for="Type" class="form-label fw-600">@L["Cat_UseForLabel"]</label>
         <select asp-for="Type" class="form-select form-select-lg" asp-items="Html.GetEnumSelectList<FinanceApp.Domain.Enums.CategoryType>()"></select>
-        <small class="text-muted d-block mt-1"><strong>Expenses only</strong> — when adding expenses. <strong>Income only</strong> — when adding income. <strong>Both</strong> — on both forms.</small>
+        <small class="text-muted d-block mt-1">@L["Cat_UseForHelpEdit"]</small>
     </div>
 
     <!-- Icon Selection -->
     <div class="mb-4">
-        <label class="form-label fw-600">Select Icon</label>
+        <label class="form-label fw-600">@L["Cat_SelectIcon"]</label>
         <div class="icon-picker-grid">
             @{
                 var icons = new[] {
@@ -55,27 +55,27 @@
 
     <!-- Badge Color -->
     <div class="mb-4">
-        <label asp-for="BadgeColor" class="form-label fw-600">Badge Color</label>
+        <label asp-for="BadgeColor" class="form-label fw-600">@L["Cat_BadgeColor"]</label>
         <div class="d-flex gap-2 align-items-center flex-wrap">
             <input type="color" asp-for="BadgeColor" class="form-control form-control-color category-color-picker" style="width: 56px; height: 40px; padding: 2px;" />
-            <input type="text" class="form-control" id="colorHex" placeholder="#137fec" value="@(Model?.BadgeColor ?? "#137fec")" style="max-width: 120px;" aria-label="Hex color" />
+            <input type="text" class="form-control" id="colorHex" placeholder="#137fec" value="@(Model?.BadgeColor ?? "#137fec")" style="max-width: 120px;" aria-label="@L["Cat_HexColorAria"]" />
         </div>
-        <small class="text-muted d-block mt-1">Choose a color for the category badge</small>
+        <small class="text-muted d-block mt-1">@L["Cat_BadgeColorHelp"]</small>
     </div>
 
     <!-- Description -->
     <div class="mb-4">
-        <label asp-for="Description" class="form-label fw-600">Description</label>
-        <textarea asp-for="Description" class="form-control" rows="3" placeholder="Add a short description for this category..."></textarea>
+        <label asp-for="Description" class="form-label fw-600">@L["Cat_ColDescription"]</label>
+        <textarea asp-for="Description" class="form-control" rows="3" placeholder="@L["Cat_DescPlaceholder"]"></textarea>
         <span asp-validation-for="Description" class="invalid-feedback d-block small"></span>
     </div>
 
     <!-- Buttons -->
     <div class="d-flex justify-content-end gap-2 pt-3 border-top">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="offcanvas">Cancel</button>
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="offcanvas">@L["Common_Cancel"]</button>
         <button type="submit" class="btn btn-primary fw-600" id="categoryEditSubmit">
-            <span class="btn-text"><i class="bi bi-check-circle me-2"></i>Save Category</span>
-            <span class="btn-loading d-none"><span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Saving…</span>
+            <span class="btn-text"><i class="bi bi-check-circle me-2"></i>@L["Cat_SaveCategory"]</span>
+            <span class="btn-loading d-none"><span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>@L["Common_Saving"]</span>
         </button>
     </div>
 </form>

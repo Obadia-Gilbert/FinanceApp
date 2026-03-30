@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
@@ -68,7 +69,7 @@ public class ReportController : Controller
         if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             return Json(new { success = true, url, expiresAt = shared.ExpiresAt });
         TempData["ShareReportUrl"] = url;
-        TempData["ShareReportExpires"] = shared.ExpiresAt.ToString("g");
+        TempData["ShareReportExpires"] = shared.ExpiresAt.ToString("g", CultureInfo.CurrentUICulture);
         return RedirectToAction(nameof(Index), new { year, month });
     }
 

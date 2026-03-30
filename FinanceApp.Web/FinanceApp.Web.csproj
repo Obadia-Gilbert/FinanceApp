@@ -1,8 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
     <ProjectReference Include="..\FinanceApp.Application\FinanceApp.Application.csproj" />
     <ProjectReference Include="..\FinanceApp.Infrastructure\FinanceApp.Infrastructure.csproj" />
+    <ProjectReference Include="..\FinanceApp.Localization\FinanceApp.Localization.csproj" />
   </ItemGroup>
 
   <ItemGroup>

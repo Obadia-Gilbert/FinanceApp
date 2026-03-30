@@ -7,7 +7,7 @@
 <div class="mb-4">
     <h1 class="visually-hidden">Subscription</h1>
     <p class="page-subtitle mb-2">Your current plan is <strong>@Model.CurrentPlan</strong>.</p>
-    <p class="text-muted small mb-0">Assigned on @Model.SubscriptionAssignedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm"). Every new user is enrolled in the Free plan by default.</p>
+    <p class="text-muted small mb-0">Assigned on @Model.SubscriptionAssignedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm"). Billing: <strong>@Model.BillingSource</strong>.@(Model.SubscriptionExpiresAtUtc != null ? $" Expires (UTC): {Model.SubscriptionExpiresAtUtc:yyyy-MM-dd HH:mm}." : "") Paid plans use the <strong>App Store</strong> or <strong>Google Play</strong> subscription in the mobile app.</p>
 </div>
 
 @if (TempData["SubscriptionSuccess"] is string success)
@@ -47,12 +47,16 @@
                     {
                         <span class="badge bg-success">Current plan</span>
                     }
-                    else
+                    else if (User.IsInRole("Admin"))
                     {
                         <form asp-action="Upgrade" method="post">
                             <input type="hidden" name="plan" value="Pro" />
-                            <button type="submit" class="btn btn-success btn-sm">Upgrade to Pro</button>
+                            <button type="submit" class="btn btn-success btn-sm">Admin: set Pro</button>
                         </form>
+                    }
+                    else
+                    {
+                        <p class="text-muted small mb-0">Subscribe in the iOS or Android app (App Store / Google Play).</p>
                     }
                 </div>
             </div>
@@ -69,12 +73,16 @@
                     {
                         <span class="badge bg-warning text-dark">Current plan</span>
                     }
-                    else
+                    else if (User.IsInRole("Admin"))
                     {
                         <form asp-action="Upgrade" method="post">
                             <input type="hidden" name="plan" value="Premium" />
-                            <button type="submit" class="btn btn-warning btn-sm text-dark">Upgrade to Premium</button>
+                            <button type="submit" class="btn btn-warning btn-sm text-dark">Admin: set Premium</button>
                         </form>
+                    }
+                    else
+                    {
+                        <p class="text-muted small mb-0">Subscribe in the iOS or Android app (App Store / Google Play).</p>
                     }
                 </div>
             </div>

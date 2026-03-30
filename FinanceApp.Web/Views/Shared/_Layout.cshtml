@@ -1,10 +1,11 @@
 <!DOCTYPE html>
+@using System.Text.Json
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
 @{
     var path = Context.Request.Path.Value?.ToLowerInvariant() ?? string.Empty;
     var showShell = !path.Contains("/identity/account/login") && !path.Contains("/identity/account/register") && !path.Contains("/identity/account/forgotpassword") && !path.Contains("/identity/account/externallogin") && !path.Contains("/home/privacy");
 }
-<html lang="en">
+<html lang="@CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -38,26 +39,32 @@
 
                 <!-- Right-side actions -->
                 <div class="d-flex align-items-center gap-1 ms-auto">
+                    @if (showShell)
+                    {
+                        <div class="d-none d-md-block"><partial name="_LanguageSwitcher" /></div>
+                    }
                     <button id="themeToggle" class="theme-toggle navbar-icon-btn d-none d-md-inline-flex"
-                            title="Toggle dark/light mode" aria-label="Toggle dark mode">
+                            title="@L["Nav_ToggleTheme"]" aria-label="@L["Nav_ToggleTheme"]">
                         <i class="bi bi-moon"></i>
                     </button>
                     @if (showShell)
                     {
-                        <div class="dropdown d-none d-md-block" id="notificationDropdown">
-                            <button class="navbar-icon-btn dropdown-toggle position-relative" type="button" id="notificationBell" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" aria-label="Notifications">
+                        <div class="d-inline-block" id="notificationDropdownWrap">
+                        <div class="dropdown dropdown-notification d-none d-md-block position-relative" id="notificationDropdown">
+                            <button class="navbar-icon-btn dropdown-toggle position-relative" type="button" id="notificationBell" data-bs-toggle="dropdown" data-bs-auto-close="outside" data-bs-display="static" data-bs-boundary="viewport" data-bs-offset="0,4" aria-expanded="false" aria-label="@L["Nav_Notifications"]">
                                 <i class="bi bi-bell"></i>
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light" id="notificationBadge" style="display: none; font-size: 0.65rem;">0</span>
                             </button>
                             <div class="dropdown-menu dropdown-menu-end shadow notification-dropdown" style="min-width: 320px; max-width: 360px; padding: 0;" aria-labelledby="notificationBell">
                                 <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom bg-light">
-                                    <span class="fw-semibold">Notifications</span>
-                                    <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" id="notificationMarkAllRead" title="Mark all as read">Mark all read</button>
+                                    <span class="fw-semibold">@L["Notif_DropdownTitle"]</span>
+                                    <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" id="notificationMarkAllRead" title="@L["Notif_MarkAllTitle"]">@L["Notif_MarkAllRead"]</button>
                                 </div>
-                                <div class="px-3 py-3 text-center text-muted small" id="notificationListLoading">Loading…</div>
+                                <div class="px-3 py-3 text-center text-muted small" id="notificationListLoading">@L["Common_Loading"]</div>
                                 <ul class="list-group list-group-flush list-unstyled mb-0" id="notificationList" style="max-height: 280px; overflow-y: auto;"></ul>
-                                <div class="text-center py-2 border-top"><a asp-controller="Notification" asp-action="Index" class="small">View all</a></div>
+                                <div class="text-center py-2 border-top"><a asp-controller="Notification" asp-action="Index" class="small">@L["Notif_ViewAll"]</a></div>
                             </div>
+                        </div>
                         </div>
                         <div class="d-none d-md-block">
                             @await Component.InvokeAsync("UserProfile")
@@ -66,7 +73,7 @@
                         <button class="navbar-icon-btn d-md-none" type="button"
                                 data-bs-toggle="collapse" data-bs-target="#sidebarCollapse"
                                 aria-controls="sidebarCollapse" aria-expanded="false"
-                                aria-label="Menu" title="Menu">
+                                aria-label="@L["Aria_Menu"]" title="@L["Aria_Menu"]">
                             <i class="bi bi-list fs-5"></i>
                         </button>
                     }
@@ -98,8 +105,8 @@
                                 <span class="fw-semibold">FinanceApp</span>
                             </div>
                             <div class="d-flex flex-wrap align-items-center gap-3 small">
-                                <a asp-area="" asp-controller="Home" asp-action="Privacy" class="footer-link">Privacy</a>
-                                <a asp-area="" asp-controller="Home" asp-action="Index" class="footer-link">Dashboard</a>
+                                <a asp-area="" asp-controller="Home" asp-action="Privacy" class="footer-link">@L["Nav_Privacy"]</a>
+                                <a asp-area="" asp-controller="Home" asp-action="Index" class="footer-link">@L["Nav_Dashboard"]</a>
                                 <span class="text-muted">&copy; @DateTime.Now.Year FinanceApp</span>
                             </div>
                         </div>
@@ -121,6 +128,11 @@
     <!-- Toast container (stays fixed regardless of scroll) -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer"></div>
 
+    <script>
+        window.__financeAppI18n = window.__financeAppI18n || {};
+        window.__financeAppI18n.notifEmpty = @Html.Raw(JsonSerializer.Serialize(L["Notif_NoneDropdown"].Value));
+        window.__financeAppI18n.notifMarkRead = @Html.Raw(JsonSerializer.Serialize(L["Notif_MarkOneTitle"].Value));
+    </script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/datatables.net@1.13.8/js/jquery.dataTables.min.js"></script>

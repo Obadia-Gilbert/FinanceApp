@@ -25,4 +25,19 @@ public class ApplicationUser : IdentityUser
 
     /// <summary>When the current subscription was assigned.</summary>
     public DateTimeOffset SubscriptionAssignedAt { get; set; } = DateTimeOffset.UtcNow;
+
+    /// <summary>UTC expiry for paid plans from App Store / Play Billing (null = no time-bound entitlement or Free).</summary>
+    public DateTimeOffset? SubscriptionExpiresAtUtc { get; set; }
+
+    /// <summary>Whether the plan came from Apple, Google, or manual admin assignment.</summary>
+    public SubscriptionBillingSource SubscriptionBillingSource { get; set; } = SubscriptionBillingSource.None;
+
+    /// <summary>Latest known Apple original transaction id (subscriptions).</summary>
+    public string? AppleOriginalTransactionId { get; set; }
+
+    /// <summary>Latest Google Play purchase token for the active subscription (for revalidation).</summary>
+    public string? GooglePurchaseToken { get; set; }
+
+    /// <summary>BCP 47 language code for UI (e.g. en, sw). Synced with web cookie and mobile i18n.</summary>
+    public string PreferredLanguage { get; set; } = "en";
 }

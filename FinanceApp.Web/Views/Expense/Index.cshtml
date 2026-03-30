@@ -1,30 +1,39 @@
 @model FinanceApp.Application.Common.PagedResult<FinanceApp.Domain.Entities.Expense>
-
+@using System.Text.Json
 @{
-    ViewData["Title"] = "Expenses";
+    ViewData["Title"] = L["Exp_PageTitle"].Value;
+    var jsExpErrLoad = JsonSerializer.Serialize(L["Exp_ErrLoadForm"].Value);
+    var jsExpErrEdit = JsonSerializer.Serialize(L["Exp_ErrLoadEdit"].Value);
+    var jsExpErrDelete = JsonSerializer.Serialize(L["Exp_ErrLoadDelete"].Value);
+    var jsExpErrReceipt = JsonSerializer.Serialize(L["Exp_ErrLoadReceipt"].Value);
+    var jsDtSearch = JsonSerializer.Serialize(L["Exp_DTSearchPlaceholder"].Value);
+    var jsDtInfo = JsonSerializer.Serialize(L["Exp_DTInfo"].Value);
+    var jsDtFiltered = JsonSerializer.Serialize(L["Exp_DTInfoFiltered"].Value);
+    var jsDtLength = JsonSerializer.Serialize(L["Exp_DTLengthMenu"].Value);
+    var jsCommonLoading = JsonSerializer.Serialize(L["Common_Loading"].Value);
 }
 
 <div class="mb-4">
-    <h1 class="visually-hidden">Expenses</h1>
-    <p class="page-subtitle mb-3">Review, add, and export your expense records.</p>
+    <h1 class="visually-hidden">@L["Exp_PageTitle"]</h1>
+    <p class="page-subtitle mb-3">@L["Exp_Subtitle"]</p>
     <div class="d-flex gap-2 mb-3">
         <button id="btnAddExpense" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Add New Expense
+            <i class="bi bi-plus-circle"></i> @L["Exp_AddNew"]
         </button>
         <a class="btn btn-success" asp-action="DownloadExcel">
-            <i class="bi bi-download"></i> Download Excel
+            <i class="bi bi-download"></i> @L["Exp_DownloadExcel"]
         </a>
     </div>
 
     <!-- Offcanvas container for create/edit forms -->
     <div class="offcanvas offcanvas-end" tabindex="-1" id="expenseOffcanvas" aria-labelledby="expenseOffcanvasLabel">
         <div class="offcanvas-header">
-            <h5 id="expenseOffcanvasLabel">Expense</h5>
-            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            <h5 id="expenseOffcanvasLabel">@L["Exp_OffcanvasTitle"]</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="@L["Common_Close"]"></button>
         </div>
         <div class="offcanvas-body px-0">
             <div class="p-3 d-flex align-items-center justify-content-center min-vh-25" id="expenseOffcanvasContent">
-                <div class="text-center text-muted"><span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Loading…</div>
+                <div class="text-center text-muted"><span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>@L["Common_Loading"]</div>
             </div>
         </div>
     </div>
@@ -33,17 +42,17 @@
 <div class="card shadow-sm">
     <div class="card-body p-0 px-1">
         <div class="table-responsive">
-            <table id="expenseTable" class="table table-hover table-sm mb-0" aria-label="List of expenses">
-                <caption class="visually-hidden">List of expenses with description, amount, currency, category, date and actions</caption>
+            <table id="expenseTable" class="table table-hover table-sm mb-0" aria-label="@L["Exp_TableAria"]">
+                <caption class="visually-hidden">@L["Exp_TableCaption"]</caption>
                 <thead>
                     <tr>
-                        <th>Description</th>
-                        <th>Amount</th>
-                        <th>Currency</th>
-                        <th>Category</th>
-                        <th>Date</th>
-                        <th title="Attached files / supporting documents"><i class="bi bi-paperclip"></i></th>
-                        <th class="text-center">Actions</th>
+                        <th>@L["Lbl_Description"]</th>
+                        <th>@L["Table_Amount"]</th>
+                        <th>@L["Exp_ColCurrency"]</th>
+                        <th>@L["Lbl_Category"]</th>
+                        <th>@L["Table_Date"]</th>
+                        <th title="@L["Exp_ColAttachments"]"><i class="bi bi-paperclip"></i></th>
+                        <th class="text-center">@L["Table_Actions"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -58,10 +67,10 @@
                             <td>
                                 @if (!string.IsNullOrEmpty(expense.ReceiptPath))
                                 {
-                                    <a href="@Url.Action("Receipt", "Expense", new { id = expense.Id })" target="_blank" class="btn btn-sm btn-outline-primary btn-receipt-view" data-expense-id="@expense.Id" title="View receipt">
+                                    <a href="@Url.Action("Receipt", "Expense", new { id = expense.Id })" target="_blank" class="btn btn-sm btn-outline-primary btn-receipt-view" data-expense-id="@expense.Id" title="@L["Exp_ReceiptViewTitle"]">
                                         <i class="bi bi-receipt"></i>
                                     </a>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary btn-receipt-preview ms-1" data-expense-id="@expense.Id" title="Preview receipt">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary btn-receipt-preview ms-1" data-expense-id="@expense.Id" title="@L["Exp_ReceiptPreviewTitle"]">
                                         <i class="bi bi-zoom-in"></i>
                                     </button>
                                 }
@@ -71,10 +80,10 @@
                                 }
                             </td>
                             <td>
-                                <a class="btn btn-sm btn-warning btn-edit" href="@Url.Action("Edit", "Expense", new { id = expense.Id })" title="Edit" aria-label="Edit expense">
+                                <a class="btn btn-sm btn-warning btn-edit" href="@Url.Action("Edit", "Expense", new { id = expense.Id })" title="@L["Common_Edit"]" aria-label="@L["Exp_EditAria"]">
                                     <i class="bi bi-pencil" aria-hidden="true"></i>
                                 </a>
-                                <a class="btn btn-sm btn-danger btn-delete" href="@Url.Action("Delete", "Expense", new { id = expense.Id })" title="Delete" aria-label="Delete expense">
+                                <a class="btn btn-sm btn-danger btn-delete" href="@Url.Action("Delete", "Expense", new { id = expense.Id })" title="@L["Common_Delete"]" aria-label="@L["Exp_DeleteAria"]">
                                     <i class="bi bi-trash" aria-hidden="true"></i>
                                 </a>
                             </td>
@@ -91,21 +100,21 @@
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="receiptPreviewModalLabel">Receipt / supporting document</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title" id="receiptPreviewModalLabel">@L["Exp_ReceiptModalTitle"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@L["Common_Close"]"></button>
             </div>
             <div class="modal-body p-0 text-center bg-dark">
                 <div id="receiptPreviewContent" style="min-height: 400px;">
                     <div class="d-flex align-items-center justify-content-center py-5">
-                        <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading…</span></div>
+                        <div class="spinner-border text-light" role="status"><span class="visually-hidden">@L["Common_Loading"]</span></div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <a id="receiptPreviewDownload" href="#" target="_blank" class="btn btn-outline-primary btn-sm">
-                    <i class="bi bi-download me-1"></i>Open in new tab
+                    <i class="bi bi-download me-1"></i>@L["Exp_OpenNewTab"]
                 </a>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@L["Common_Close"]</button>
             </div>
         </div>
     </div>
@@ -121,10 +130,10 @@
                 pageLength: 10,
                 language: {
                     search: "",
-                    searchPlaceholder: "Search expenses…",
-                    info: "_TOTAL_ records",
-                    infoFiltered: "(filtered from _MAX_)",
-                    lengthMenu: "Show _MENU_ rows",
+                    searchPlaceholder: @Html.Raw(jsDtSearch),
+                    info: @Html.Raw(jsDtInfo),
+                    infoFiltered: @Html.Raw(jsDtFiltered),
+                    lengthMenu: @Html.Raw(jsDtLength),
                     paginate: { first: "«", last: "»", next: "›", previous: "‹" }
                 }
             });
@@ -139,13 +148,13 @@
                 e.preventDefault();
                 const content = document.getElementById('expenseOffcanvasContent');
                 const offcanvasEl = document.getElementById('expenseOffcanvas');
-                const loadingHtml = '<div class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Loading…</div>';
+                const loadingHtml = '<div class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>' + @Html.Raw(jsCommonLoading) + '</div>';
                 content.innerHTML = loadingHtml;
                 if (offcanvasEl) { var o = new bootstrap.Offcanvas(offcanvasEl); o.show(); }
                 const url = '@Url.Action("Create","Expense")?partial=true';
                 const res = await fetch(url, { credentials: 'include', headers: { 'X-Requested-With': 'XMLHttpRequest' }});
                 if (!res.ok) {
-                    var msg = 'Unable to load form. (' + res.status + ')';
+                    var msg = @Html.Raw(jsExpErrLoad) + ' (' + res.status + ')';
                     if (typeof showToast === 'function') showToast(msg); else alert(msg);
                     return;
                 }
@@ -162,7 +171,7 @@
                     if (!href) return;
                     const url = href + (href.indexOf('?') === -1 ? '?partial=true' : '&partial=true');
                     const res = await fetch(url, { credentials: 'include', headers: { 'X-Requested-With': 'XMLHttpRequest' }});
-                    if (!res.ok) { if (typeof showToast === 'function') showToast('Unable to load edit form.'); else alert('Unable to load edit form.'); return; }
+                    if (!res.ok) { var em = @Html.Raw(jsExpErrEdit); if (typeof showToast === 'function') showToast(em); else alert(em); return; }
                     const html = await res.text();
                     const content = document.getElementById('expenseOffcanvasContent');
                     content.innerHTML = html;
@@ -179,7 +188,7 @@
                     if (!href) return;
                     const url = href + (href.indexOf('?') === -1 ? '?partial=true' : '&partial=true');
                     const res = await fetch(url, { credentials: 'include', headers: { 'X-Requested-With': 'XMLHttpRequest' }});
-                    if (!res.ok) { if (typeof showToast === 'function') showToast('Unable to load delete confirmation.'); else alert('Unable to load delete confirmation.'); return; }
+                    if (!res.ok) { var dm = @Html.Raw(jsExpErrDelete); if (typeof showToast === 'function') showToast(dm); else alert(dm); return; }
                     const html = await res.text();
                     const content = document.getElementById('expenseOffcanvasContent');
                     content.innerHTML = html;
@@ -207,24 +216,24 @@
                 xhr.responseType = 'blob';
                 xhr.onload = function() {
                     if (xhr.status !== 200) {
-                        receiptContent.innerHTML = '<p class="text-light py-5">Unable to load receipt.</p>';
+                        receiptContent.innerHTML = '<p class="text-light py-5">' + @Html.Raw(jsExpErrReceipt) + '</p>';
                         return;
                     }
                     var blob = xhr.response;
                     var contentType = xhr.getResponseHeader('Content-Type') || '';
                     var isPdf = contentType.indexOf('pdf') !== -1;
                     if (isPdf) {
-                        receiptContent.innerHTML = '<iframe src="' + url + '" style="width:100%;height:500px;border:none;" title="Receipt PDF"></iframe>';
+                        receiptContent.innerHTML = '<iframe src="' + url + '" style="width:100%;height:500px;border:none;" title="@L["Exp_ReceiptPdfTitle"]"></iframe>';
                     } else {
                         var reader = new FileReader();
                         reader.onload = function() {
-                            receiptContent.innerHTML = '<img src="' + reader.result + '" alt="Receipt" style="max-width:100%;max-height:70vh;object-fit:contain;" />';
+                            receiptContent.innerHTML = '<img src="' + reader.result + '" alt="@L["Exp_ReceiptModalTitle"]" style="max-width:100%;max-height:70vh;object-fit:contain;" />';
                         };
                         reader.readAsDataURL(blob);
                     }
                 };
                 xhr.onerror = function() {
-                    receiptContent.innerHTML = '<p class="text-light py-5">Unable to load receipt.</p>';
+                    receiptContent.innerHTML = '<p class="text-light py-5">' + @Html.Raw(jsExpErrReceipt) + '</p>';
                 };
                 xhr.send();
             }

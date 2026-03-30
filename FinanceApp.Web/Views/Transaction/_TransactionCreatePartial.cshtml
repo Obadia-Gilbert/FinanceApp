@@ -9,9 +9,9 @@
     @Html.AntiForgeryToken()
 
     <div class="mb-3">
-        <label asp-for="AccountId" class="form-label">Account</label>
+        <label asp-for="AccountId" class="form-label">@L["Lbl_Account"]</label>
         <select asp-for="AccountId" class="form-select">
-            <option value="">— Select Account —</option>
+            <option value="">@L["Tx_SelectAccount"]</option>
             @foreach (var a in accounts)
             {
                 <option value="@a.Id">@a.Name (@a.Currency)</option>
@@ -21,15 +21,15 @@
     </div>
 
     <div class="mb-3">
-        <label asp-for="Type" class="form-label">Type</label>
+        <label asp-for="Type" class="form-label">@L["Lbl_Type"]</label>
         <div class="btn-group w-100" role="group">
             <input type="radio" name="Type" id="typeIncome" value="Income" class="btn-check" autocomplete="off"
                    @(Model.Type == FinanceApp.Domain.Enums.TransactionType.Income ? "checked" : "") />
-            <label class="btn btn-outline-success" for="typeIncome"><i class="bi bi-arrow-down-circle me-1"></i>Income</label>
+            <label class="btn btn-outline-success" for="typeIncome"><i class="bi bi-arrow-down-circle me-1"></i>@L["Tx_TypeIncome"]</label>
 
             <input type="radio" name="Type" id="typeExpense" value="Expense" class="btn-check" autocomplete="off"
                    @(Model.Type == FinanceApp.Domain.Enums.TransactionType.Expense ? "checked" : "") />
-            <label class="btn btn-outline-danger" for="typeExpense"><i class="bi bi-arrow-up-circle me-1"></i>Expense</label>
+            <label class="btn btn-outline-danger" for="typeExpense"><i class="bi bi-arrow-up-circle me-1"></i>@L["Tx_TypeExpense"]</label>
         </div>
     </div>
 
@@ -40,7 +40,7 @@
     </div>
 
     <div class="mb-3">
-        <label asp-for="Currency" class="form-label">Currency</label>
+        <label asp-for="Currency" class="form-label">@L["Lbl_Currency"]</label>
         <select asp-for="Currency" class="form-select">
             @foreach (var c in Enum.GetValues(typeof(FinanceApp.Domain.Enums.Currency)))
             {
@@ -50,37 +50,37 @@
     </div>
 
     <div class="mb-3">
-        <label asp-for="Date" class="form-label">Date</label>
+        <label asp-for="Date" class="form-label">@L["Lbl_Date"]</label>
         <input asp-for="Date" type="date" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
         <span asp-validation-for="Date" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
-        <label asp-for="CategoryId" class="form-label">Category <span class="text-muted fw-normal">(optional — expense or income)</span></label>
+        <label asp-for="CategoryId" class="form-label">@L["Lbl_Category"] <span class="text-muted fw-normal">@L["Tx_CategoryOptional"]</span></label>
         <select asp-for="CategoryId" class="form-select" id="transactionCategorySelect">
-            <option value="">— None —</option>
+            <option value="">@L["Tx_None"]</option>
             @foreach (var cat in categories)
             {
                 <option value="@cat.Id" data-type="@cat.Type">@cat.Name</option>
             }
         </select>
-        <small class="text-muted">Shown by transaction type: Income or Expense.</small>
+        <small class="text-muted">@L["Tx_CategoryFilterHint"]</small>
     </div>
 
     <div class="mb-3">
-        <label asp-for="Note" class="form-label">Note <span class="text-muted fw-normal">(optional)</span></label>
-        <input asp-for="Note" class="form-control" placeholder="e.g. Grocery shopping" />
+        <label asp-for="Note" class="form-label">@L["Lbl_Note"] <span class="text-muted fw-normal">@L["Exp_ReceiptOptional"]</span></label>
+        <input asp-for="Note" class="form-control" placeholder="@L["Tx_NotePlaceholder"]" />
     </div>
 
     <div class="mb-3 form-check">
         <input asp-for="IsRecurring" class="form-check-input" type="checkbox" />
-        <label asp-for="IsRecurring" class="form-check-label">Recurring transaction</label>
+        <label asp-for="IsRecurring" class="form-check-label">@L["Tx_Recurring"]</label>
     </div>
 
     <div class="d-flex justify-content-end gap-2">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">Cancel</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">@L["Common_Cancel"]</button>
         <button type="submit" class="btn btn-primary">
-            <i class="bi bi-check-lg me-1"></i>Save Transaction
+            <i class="bi bi-check-lg me-1"></i>@L["Tx_SaveTransaction"]
         </button>
     </div>
 </form>

@@ -149,7 +149,7 @@ Ask the agent to produce the following in a structured format (Figma, markdown, 
 - Backend or API changes.  
 - Exact React Native component implementation (only design and specs).  
 - Copy for full legal pages (Privacy, Terms); only placement and “View policy” entry points.  
-- Localization and RTL (can be added later; design for LTR and one language first).
+- Full **RTL** and locales beyond the app’s baseline (**en** / **es** / **sw**) — optional follow-ups; the live app already has baseline i18n (design for **LTR** unless you explicitly scope RTL).
 
 ---
 

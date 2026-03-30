@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Extensions, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Extensions, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51</value></resheader>
+  <data name="Nav_Dashboard" xml:space="preserve"><value>Dashibodi</value></data>
+  <data name="Nav_Expenses" xml:space="preserve"><value>Matumizi</value></data>
+  <data name="Nav_Income" xml:space="preserve"><value>Mapato</value></data>
+  <data name="Nav_Categories" xml:space="preserve"><value>Aina</value></data>
+  <data name="Nav_Accounts" xml:space="preserve"><value>Akaunti</value></data>
+  <data name="Nav_Transactions" xml:space="preserve"><value>Miamala</value></data>
+  <data name="Nav_Recurring" xml:space="preserve"><value>Rudia</value></data>
+  <data name="Nav_Budget" xml:space="preserve"><value>Bajeti</value></data>
+  <data name="Nav_MonthlyReport" xml:space="preserve"><value>Ripoti ya mwezi</value></data>
+  <data name="Nav_Subscription" xml:space="preserve"><value>Michango</value></data>
+  <data name="Nav_Profile" xml:space="preserve"><value>Wasifu</value></data>
+  <data name="Nav_Privacy" xml:space="preserve"><value>Faragha</value></data>
+  <data name="Nav_ManageUsers" xml:space="preserve"><value>Simamia watumiaji</value></data>
+  <data name="Nav_UserFeedback" xml:space="preserve"><value>Maoni ya watumiaji</value></data>
+  <data name="Nav_Feedback" xml:space="preserve"><value>Maoni</value></data>
+  <data name="Nav_SignOut" xml:space="preserve"><value>Ondoka</value></data>
+  <data name="Nav_DarkMode" xml:space="preserve"><value>Hali ya giza</value></data>
+  <data name="Nav_Navigation" xml:space="preserve"><value>Urambazaji</value></data>
+  <data name="Lang_English" xml:space="preserve"><value>Kiingereza</value></data>
+  <data name="Lang_Swahili" xml:space="preserve"><value>Kiswahili</value></data>
+  <data name="Lang_Spanish" xml:space="preserve"><value>Kihispania</value></data>
+  <data name="Lang_Language" xml:space="preserve"><value>Lugha</value></data>
+  <data name="Api_InvalidCredentials" xml:space="preserve"><value>Barua pepe au nenosiri si sahihi.</value></data>
+  <data name="Api_EmailRegistered" xml:space="preserve"><value>Barua pepe tayari imesajiliwa.</value></data>
+  <data name="Api_InvalidRefresh" xml:space="preserve"><value>Ishara ya kufuta si sahihi au imekwisha muda.</value></data>
+  <data name="Api_UserNotFound" xml:space="preserve"><value>Mtumiaji hajapatikana.</value></data>
+  <data name="Dash_WelcomeBack" xml:space="preserve"><value>Karibu tena, {0}. Hivi ndivyo hali ya fedha zako.</value></data>
+  <data name="Dash_ThisMonth" xml:space="preserve"><value>Mwezi huu</value></data>
+  <data name="Dash_NoExpensesStrong" xml:space="preserve"><value>Bado hakuna matumizi.</value></data>
+  <data name="Dash_NoExpensesLink" xml:space="preserve"><value>Ongeza matumizi yako ya kwanza</value></data>
+  <data name="Dash_NoExpensesTail" xml:space="preserve"><value> ili kuona muhtasari na mwenendo wa matumizi hapa.</value></data>
+  <data name="Dash_BudgetLimitStrong" xml:space="preserve"><value>Ukomo wa bajeti umefikiwa.</value></data>
+  <data name="Dash_BudgetSpentBody" xml:space="preserve"><value>Mwezi huu umetumia {0} {1} dhidi ya bajeti yako ya {2} {3}.</value></data>
+  <data name="Dash_UpdateBudget" xml:space="preserve"><value>Sasisha bajeti</value></data>
+  <data name="Dash_OrReduceSpending" xml:space="preserve"><value> au punguza matumizi.</value></data>
+  <data name="Dash_BudgetExceededLabel" xml:space="preserve"><value>bajeti imezidi:</value></data>
+  <data name="Dash_BudgetNearLabel" xml:space="preserve"><value>karibu na kikomo cha bajeti (80%+):</value></data>
+  <data name="Dash_ManageBudgets" xml:space="preserve"><value>Simamia bajeti</value></data>
+  <data name="Dash_SetMonthlyBudgetStrong" xml:space="preserve"><value>Weka bajeti ya kila mwezi</value></data>
+  <data name="Dash_SetMonthlyBudgetTail" xml:space="preserve"><value> ili kupata tahadhari matumizi yanapofikia kikomo.</value></data>
+  <data name="Dash_SetBudgetLink" xml:space="preserve"><value>Weka bajeti</value></data>
+  <data name="KPI_TotalBalance" xml:space="preserve"><value>Jumla ya salio</value></data>
+  <data name="KPI_MonthlyIncome" xml:space="preserve"><value>Mapato ya mwezi</value></data>
+  <data name="KPI_MonthlyExpense" xml:space="preserve"><value>Matumizi ya mwezi</value></data>
+  <data name="KPI_ActiveBudgets" xml:space="preserve"><value>Bajeti hai</value></data>
+  <data name="KPI_Stable" xml:space="preserve"><value>Thabiti</value></data>
+  <data name="KPI_TotalSpend" xml:space="preserve"><value>Jumla ya matumizi</value></data>
+  <data name="KPI_Categories" xml:space="preserve"><value>Aina</value></data>
+  <data name="Dash_MonthlyCashFlow" xml:space="preserve"><value>Mtiririko wa fedha wa mwezi</value></data>
+  <data name="Dash_OptionsAria" xml:space="preserve"><value>Chaguo</value></data>
+  <data name="Dash_ViewBudget" xml:space="preserve"><value>Angalia bajeti</value></data>
+  <data name="Dash_IncomeMinusExpenses" xml:space="preserve"><value>Mapato minus matumizi mwezi huu</value></data>
+  <data name="Dash_PctVsLastMonth" xml:space="preserve"><value>{0}% ikilinganishwa na mwezi uliopita</value></data>
+  <data name="Dash_RecentTransactions" xml:space="preserve"><value>Miamala ya hivi karibuni</value></data>
+  <data name="Dash_ViewAll" xml:space="preserve"><value>Angalia yote</value></data>
+  <data name="Table_Date" xml:space="preserve"><value>Tarehe</value></data>
+  <data name="Table_Category" xml:space="preserve"><value>Aina</value></data>
+  <data name="Table_Amount" xml:space="preserve"><value>Kiasi</value></data>
+  <data name="Table_Actions" xml:space="preserve"><value>Vitendo</value></data>
+  <data name="Dash_NoRecentTx" xml:space="preserve"><value>Hakuna miamala ya hivi karibuni.</value></data>
+  <data name="Dash_AddExpense" xml:space="preserve"><value>Ongeza matumizi</value></data>
+  <data name="Dash_Or" xml:space="preserve"><value> au </value></data>
+  <data name="Dash_NewTransaction" xml:space="preserve"><value>muamala mpya</value></data>
+  <data name="Dash_ExpenseTrendTitle" xml:space="preserve"><value>Mwenendo wa matumizi (siku 30 zilizopita) — {0}</value></data>
+  <data name="Dash_AddExpensesChartHint" xml:space="preserve"><value>Ongeza matumizi ili kuona chati ya mwenendo.</value></data>
+  <data name="Chart_CashFlow" xml:space="preserve"><value>Mtiririko wa fedha</value></data>
+  <data name="Chart_DailyExpenses" xml:space="preserve"><value>Matumizi ya kila siku</value></data>
+  <data name="Chart_AmountAxis" xml:space="preserve"><value>Kiasi ({0})</value></data>
+  <data name="Generic_User" xml:space="preserve"><value>Mtumiaji</value></data>
+  <data name="Generic_Category" xml:space="preserve"><value>Aina</value></data>
+  <data name="Dash_OverviewHidden" xml:space="preserve"><value>Muhtasari wa dashibodi</value></data>
+  <data name="Common_Close" xml:space="preserve"><value>Funga</value></data>
+  <data name="Common_Cancel" xml:space="preserve"><value>Ghairi</value></data>
+  <data name="Common_Loading" xml:space="preserve"><value>Inapakia…</value></data>
+  <data name="Common_Saving" xml:space="preserve"><value>Inahifadhi…</value></data>
+  <data name="Common_Edit" xml:space="preserve"><value>Hariri</value></data>
+  <data name="Common_Delete" xml:space="preserve"><value>Futa</value></data>
+  <data name="Common_SaveChanges" xml:space="preserve"><value>Hifadhi mabadiliko</value></data>
+  <data name="Lbl_Description" xml:space="preserve"><value>Maelezo</value></data>
+  <data name="Lbl_Currency" xml:space="preserve"><value>Sarafu</value></data>
+  <data name="Lbl_Account" xml:space="preserve"><value>Akaunti</value></data>
+  <data name="Lbl_Note" xml:space="preserve"><value>Maelezo</value></data>
+  <data name="Lbl_Type" xml:space="preserve"><value>Aina</value></data>
+  <data name="Lbl_Date" xml:space="preserve"><value>Tarehe</value></data>
+  <data name="Lbl_ExpenseDate" xml:space="preserve"><value>Tarehe ya matumizi</value></data>
+  <data name="Lbl_Category" xml:space="preserve"><value>Aina</value></data>
+  <data name="Lbl_FromAccount" xml:space="preserve"><value>Kutoka akaunti</value></data>
+  <data name="Lbl_ToAccount" xml:space="preserve"><value>Kwenda akaunti</value></data>
+  <data name="Lbl_BudgetAmount" xml:space="preserve"><value>Kiasi cha bajeti</value></data>
+  <data name="Nav_ToggleTheme" xml:space="preserve"><value>Badilisha hali ya giza/mwanga</value></data>
+  <data name="Nav_Notifications" xml:space="preserve"><value>Arifa</value></data>
+  <data name="Aria_Menu" xml:space="preserve"><value>Menyu</value></data>
+  <data name="Exp_PageTitle" xml:space="preserve"><value>Matumizi</value></data>
+  <data name="Exp_Subtitle" xml:space="preserve"><value>Angalia, ongeza na pakua rekodi za matumizi.</value></data>
+  <data name="Exp_AddNew" xml:space="preserve"><value>Ongeza matumizi mapya</value></data>
+  <data name="Exp_DownloadExcel" xml:space="preserve"><value>Pakua Excel</value></data>
+  <data name="Exp_OffcanvasTitle" xml:space="preserve"><value>Matumizi</value></data>
+  <data name="Exp_TableAria" xml:space="preserve"><value>Orodha ya matumizi</value></data>
+  <data name="Exp_TableCaption" xml:space="preserve"><value>Orodha ya matumizi yenye maelezo, kiasi, sarafu, aina, tarehe na vitendo</value></data>
+  <data name="Exp_ColCurrency" xml:space="preserve"><value>Sarafu</value></data>
+  <data name="Exp_ColAttachments" xml:space="preserve"><value>Vifaa vilivyonaswa / nyaraka</value></data>
+  <data name="Exp_ReceiptViewTitle" xml:space="preserve"><value>Angalia risiti</value></data>
+  <data name="Exp_ReceiptPreviewTitle" xml:space="preserve"><value>Hakiki risiti</value></data>
+  <data name="Exp_EditAria" xml:space="preserve"><value>Hariri matumizi</value></data>
+  <data name="Exp_DeleteAria" xml:space="preserve"><value>Futa matumizi</value></data>
+  <data name="Exp_ReceiptModalTitle" xml:space="preserve"><value>Risiti / nyaraka</value></data>
+  <data name="Exp_OpenNewTab" xml:space="preserve"><value>Fungua kwenye kichupo kipya</value></data>
+  <data name="Exp_DTSearchPlaceholder" xml:space="preserve"><value>Tafuta matumizi…</value></data>
+  <data name="Exp_DTInfo" xml:space="preserve"><value>rekodi _TOTAL_</value></data>
+  <data name="Exp_DTInfoFiltered" xml:space="preserve"><value>(zilizochujwa kutoka _MAX_)</value></data>
+  <data name="Exp_DTLengthMenu" xml:space="preserve"><value>Onyesha safu _MENU_</value></data>
+  <data name="Exp_ErrLoadForm" xml:space="preserve"><value>Haikuweza kupakia fomu.</value></data>
+  <data name="Exp_ErrLoadEdit" xml:space="preserve"><value>Haikuweza kupakia fomu ya uhariri.</value></data>
+  <data name="Exp_ErrLoadDelete" xml:space="preserve"><value>Haikuweza kupakia uthibitisho wa kufuta.</value></data>
+  <data name="Exp_ErrLoadReceipt" xml:space="preserve"><value>Haikuweza kupakia risiti.</value></data>
+  <data name="Exp_SelectCurrency" xml:space="preserve"><value>-- Chagua sarafu --</value></data>
+  <data name="Exp_SelectCategory" xml:space="preserve"><value>-- Chagua aina --</value></data>
+  <data name="Exp_LabelExpenseCategory" xml:space="preserve"><value>Aina ya matumizi</value></data>
+  <data name="Exp_AccountOptional" xml:space="preserve"><value>(si lazima — kwa ufuatiliaji wa salio)</value></data>
+  <data name="Exp_AccountNone" xml:space="preserve"><value>— Hakuna (ufuatiliaji tu) —</value></data>
+  <data name="Exp_AccountHelp" xml:space="preserve"><value>Acha "Hakuna" ikiwa hutumii akaunti; matumizi yako yataonekana na katika ripoti.</value></data>
+  <data name="Exp_ReceiptLabel" xml:space="preserve"><value>Risiti / nyaraka</value></data>
+  <data name="Exp_ReceiptOptional" xml:space="preserve"><value>(si lazima)</value></data>
+  <data name="Exp_ReceiptTypes" xml:space="preserve"><value>JPG, PNG, GIF, WebP au PDF. Zaidi MB 5.</value></data>
+  <data name="Exp_PdfWillUpload" xml:space="preserve"><value>PDF imechaguliwa — itapakiwa unapohifadhi.</value></data>
+  <data name="Exp_CreateExpense" xml:space="preserve"><value>Unda matumizi</value></data>
+  <data name="Exp_LegacyReceipt" xml:space="preserve"><value>Risiti ya awali (urithi)</value></data>
+  <data name="Exp_View" xml:space="preserve"><value>Angalia</value></data>
+  <data name="Exp_Preview" xml:space="preserve"><value>Hakiki</value></data>
+  <data name="Exp_PreviewInModal" xml:space="preserve"><value>Hakiki kwenye dirisha</value></data>
+  <data name="Exp_ViewNewTab" xml:space="preserve"><value>Angalia risiti kwenye kichupo kipya</value></data>
+  <data name="Exp_DeleteTitle" xml:space="preserve"><value>Thibitisha kufuta</value></data>
+  <data name="Exp_DeleteBody" xml:space="preserve"><value>Je, unataka kufuta matumizi "{0}" ya tarehe {1} yenye kiasi {2}?</value></data>
+  <data name="Exp_ReceiptPdfTitle" xml:space="preserve"><value>Risiti PDF</value></data>
+  <data name="Bud_PageTitle" xml:space="preserve"><value>Bajeti ya mwezi</value></data>
+  <data name="Bud_Subtitle" xml:space="preserve"><value>Weka kikomo cha matumizi kwa {0} na endelea vizuri.</value></data>
+  <data name="Bud_SavedAlert" xml:space="preserve"><value>Bajeti ya {0} imehifadhiwa.</value></data>
+  <data name="Bud_CatSaved" xml:space="preserve"><value>Bajeti ya aina imehifadhiwa.</value></data>
+  <data name="Bud_CatRemoved" xml:space="preserve"><value>Bajeti ya aina imeondolewa.</value></data>
+  <data name="Bud_CatExceededTitle" xml:space="preserve"><value>Bajeti ya aina imezidi kwa {0}</value></data>
+  <data name="Bud_CatExceededIntro" xml:space="preserve"><value>Aina zifuatazo zimezidi bajeti mwezi huu:</value></data>
+  <data name="Bud_SetBudgetCardTitle" xml:space="preserve"><value>Weka bajeti kwa {0}</value></data>
+  <data name="Bud_SetBudgetHelp" xml:space="preserve"><value>Unapofikia kiasi hiki katika sarafu uliyochagua, utaona tahadhari kwenye dashibodi.</value></data>
+  <data name="Bud_PlaceholderAmount" xml:space="preserve"><value>mf. 500000</value></data>
+  <data name="Bud_SaveBudget" xml:space="preserve"><value>Hifadhi bajeti</value></data>
+  <data name="Bud_BackDashboard" xml:space="preserve"><value>Rudi kwenye dashibodi</value></data>
+  <data name="Bud_CatBudgetsTitle" xml:space="preserve"><value>Bajeti za aina kwa {0}</value></data>
+  <data name="Bud_AddCatBudget" xml:space="preserve"><value>Ongeza bajeti ya aina</value></data>
+  <data name="Bud_CatBudgetHelp" xml:space="preserve"><value>Weka kikomo cha matumizi kwa kila aina. Utaona tahadhari aina inapofikia kikomo.</value></data>
+  <data name="Bud_ColSpentBudget" xml:space="preserve"><value>Matumizi / Bajeti</value></data>
+  <data name="Bud_Status" xml:space="preserve"><value>Hali</value></data>
+  <data name="Bud_OverLimit" xml:space="preserve"><value>Imezidi</value></data>
+  <data name="Bud_NearLimit" xml:space="preserve"><value>Karibu na kikomo</value></data>
+  <data name="Bud_OnTrack" xml:space="preserve"><value>Vizuri</value></data>
+  <data name="Bud_RemoveConfirm" xml:space="preserve"><value>Ondoa bajeti hii ya aina?</value></data>
+  <data name="Bud_RemoveAria" xml:space="preserve"><value>Ondoa bajeti ya aina</value></data>
+  <data name="Bud_NoCatBudgets" xml:space="preserve"><value>Hakuna bajeti za aina. Tumia kitufe hapo juu kuweka vikomo kwa aina maalum.</value></data>
+  <data name="Bud_OffcanvasPlaceholder" xml:space="preserve"><value>Bonyeza kitufe kuweka kikomo kwa aina.</value></data>
+  <data name="Bud_UnableLoadForm" xml:space="preserve"><value>Haikuweza kupakia fomu.</value></data>
+  <data name="Bud_SaveCatBudget" xml:space="preserve"><value>Hifadhi bajeti ya aina</value></data>
+  <data name="Bud_SelectCategory" xml:space="preserve"><value>-- Chagua aina --</value></data>
+  <data name="Bud_CatAllSet" xml:space="preserve"><value>Aina zako zote tayari zina bajeti kwa {0}, au bado huna aina.</value></data>
+  <data name="Bud_CatPlaceholder" xml:space="preserve"><value>mf. 100000</value></data>
+  <data name="Tx_PageTitle" xml:space="preserve"><value>Miamala</value></data>
+  <data name="Tx_Subtitle" xml:space="preserve"><value>Mapato, matumizi na uhamisho katika akaunti zako.</value></data>
+  <data name="Tx_Add" xml:space="preserve"><value>Ongeza muamala</value></data>
+  <data name="Tx_Transfer" xml:space="preserve"><value>Hamisha</value></data>
+  <data name="Tx_OffcanvasTitle" xml:space="preserve"><value>Muamala</value></data>
+  <data name="Tx_EmptyPart1" xml:space="preserve"><value>Bado hakuna miamala. Bonyeza </value></data>
+  <data name="Tx_EmptyPart2" xml:space="preserve"><value> kuanza.</value></data>
+  <data name="Tx_AddStrong" xml:space="preserve"><value>Ongeza muamala</value></data>
+  <data name="Tx_ColAccount" xml:space="preserve"><value>Akaunti</value></data>
+  <data name="Tx_ColType" xml:space="preserve"><value>Aina</value></data>
+  <data name="Tx_ColNote" xml:space="preserve"><value>Maelezo</value></data>
+  <data name="Tx_BadgeTransfer" xml:space="preserve"><value>Uhamisho</value></data>
+  <data name="Tx_DeleteConfirm" xml:space="preserve"><value>Futa muamala huu?</value></data>
+  <data name="Tx_FailedLoadForm" xml:space="preserve"><value>Haikuweza kupakia fomu.</value></data>
+  <data name="Tx_Prev" xml:space="preserve"><value>‹ Iliyopita</value></data>
+  <data name="Tx_Next" xml:space="preserve"><value>Ifuatayo ›</value></data>
+  <data name="Tx_PaginationAria" xml:space="preserve"><value>Ukurasa wa miamala</value></data>
+  <data name="Tx_TypeIncome" xml:space="preserve"><value>Mapato</value></data>
+  <data name="Tx_TypeExpense" xml:space="preserve"><value>Matumizi</value></data>
+  <data name="Tx_SelectAccount" xml:space="preserve"><value>-- Chagua akaunti --</value></data>
+  <data name="Tx_SaveTransaction" xml:space="preserve"><value>Hifadhi muamala</value></data>
+  <data name="Tx_Recurring" xml:space="preserve"><value>Muamala unao rudia</value></data>
+  <data name="Tx_CategoryOptional" xml:space="preserve"><value>(si lazima — mapato au matumizi)</value></data>
+  <data name="Tx_CategoryFilterHint" xml:space="preserve"><value>Inaonyeshwa kwa aina ya muamala: Mapato au Matumizi.</value></data>
+  <data name="Tx_NotePlaceholder" xml:space="preserve"><value>mf. ununuzi wa chakula</value></data>
+  <data name="Tx_TransferBlurb" xml:space="preserve"><value>Uhamisho huunda miamala miwili — malipo kutoka akaunti ya chanzo na mkopo kwenye lengo.</value></data>
+  <data name="Tx_TransferNotePlaceholder" xml:space="preserve"><value>mf. uhamisho wa akiba</value></data>
+  <data name="Tx_EditSummary" xml:space="preserve"><value>{0} kwenye {1} ({2})</value></data>
+  <data name="Tx_None" xml:space="preserve"><value>— Hakuna —</value></data>
+  <data name="Notif_PageTitle" xml:space="preserve"><value>Arifa</value></data>
+  <data name="Notif_Subtitle" xml:space="preserve"><value>Tahadhari za bajeti na shughuli.</value></data>
+  <data name="Notif_Empty" xml:space="preserve"><value>Bado hakuna arifa.</value></data>
+  <data name="Notif_GoDashboard" xml:space="preserve"><value>Kwenda dashibodi</value></data>
+  <data name="Notif_PageOf" xml:space="preserve"><value>Ukurasa {0} kati ya {1} (jumla {2})</value></data>
+  <data name="Notif_Previous" xml:space="preserve"><value>Iliyopita</value></data>
+  <data name="Notif_Next" xml:space="preserve"><value>Ifuatayo</value></data>
+  <data name="Notif_DropdownTitle" xml:space="preserve"><value>Arifa</value></data>
+  <data name="Notif_MarkAllRead" xml:space="preserve"><value>Weka zote zimesomwa</value></data>
+  <data name="Notif_MarkAllTitle" xml:space="preserve"><value>Weka zote zimesomwa</value></data>
+  <data name="Notif_ViewAll" xml:space="preserve"><value>Angalia zote</value></data>
+  <data name="Notif_NoneDropdown" xml:space="preserve"><value>Hakuna arifa</value></data>
+  <data name="Notif_MarkOneTitle" xml:space="preserve"><value>Weka imesomwa</value></data>
+  <data name="Inc_PageTitle" xml:space="preserve"><value>Mapato</value></data>
+  <data name="Inc_Subtitle" xml:space="preserve"><value>Fuatilia na simamia mapato yako.</value></data>
+  <data name="Inc_Add" xml:space="preserve"><value>Ongeza mapato</value></data>
+  <data name="Inc_OffcanvasTitle" xml:space="preserve"><value>Mapato</value></data>
+  <data name="Inc_EmptyPart1" xml:space="preserve"><value>Bado hakuna mapato. Bonyeza </value></data>
+  <data name="Inc_EmptyPart2" xml:space="preserve"><value> kuanza.</value></data>
+  <data name="Inc_AddStrong" xml:space="preserve"><value>Ongeza mapato</value></data>
+  <data name="Inc_ColDescSource" xml:space="preserve"><value>Maelezo / Chanzo</value></data>
+  <data name="Inc_PaginationAria" xml:space="preserve"><value>Ukurasa wa mapato</value></data>
+  <data name="Inc_DeleteConfirm" xml:space="preserve"><value>Futa kiingilio hiki cha mapato?</value></data>
+  <data name="Inc_AccountOptional" xml:space="preserve"><value>(si lazima — kwa ufuatiliaji wa salio)</value></data>
+  <data name="Inc_AccountOptionalShort" xml:space="preserve"><value>(si lazima)</value></data>
+  <data name="Inc_AccountHelp" xml:space="preserve"><value>Acha "Hakuna" ikiwa hutumii akaunti; mapato yako yataonekana na katika ripoti.</value></data>
+  <data name="Inc_IncomeCategory" xml:space="preserve"><value>Aina ya mapato</value></data>
+  <data name="Inc_SourceHint" xml:space="preserve"><value>(mf. mwajiri, mteja)</value></data>
+  <data name="Inc_SupportingDoc" xml:space="preserve"><value>Nyaraka ya uthibitisho</value></data>
+  <data name="Inc_FileTypes" xml:space="preserve"><value>JPG, PNG, PDF, Word, Excel. Zaidi MB 10.</value></data>
+  <data name="Inc_AddIncomeBtn" xml:space="preserve"><value>Ongeza mapato</value></data>
+  <data name="Inc_Save" xml:space="preserve"><value>Hifadhi</value></data>
+  <data name="Lbl_Source" xml:space="preserve"><value>Chanzo</value></data>
+  <data name="Cat_PageTitle" xml:space="preserve"><value>Aina</value></data>
+  <data name="Cat_Subtitle" xml:space="preserve"><value>Panga matumizi na mapato kwa aina wazi. Kila aina ni ya matumizi tu, mapato tu, au zote mbili.</value></data>
+  <data name="Cat_AddNew" xml:space="preserve"><value>Ongeza aina mpya</value></data>
+  <data name="Cat_FilterAria" xml:space="preserve"><value>Chuja kwa aina</value></data>
+  <data name="Cat_FilterAll" xml:space="preserve"><value>Zote</value></data>
+  <data name="Cat_FilterExpense" xml:space="preserve"><value>Matumizi tu</value></data>
+  <data name="Cat_FilterIncome" xml:space="preserve"><value>Mapato tu</value></data>
+  <data name="Cat_FilterBoth" xml:space="preserve"><value>Zote</value></data>
+  <data name="Cat_OffcanvasTitle" xml:space="preserve"><value>Simamia aina ya fedha</value></data>
+  <data name="Cat_OffcanvasAdd" xml:space="preserve"><value>Ongeza aina</value></data>
+  <data name="Cat_OffcanvasEdit" xml:space="preserve"><value>Hariri aina</value></data>
+  <data name="Cat_OffcanvasDelete" xml:space="preserve"><value>Futa aina</value></data>
+  <data name="Cat_TableAria" xml:space="preserve"><value>Orodha ya aina</value></data>
+  <data name="Cat_TableCaption" xml:space="preserve"><value>Orodha ya aina yenye jina, maelezo na vitendo</value></data>
+  <data name="Cat_ColName" xml:space="preserve"><value>Jina</value></data>
+  <data name="Cat_ColUseFor" xml:space="preserve"><value>Tumia kwa</value></data>
+  <data name="Cat_ColDescription" xml:space="preserve"><value>Maelezo</value></data>
+  <data name="Cat_ColActions" xml:space="preserve"><value>Vitendo</value></data>
+  <data name="Cat_BadgeExpenseOnly" xml:space="preserve"><value>Matumizi tu</value></data>
+  <data name="Cat_BadgeIncomeOnly" xml:space="preserve"><value>Mapato tu</value></data>
+  <data name="Cat_BadgeBoth" xml:space="preserve"><value>Zote</value></data>
+  <data name="Cat_DTSearchPlaceholder" xml:space="preserve"><value>Tafuta aina…</value></data>
+  <data name="Cat_DTInfo" xml:space="preserve"><value>rekodi _TOTAL_</value></data>
+  <data name="Cat_DTInfoFiltered" xml:space="preserve"><value>(zilizochujwa kutoka _MAX_)</value></data>
+  <data name="Cat_DTLengthMenu" xml:space="preserve"><value>Onyesha safu _MENU_</value></data>
+  <data name="Cat_NameLabel" xml:space="preserve"><value>Jina la aina</value></data>
+  <data name="Cat_PlaceholderName" xml:space="preserve"><value>mf. mboga</value></data>
+  <data name="Cat_UseForLabel" xml:space="preserve"><value>Tumia kwa</value></data>
+  <data name="Cat_UseForHelpCreate" xml:space="preserve"><value>Matumizi tu — inaonekana unapoongeza matumizi. Mapato tu — unapoongeza mapato. Zote mbili — kwenye fomu zote (mf. uhamisho).</value></data>
+  <data name="Cat_UseForHelpEdit" xml:space="preserve"><value>Matumizi tu — unapoongeza matumizi. Mapato tu — unapoongeza mapato. Zote mbili — kwenye fomu zote.</value></data>
+  <data name="Cat_SelectIcon" xml:space="preserve"><value>Chagua ikoni</value></data>
+  <data name="Cat_BadgeColor" xml:space="preserve"><value>Rangi ya beji</value></data>
+  <data name="Cat_BadgeColorHelp" xml:space="preserve"><value>Chagua rangi ya beji ya aina</value></data>
+  <data name="Cat_HexColorAria" xml:space="preserve"><value>Rangi ya hex</value></data>
+  <data name="Cat_DescPlaceholder" xml:space="preserve"><value>Ongeza maelezo mafupi ya aina hii...</value></data>
+  <data name="Cat_SaveCategory" xml:space="preserve"><value>Hifadhi aina</value></data>
+  <data name="Cat_DeleteTitle" xml:space="preserve"><value>Futa aina</value></data>
+  <data name="Cat_DeleteBody" xml:space="preserve"><value>Je, unataka kufuta kabisa aina "{0}"? Hatua hii haiwezi kutenduliwa.</value></data>
+  <data name="Cat_ViewExpensesTitle" xml:space="preserve"><value>Angalia matumizi</value></data>
+  <data name="Cat_ViewExpensesAria" xml:space="preserve"><value>Angalia matumizi katika aina hii</value></data>
+  <data name="Cat_ViewIncomeTitle" xml:space="preserve"><value>Angalia mapato</value></data>
+  <data name="Cat_ViewIncomeAria" xml:space="preserve"><value>Angalia mapato</value></data>
+  <data name="Cat_EditAria" xml:space="preserve"><value>Hariri aina</value></data>
+  <data name="Cat_DeleteAria" xml:space="preserve"><value>Futa aina</value></data>
+  <data name="Acc_PageTitle" xml:space="preserve"><value>Akaunti</value></data>
+  <data name="Acc_Subtitle" xml:space="preserve"><value>Simamia akaunti za benki, fedha taslimu na uwekezaji.</value></data>
+  <data name="Acc_Add" xml:space="preserve"><value>Ongeza akaunti</value></data>
+  <data name="Acc_OffcanvasTitle" xml:space="preserve"><value>Akaunti</value></data>
+  <data name="Acc_EmptyPart1" xml:space="preserve"><value>Bado hakuna akaunti. Bonyeza </value></data>
+  <data name="Acc_EmptyPart2" xml:space="preserve"><value> kuanza.</value></data>
+  <data name="Acc_AddStrong" xml:space="preserve"><value>Ongeza akaunti</value></data>
+  <data name="Acc_Edit" xml:space="preserve"><value>Hariri</value></data>
+  <data name="Acc_Deactivate" xml:space="preserve"><value>Zima</value></data>
+  <data name="Acc_DeactivateConfirm" xml:space="preserve"><value>Kuzima {0}?</value></data>
+  <data name="Acc_InactiveSummary" xml:space="preserve"><value>Akaunti zisizo hai ({0})</value></data>
+  <data name="Acc_InactiveBadge" xml:space="preserve"><value>Siyo hai</value></data>
+  <data name="Acc_FailedLoadForm" xml:space="preserve"><value>Haikuweza kupakia fomu.</value></data>
+  <data name="Acc_LblAccountName" xml:space="preserve"><value>Jina la akaunti</value></data>
+  <data name="Acc_LblAccountType" xml:space="preserve"><value>Aina ya akaunti</value></data>
+  <data name="Acc_PlaceholderName" xml:space="preserve"><value>mf. akiba CRDB</value></data>
+  <data name="Acc_LblInitialBalance" xml:space="preserve"><value>Salio la kwanza</value></data>
+  <data name="Acc_DescPlaceholder" xml:space="preserve"><value>Maelezo mafupi kuhusu akaunti hii</value></data>
+  <data name="Acc_CreateAccount" xml:space="preserve"><value>Unda akaunti</value></data>
+  <data name="Acc_BalanceLabel" xml:space="preserve"><value>Salio:</value></data>
+  <data name="Acc_ManageProfile" xml:space="preserve"><value>Simamia wasifu wako</value></data>
+  <data name="Acc_Type_Checking" xml:space="preserve"><value>Akaunti ya kawaida</value></data>
+  <data name="Acc_Type_Savings" xml:space="preserve"><value>Akaunti ya akiba</value></data>
+  <data name="Acc_Type_CreditCard" xml:space="preserve"><value>Kadi ya mkopo</value></data>
+  <data name="Acc_Type_Cash" xml:space="preserve"><value>Fedha taslimu</value></data>
+  <data name="Acc_Type_Investment" xml:space="preserve"><value>Uwekezaji</value></data>
+  <data name="Acc_PlaceholderInitialBalance" xml:space="preserve"><value>0.00</value></data>
+  <data name="Priv_Title" xml:space="preserve"><value>Sera ya Faragha</value></data>
+  <data name="Priv_BadgeUpdated" xml:space="preserve"><value>Ilisasishwa mwisho: Machi 1, 2026</value></data>
+  <data name="Priv_HeroLead" xml:space="preserve"><value>Tunaamini data yako ya kifedha ni yako. Sera hii inaeleza wazi tunachokusanya, jinsi tunavyotumia, na udhibiti unaonacho.</value></data>
+  <data name="Priv_TocContents" xml:space="preserve"><value>Yaliyomo</value></data>
+  <data name="Priv_TocNavAria" xml:space="preserve"><value>Sehemu za sera</value></data>
+  <data name="Priv_Toc01" xml:space="preserve"><value>Muhtasari</value></data>
+  <data name="Priv_Toc02" xml:space="preserve"><value>Taarifa Tunazokusanya</value></data>
+  <data name="Priv_Toc03" xml:space="preserve"><value>Jinsi Tunavyotumia Data</value></data>
+  <data name="Priv_Toc04" xml:space="preserve"><value>Hifadhi na Usalama</value></data>
+  <data name="Priv_Toc05" xml:space="preserve"><value>Kuhifadhi Data</value></data>
+  <data name="Priv_Toc06" xml:space="preserve"><value>Haki Zako</value></data>
+  <data name="Priv_Toc07" xml:space="preserve"><value>Huduma za Wahusika Wengine</value></data>
+  <data name="Priv_Toc08" xml:space="preserve"><value>Kuki</value></data>
+  <data name="Priv_Toc09" xml:space="preserve"><value>Mabadiliko ya Sera</value></data>
+  <data name="Priv_Toc10" xml:space="preserve"><value>Wasiliana Nasi</value></data>
+  <data name="Priv_S1_H2" xml:space="preserve"><value>01 Muhtasari</value></data>
+  <data name="Priv_S1_P1" xml:space="preserve"><value>FinanceApp ni programu ya kibinafsi ya kifedha. Tunalinda faragha yako na kushughulikia data kwa uangalifu. Sera hii inatumika kwa watumiaji wote na inaeleza jinsi tunavyokusanya, kutumia na kulinda taarifa zako.</value></data>
+  <data name="Priv_S1_P2" xml:space="preserve"><value>Kwa kutumia FinanceApp unakubaliana na mambo yaliyo hapa. Usipokubali, acha kutumia programu.</value></data>
+  <data name="Priv_S1_Highlight" xml:space="preserve"><value>Toleo fupi: Tunakusanya kilichohitaji tu. Hatuuzi data yako. Wewe unadhibiti data yako.</value></data>
+  <data name="Priv_S2_H2" xml:space="preserve"><value>02 Taarifa Tunazokusanya</value></data>
+  <data name="Priv_S2_P1" xml:space="preserve"><value>Tunakusanya taarifa kidogo zinazohitajika:</value></data>
+  <data name="Priv_S2_AccountHdr" xml:space="preserve"><value>Taarifa za akaunti</value></data>
+  <data name="Priv_S2_FinancialHdr" xml:space="preserve"><value>Data ya kifedha unaingiza</value></data>
+  <data name="Priv_S2_TechHdr" xml:space="preserve"><value>Data ya kiufundi</value></data>
+  <data name="Priv_S3_H2" xml:space="preserve"><value>03 Jinsi Tunavyotumia Data Yako</value></data>
+  <data name="Priv_S3_P1" xml:space="preserve"><value>Data inatumika tu kuendesha na kuboresha FinanceApp:</value></data>
+  <data name="Priv_S3_P2" xml:space="preserve"><value>Hatutumii data yako ya kifedha kwa matangazo, profiling au kuuza kwa wahusika wengine.</value></data>
+  <data name="Priv_S4_H2" xml:space="preserve"><value>04 Hifadhi na Usalama</value></data>
+  <data name="Priv_S4_P1" xml:space="preserve"><value>Tunazingatia usalama na safu mbalimbali za ulinzi:</value></data>
+  <data name="Priv_S5_H2" xml:space="preserve"><value>05 Kuhifadhi Data</value></data>
+  <data name="Priv_S5_P1" xml:space="preserve"><value>Data inahifadhiwa ma akaunti yako inapoendelea kuwa hai. Unapofuta akaunti:</value></data>
+  <data name="Priv_S5_P2" xml:space="preserve"><value>Unaweza kufuta rekodi maalum wakati wowote ndani ya programu.</value></data>
+  <data name="Priv_S6_H2" xml:space="preserve"><value>06 Haki na Udhibiti</value></data>
+  <data name="Priv_S6_P1" xml:space="preserve"><value>Una udhibiti kamili wa data yako:</value></data>
+  <data name="Priv_S6_P2" xml:space="preserve"><value>Ikiwa unahitaji msaada, wasiliana nasi kama Sehemu 10.</value></data>
+  <data name="Priv_S7_H2" xml:space="preserve"><value>07 Huduma za Wahusika Wengine</value></data>
+  <data name="Priv_S7_P1" xml:space="preserve"><value>FinanceApp inapakia rasilimali za nje kwa kiolesura:</value></data>
+  <data name="Priv_S7_P2" xml:space="preserve"><value>Huduma hizi hupokea IP na vichwa vya kivinjari tu. Hakuna data ya kifedha inayotumwa. Hatutumii uchanganuzi wala matangazo.</value></data>
+  <data name="Priv_S8_H2" xml:space="preserve"><value>08 Kuki</value></data>
+  <data name="Priv_S8_P1" xml:space="preserve"><value>Tunatumia kuki chache zinazohitajika tu:</value></data>
+  <data name="Priv_S8_P2" xml:space="preserve"><value>Hatutumii kuki za matangazo au ufuatiliaji.</value></data>
+  <data name="Priv_TableCookie" xml:space="preserve"><value>Kuki</value></data>
+  <data name="Priv_TablePurpose" xml:space="preserve"><value>Lengo</value></data>
+  <data name="Priv_TableDuration" xml:space="preserve"><value>Muda</value></data>
+  <data name="Priv_S9_H2" xml:space="preserve"><value>09 Mabadiliko ya Sera</value></data>
+  <data name="Priv_S9_P1" xml:space="preserve"><value>Tunaweza kusasisha sera mara kwa mara:</value></data>
+  <data name="Priv_S9_P2" xml:space="preserve"><value>Endelea kutumia FinanceApp baada ya sasisho linamaanisha unakubali sera mpya.</value></data>
+  <data name="Priv_S10_H2" xml:space="preserve"><value>10 Wasiliana Nasi</value></data>
+  <data name="Priv_S10_P1" xml:space="preserve"><value>Una maswali au ombi la data? Tuko hapa.</value></data>
+  <data name="Priv_S10_P2" xml:space="preserve"><value>Tunalenga kujibu maswali ya faragha ndani ya siku 5 za kazi.</value></data>
+  <data name="Priv_S2_A1" xml:space="preserve"><value>Jina, barua pepe na nenosiri (iliyohifadhiwa kwa hash salama)</value></data>
+  <data name="Priv_S2_A2" xml:space="preserve"><value>Picha ya wasifu ya hiari</value></data>
+  <data name="Priv_S2_A3" xml:space="preserve"><value>Mpango wa usajili na tarehe</value></data>
+  <data name="Priv_S2_F1" xml:space="preserve"><value>Matumizi: maelezo, kiasi, sarafu, tarehe, aina</value></data>
+  <data name="Priv_S2_F2" xml:space="preserve"><value>Akaunti: jina, aina, sarafu, salio</value></data>
+  <data name="Priv_S2_F3" xml:space="preserve"><value>Miamala: aina, kiasi, tarehe, aina, maelezo</value></data>
+  <data name="Priv_S2_F4" xml:space="preserve"><value>Mipangilio ya bajeti na aina</value></data>
+  <data name="Priv_S2_F5" xml:space="preserve"><value>Nyaraka na risiti unazounganisha</value></data>
+  <data name="Priv_S2_T1" xml:space="preserve"><value>Ishara za uthibitishaji na kikao</value></data>
+  <data name="Priv_S2_T2" xml:space="preserve"><value>Ishara za kuzuia ulaghai</value></data>
+  <data name="Priv_S3_L1" xml:space="preserve"><value>Kuthibitisha na kudumisha kikao salama</value></data>
+  <data name="Priv_S3_L2" xml:space="preserve"><value>Kuonyesha rekodi, muhtasari na bajeti</value></data>
+  <data name="Priv_S3_L3" xml:space="preserve"><value>Kuzalisha Excel kwa ombi</value></data>
+  <data name="Priv_S3_L4" xml:space="preserve"><value>Kurudisha faili ulizopakia</value></data>
+  <data name="Priv_S3_L5" xml:space="preserve"><value>Kutuma barua pepe za usalama (mf. kuweka upya nenosiri)</value></data>
+  <data name="Priv_S3_L6" xml:space="preserve"><value>Kuboresha utendaji na marekebisho</value></data>
+  <data name="Priv_S4_L1" xml:space="preserve"><value>Manenosiri yamehashwa kwa Identity (PBKDF2)</value></data>
+  <data name="Priv_S4_L2" xml:space="preserve"><value>Uthibitishaji hutumia kuki salama na tokeni ya ulaghai</value></data>
+  <data name="Priv_S4_L3" xml:space="preserve"><value>Hifadhidata imefarakishwa kwa utekelezaji</value></data>
+  <data name="Priv_S4_L4" xml:space="preserve"><value>Faili zimehifadhiwa kwa seva na mmiliki tu anaweza kuzifikia</value></data>
+  <data name="Priv_S4_L5" xml:space="preserve"><value>HTTPS inalazimishwa uzalishaji</value></data>
+  <data name="Priv_S4_L6" xml:space="preserve"><value>Futa laini — rekodi zinawekwa alama badala ya kufutwa kabisa mara moja</value></data>
+  <data name="Priv_S5_L1" xml:space="preserve"><value>Rekodi zote za kifedha zinaondolewa kabisa</value></data>
+  <data name="Priv_S5_L2" xml:space="preserve"><value>Faili zinaondolewa kwenye seva</value></data>
+  <data name="Priv_S5_L3" xml:space="preserve"><value>Hati za uthibitishaji zinaondolewa</value></data>
+  <data name="Priv_S6_L1" xml:space="preserve"><value>Upatikanaji — ona rekodi zote wakati wowote</value></data>
+  <data name="Priv_S6_L2" xml:space="preserve"><value>Marekebisho — hariri kupitia programu</value></data>
+  <data name="Priv_S6_L3" xml:space="preserve"><value>Kufuta — futa rekodi, nyaraka au akaunti nzima</value></data>
+  <data name="Priv_S6_L4" xml:space="preserve"><value>Kupakua — pakua matumizi kama Excel kwenye ukurasa wa Matumizi</value></data>
+  <data name="Priv_S6_L5" xml:space="preserve"><value>Wasifu — sasisha jina, barua pepe na picha</value></data>
+  <data name="Priv_S7_L1" xml:space="preserve"><value>Google Fonts — fonti; Google inaweza kurekodi ombi</value></data>
+  <data name="Priv_S7_L2" xml:space="preserve"><value>Bootstrap Icons CDN — ikoni</value></data>
+  <data name="Priv_S7_L3" xml:space="preserve"><value>DataTables CDN — jedwali</value></data>
+  <data name="Priv_S9_L1" xml:space="preserve"><value>Tarehe "Ilisasishwa mwisho" itabadilishwa</value></data>
+  <data name="Priv_S9_L2" xml:space="preserve"><value>Mabadiliko makubwa yatajulishwa kupitia programu</value></data>
+  <data name="Priv_Cookie_R1C2" xml:space="preserve"><value>Inadumisha kikao kilichothibitishwa</value></data>
+  <data name="Priv_Cookie_R1C3" xml:space="preserve"><value>Kikao / muda unaongezeka</value></data>
+  <data name="Priv_Cookie_R2C2" xml:space="preserve"><value>Kuzuia mashambulio ya CSRF</value></data>
+  <data name="Priv_Cookie_R2C3" xml:space="preserve"><value>Kikao</value></data>
+  <data name="Priv_Cookie_R3C1" xml:space="preserve"><value>(hifadhi ya ndani)</value></data>
+  <data name="Priv_Cookie_R3C2" xml:space="preserve"><value>Kukumbuka hali ya mwanga/giza</value></data>
+  <data name="Priv_Cookie_R3C3" xml:space="preserve"><value>Kudumu (hifadhi ya ndani)</value></data>
+  <data name="Rpt_PageTitle" xml:space="preserve"><value>Ripoti ya mwezi</value></data>
+  <data name="Rpt_Subtitle" xml:space="preserve"><value>Muhtasari wa matumizi na bajeti kwa mwezi. Shiriki au pakua kama unavyotaka.</value></data>
+  <data name="Rpt_Month" xml:space="preserve"><value>Mwezi</value></data>
+  <data name="Rpt_Year" xml:space="preserve"><value>Mwaka</value></data>
+  <data name="Rpt_ShowReport" xml:space="preserve"><value>Onyesha ripoti</value></data>
+  <data name="Rpt_DownloadHtml" xml:space="preserve"><value>Pakua kama HTML</value></data>
+  <data name="Rpt_GetShareLink" xml:space="preserve"><value>Pata kiungo cha kushiriki</value></data>
+  <data name="Rpt_ShareCreatedStrong" xml:space="preserve"><value>Kiungo cha kushiriki kimeundwa.</value></data>
+  <data name="Rpt_ShareCreatedDetail" xml:space="preserve"><value>Kinaisha {0}. Nakili kiungo hapa chini ili kushiriki ripoti yako.</value></data>
+  <data name="Rpt_Copy" xml:space="preserve"><value>Nakili</value></data>
+  <data name="Rpt_Copied" xml:space="preserve"><value>Imenakiliwa!</value></data>
+  <data name="Rpt_TotalSpent" xml:space="preserve"><value>Jumla ya matumizi</value></data>
+  <data name="Rpt_TotalIncome" xml:space="preserve"><value>Jumla ya mapato</value></data>
+  <data name="Rpt_NetCashFlow" xml:space="preserve"><value>Mtiririko halisi</value></data>
+  <data name="Rpt_MonthlyBudget" xml:space="preserve"><value>Bajeti ya mwezi</value></data>
+  <data name="Rpt_BudgetExceededBy" xml:space="preserve"><value>Imepita kwa {0} {1}</value></data>
+  <data name="Rpt_BudgetLeftShort" xml:space="preserve"><value>Ilibaki: {0} {1}</value></data>
+  <data name="Rpt_ByCategory" xml:space="preserve"><value>Kwa kategoria</value></data>
+  <data name="Rpt_ColSpent" xml:space="preserve"><value>Yaliyotumika</value></data>
+  <data name="Rpt_ColBudget" xml:space="preserve"><value>Bajeti</value></data>
+  <data name="Rpt_ColLeft" xml:space="preserve"><value>Ilibaki</value></data>
+  <data name="Rpt_TopExpenses" xml:space="preserve"><value>Matumizi makubwa</value></data>
+  <data name="Rpt_ExpenseFallback" xml:space="preserve"><value>Matumizi</value></data>
+  <data name="Rpt_Over" xml:space="preserve"><value>Kupita</value></data>
+  <data name="Rpt_EmptyMonth" xml:space="preserve"><value>Hakuna matumizi yaliyorekodiwa mwezi huu.</value></data>
+  <data name="Rpt_Dash" xml:space="preserve"><value>—</value></data>
+  <data name="Rpt_DocTitle" xml:space="preserve"><value>Ripoti ya mwezi - {0} - FinanceApp</value></data>
+  <data name="Rpt_GeneratedLine" xml:space="preserve"><value>Ripoti ya mwezi ya FinanceApp — iliyotengenezwa {0}</value></data>
+  <data name="Rpt_HtmlSaveHint" xml:space="preserve"><value>FinanceApp — ripoti ya mwezi. Unaweza kuhifadhi ukurasa huu (Faili → Hifadhi kama) kuweka nakala.</value></data>
+</root>

@@ -1,21 +1,32 @@
 @model FinanceApp.Application.Common.PagedResult<FinanceApp.Web.Models.CategoryViewModel>
-
+@using System.Text.Json
 @{
-    ViewData["Title"] = "Categories";
+    ViewData["Title"] = L["Cat_PageTitle"].Value;
+    var jsCatDtSearch = JsonSerializer.Serialize(L["Cat_DTSearchPlaceholder"].Value);
+    var jsCatDtInfo = JsonSerializer.Serialize(L["Cat_DTInfo"].Value);
+    var jsCatDtFiltered = JsonSerializer.Serialize(L["Cat_DTInfoFiltered"].Value);
+    var jsCatDtLength = JsonSerializer.Serialize(L["Cat_DTLengthMenu"].Value);
+    var jsCatErrLoad = JsonSerializer.Serialize(L["Exp_ErrLoadForm"].Value);
+    var jsCatErrEdit = JsonSerializer.Serialize(L["Exp_ErrLoadEdit"].Value);
+    var jsCatErrDelete = JsonSerializer.Serialize(L["Exp_ErrLoadDelete"].Value);
+    var jsCatAddLabel = JsonSerializer.Serialize(L["Cat_OffcanvasAdd"].Value);
+    var jsCatEditLabel = JsonSerializer.Serialize(L["Cat_OffcanvasEdit"].Value);
+    var jsCatDeleteLabel = JsonSerializer.Serialize(L["Cat_OffcanvasDelete"].Value);
+    var jsCommonLoading = JsonSerializer.Serialize(L["Common_Loading"].Value);
 }
 
 <div class="mb-4">
-    <h1 class="visually-hidden">Categories</h1>
-    <p class="page-subtitle mb-3">Organize <strong>expenses</strong> and <strong>income</strong> with clear categories. Each category is for expenses only, income only, or both.</p>
+    <h1 class="visually-hidden">@L["Cat_PageTitle"]</h1>
+    <p class="page-subtitle mb-3">@L["Cat_Subtitle"]</p>
     <div class="d-flex flex-wrap gap-2 align-items-center">
         <button type="button" id="btnAddCategory" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Add New Category
+            <i class="bi bi-plus-circle"></i> @L["Cat_AddNew"]
         </button>
-        <div class="btn-group btn-group-sm" role="group" aria-label="Filter by type">
-            <button type="button" class="btn btn-outline-secondary active" data-filter="all">All</button>
-            <button type="button" class="btn btn-outline-secondary" data-filter="Expense">Expenses only</button>
-            <button type="button" class="btn btn-outline-secondary" data-filter="Income">Income only</button>
-            <button type="button" class="btn btn-outline-secondary" data-filter="Both">Both</button>
+        <div class="btn-group btn-group-sm" role="group" aria-label="@L["Cat_FilterAria"]">
+            <button type="button" class="btn btn-outline-secondary active" data-filter="all">@L["Cat_FilterAll"]</button>
+            <button type="button" class="btn btn-outline-secondary" data-filter="Expense">@L["Cat_FilterExpense"]</button>
+            <button type="button" class="btn btn-outline-secondary" data-filter="Income">@L["Cat_FilterIncome"]</button>
+            <button type="button" class="btn btn-outline-secondary" data-filter="Both">@L["Cat_FilterBoth"]</button>
         </div>
     </div>
 </div>
@@ -23,12 +34,12 @@
 <!-- Offcanvas for category create/edit/delete (like Expense) -->
 <div class="offcanvas offcanvas-end" tabindex="-1" id="categoryOffcanvas" aria-labelledby="categoryOffcanvasLabel">
     <div class="offcanvas-header border-bottom">
-        <h5 class="offcanvas-title fw-600" id="categoryOffcanvasLabel">Manage Financial Category</h5>
-        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        <h5 class="offcanvas-title fw-600" id="categoryOffcanvasLabel">@L["Cat_OffcanvasTitle"]</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="@L["Common_Close"]"></button>
     </div>
     <div class="offcanvas-body px-0">
         <div class="p-3 d-flex align-items-center justify-content-center min-vh-25" id="categoryOffcanvasContent">
-            <div class="text-center text-muted"><span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Loading…</div>
+            <div class="text-center text-muted"><span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>@L["Common_Loading"]</div>
         </div>
     </div>
 </div>
@@ -36,14 +47,14 @@
 <div class="card shadow-sm">
     <div class="card-body">
         <div class="table-responsive">
-            <table id="categoryTable" class="table table-hover mb-0" aria-label="List of categories">
-                <caption class="visually-hidden">List of categories with name, description and actions</caption>
+            <table id="categoryTable" class="table table-hover mb-0" aria-label="@L["Cat_TableAria"]">
+                <caption class="visually-hidden">@L["Cat_TableCaption"]</caption>
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Use for</th>
-                        <th>Description</th>
-                        <th style="width: 220px;">Actions</th>
+                        <th>@L["Cat_ColName"]</th>
+                        <th>@L["Cat_ColUseFor"]</th>
+                        <th>@L["Cat_ColDescription"]</th>
+                        <th style="width: 220px;">@L["Cat_ColActions"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -65,25 +76,25 @@
                                 </span>
                             </td>
                             <td>
-                                <span class="badge @(isExpense ? "bg-danger" : isIncome ? "bg-success" : "bg-secondary")">@(isExpense ? "Expenses only" : isIncome ? "Income only" : "Both")</span>
+                                <span class="badge @(isExpense ? "bg-danger" : isIncome ? "bg-success" : "bg-secondary")">@(isExpense ? L["Cat_BadgeExpenseOnly"].Value : isIncome ? L["Cat_BadgeIncomeOnly"].Value : L["Cat_BadgeBoth"].Value)</span>
                             </td>
                             <td>@category.Description</td>
                             <td>
-                                <a class="btn btn-sm btn-warning btn-edit" href="@Url.Action("Edit", "Category", new { id = category.Id })" title="Edit" aria-label="Edit category">
+                                <a class="btn btn-sm btn-warning btn-edit" href="@Url.Action("Edit", "Category", new { id = category.Id })" title="@L["Common_Edit"]" aria-label="@L["Cat_EditAria"]">
                                     <i class="bi bi-pencil" aria-hidden="true"></i>
                                 </a>
-                                <a class="btn btn-sm btn-danger btn-delete" href="@Url.Action("Delete", "Category", new { id = category.Id })" title="Delete" aria-label="Delete category">
+                                <a class="btn btn-sm btn-danger btn-delete" href="@Url.Action("Delete", "Category", new { id = category.Id })" title="@L["Common_Delete"]" aria-label="@L["Cat_DeleteAria"]">
                                     <i class="bi bi-trash" aria-hidden="true"></i>
                                 </a>
                                 @if (isExpense || isBoth)
                                 {
-                                    <a asp-controller="Expense" asp-action="ByCategory" asp-route-categoryId="@category.Id" class="btn btn-sm btn-info" title="View expenses" aria-label="View expenses in this category">
+                                    <a asp-controller="Expense" asp-action="ByCategory" asp-route-categoryId="@category.Id" class="btn btn-sm btn-info" title="@L["Cat_ViewExpensesTitle"]" aria-label="@L["Cat_ViewExpensesAria"]">
                                         <i class="bi bi-cash-stack" aria-hidden="true"></i>
                                     </a>
                                 }
                                 @if (isIncome || isBoth)
                                 {
-                                    <a asp-controller="Income" asp-action="Index" class="btn btn-sm btn-success" title="View income" aria-label="View income">
+                                    <a asp-controller="Income" asp-action="Index" class="btn btn-sm btn-success" title="@L["Cat_ViewIncomeTitle"]" aria-label="@L["Cat_ViewIncomeAria"]">
                                         <i class="bi bi-arrow-down-circle" aria-hidden="true"></i>
                                     </a>
                                 }
@@ -106,32 +117,30 @@
                 pageLength: 10,
                 language: {
                     search: "",
-                    searchPlaceholder: "Search categories…",
-                    info: "_TOTAL_ records",
-                    infoFiltered: "(filtered from _MAX_)",
-                    lengthMenu: "Show _MENU_ rows",
+                    searchPlaceholder: @Html.Raw(jsCatDtSearch),
+                    info: @Html.Raw(jsCatDtInfo),
+                    infoFiltered: @Html.Raw(jsCatDtFiltered),
+                    lengthMenu: @Html.Raw(jsCatDtLength),
                     paginate: { first: "«", last: "»", next: "›", previous: "‹" }
                 }
             });
 
-            // Add New Category: load create form in offcanvas (like Expense)
             document.getElementById('btnAddCategory')?.addEventListener('click', async function(e) {
                 e.preventDefault();
                 var content = document.getElementById('categoryOffcanvasContent');
                 var label = document.getElementById('categoryOffcanvasLabel');
                 var offcanvasEl = document.getElementById('categoryOffcanvas');
-                if (label) label.textContent = 'Add Category';
-                if (content) content.innerHTML = '<div class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Loading…</div>';
+                if (label) label.textContent = @Html.Raw(jsCatAddLabel);
+                if (content) content.innerHTML = '<div class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>' + @Html.Raw(jsCommonLoading) + '</div>';
                 if (offcanvasEl) { var o = new bootstrap.Offcanvas(offcanvasEl); o.show(); }
                 var url = '@Url.Action("Create", "Category")?partial=true';
                 var res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-                if (!res.ok) { if (typeof showToast === 'function') showToast('Unable to load form.'); else alert('Unable to load form.'); return; }
+                if (!res.ok) { var em = @Html.Raw(jsCatErrLoad); if (typeof showToast === 'function') showToast(em); else alert(em); return; }
                 var html = await res.text();
                 if (content) content.innerHTML = html;
                 if (typeof initCategoryForm === 'function') initCategoryForm(content || document);
             });
 
-            // Delegate edit/delete clicks to offcanvas loader
             document.querySelector('#categoryTable').addEventListener('click', async function(e){
                 const editBtn = e.target.closest('.btn-edit');
                 if (editBtn) {
@@ -139,10 +148,10 @@
                     const href = editBtn.getAttribute('href');
                     if (!href) return;
                     var label = document.getElementById('categoryOffcanvasLabel');
-                    if (label) label.textContent = 'Edit Category';
+                    if (label) label.textContent = @Html.Raw(jsCatEditLabel);
                     const url = href + (href.indexOf('?') === -1 ? '?partial=true' : '&partial=true');
                     const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }});
-                    if (!res.ok) { if (typeof showToast === 'function') showToast('Unable to load edit form.'); else alert('Unable to load edit form.'); return; }
+                    if (!res.ok) { var ee = @Html.Raw(jsCatErrEdit); if (typeof showToast === 'function') showToast(ee); else alert(ee); return; }
                     const html = await res.text();
                     document.getElementById('categoryOffcanvasContent').innerHTML = html;
                     const offcanvasEl = document.getElementById('categoryOffcanvas');
@@ -158,10 +167,10 @@
                     const href = delBtn.getAttribute('href');
                     if (!href) return;
                     var label = document.getElementById('categoryOffcanvasLabel');
-                    if (label) label.textContent = 'Delete Category';
+                    if (label) label.textContent = @Html.Raw(jsCatDeleteLabel);
                     const url = href + (href.indexOf('?') === -1 ? '?partial=true' : '&partial=true');
                     const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }});
-                    if (!res.ok) { if (typeof showToast === 'function') showToast('Unable to load delete confirmation.'); else alert('Unable to load delete confirmation.'); return; }
+                    if (!res.ok) { var dm = @Html.Raw(jsCatErrDelete); if (typeof showToast === 'function') showToast(dm); else alert(dm); return; }
                     const html = await res.text();
                     document.getElementById('categoryOffcanvasContent').innerHTML = html;
                     const offcanvasEl = document.getElementById('categoryOffcanvas');
@@ -171,7 +180,6 @@
                 }
             });
 
-            // Filter by type: All | Expenses only | Income only | Both
             document.querySelectorAll('[data-filter]').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     var filter = this.getAttribute('data-filter');

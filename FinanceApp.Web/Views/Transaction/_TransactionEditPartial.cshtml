@@ -7,6 +7,9 @@
     var typeClass     = Model.Type == TransactionType.Income ? "text-success" : "text-danger";
     var supportingDocs = ViewBag.SupportingDocs as IEnumerable<FinanceApp.Domain.Entities.SupportingDocument>
                        ?? Enumerable.Empty<FinanceApp.Domain.Entities.SupportingDocument>();
+    var typeLabel = Model.Type == TransactionType.Income ? L["Tx_TypeIncome"].Value
+        : Model.Type == TransactionType.Expense ? L["Tx_TypeExpense"].Value
+        : L["Tx_BadgeTransfer"].Value;
 }
 
 <form asp-action="Edit" asp-controller="Transaction" asp-route-id="@Model.Id" method="post" class="p-3" id="transactionEditForm">
@@ -15,26 +18,26 @@
     <div class="mb-3">
         <p class="text-muted small mb-0">
             <i class="bi bi-info-circle me-1"></i>
-            <strong class="@typeClass">@Model.Type</strong> on <strong>@Model.AccountName</strong> (@Model.Currency)
+            <span class="@typeClass fw-semibold">@L["Tx_EditSummary", typeLabel, Model.AccountName, Model.Currency]</span>
         </p>
     </div>
 
     <div class="mb-3">
-        <label asp-for="Amount" class="form-label">Amount</label>
+        <label asp-for="Amount" class="form-label">@L["Table_Amount"]</label>
         <input asp-for="Amount" class="form-control" type="number" step="0.01" min="0.01" />
         <span asp-validation-for="Amount" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
-        <label asp-for="Date" class="form-label">Date</label>
+        <label asp-for="Date" class="form-label">@L["Lbl_Date"]</label>
         <input asp-for="Date" type="date" class="form-control" />
         <span asp-validation-for="Date" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
-        <label asp-for="CategoryId" class="form-label">Category <span class="text-muted fw-normal">(optional)</span></label>
+        <label asp-for="CategoryId" class="form-label">@L["Lbl_Category"] <span class="text-muted fw-normal">@L["Exp_ReceiptOptional"]</span></label>
         <select asp-for="CategoryId" class="form-select">
-            <option value="">— None —</option>
+            <option value="">@L["Tx_None"]</option>
             @foreach (var cat in categories)
             {
                 <option value="@cat.Id">@cat.Name</option>
@@ -43,14 +46,14 @@
     </div>
 
     <div class="mb-3">
-        <label asp-for="Note" class="form-label">Note <span class="text-muted fw-normal">(optional)</span></label>
+        <label asp-for="Note" class="form-label">@L["Lbl_Note"] <span class="text-muted fw-normal">@L["Exp_ReceiptOptional"]</span></label>
         <input asp-for="Note" class="form-control" />
     </div>
 
     <div class="d-flex justify-content-end gap-2">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">Cancel</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">@L["Common_Cancel"]</button>
         <button type="submit" class="btn btn-primary">
-            <i class="bi bi-check-lg me-1"></i>Save Changes
+            <i class="bi bi-check-lg me-1"></i>@L["Common_SaveChanges"]
         </button>
     </div>
 </form>
@@ -88,7 +91,7 @@
             if (contentType.includes('application/json')) {
                 var json = await res.json();
                 if (json.success) {
-                    var offcanvasEl = document.getElementById('transactionOffcanvas');
+                    var offcanvasEl = document.getElementById('txOffcanvas');
                     if (offcanvasEl) {
                         var bs = bootstrap.Offcanvas.getInstance(offcanvasEl) || new bootstrap.Offcanvas(offcanvasEl);
                         bs.hide();
@@ -99,7 +102,7 @@
             }
 
             var html = await res.text();
-            var content = document.getElementById('transactionOffcanvasContent');
+            var content = document.getElementById('txOffcanvasContent');
             if (content) {
                 content.innerHTML = html;
                 if (window.jQuery && jQuery.validator && jQuery.validator.unobtrusive) {

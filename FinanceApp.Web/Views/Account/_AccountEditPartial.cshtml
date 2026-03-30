@@ -6,27 +6,27 @@
     <div class="mb-3">
         <p class="text-muted small mb-1">
             <i class="bi bi-info-circle me-1"></i>
-            <strong>@Model.Type</strong> · <strong>@Model.Currency</strong> ·
-            Balance: <strong class="@(Model.CurrentBalance >= 0 ? "text-success" : "text-danger")">@Model.CurrentBalance.ToString("N2")</strong>
+            <strong>@AccountDisplayHelper.LocalizedAccountType(L, Model.Type)</strong> · <strong>@Model.Currency</strong> ·
+            @L["Acc_BalanceLabel"] <strong class="@(Model.CurrentBalance >= 0 ? "text-success" : "text-danger")">@Model.CurrentBalance.ToString("N2")</strong>
         </p>
     </div>
 
     <div class="mb-3">
-        <label asp-for="Name" class="form-label">Account Name</label>
+        <label asp-for="Name" class="form-label">@L["Acc_LblAccountName"]</label>
         <input asp-for="Name" class="form-control" />
         <span asp-validation-for="Name" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
-        <label asp-for="Description" class="form-label">Description <span class="text-muted fw-normal">(optional)</span></label>
+        <label asp-for="Description" class="form-label">@L["Lbl_Description"] <span class="text-muted fw-normal">@L["Exp_ReceiptOptional"]</span></label>
         <textarea asp-for="Description" class="form-control" rows="2"></textarea>
         <span asp-validation-for="Description" class="text-danger"></span>
     </div>
 
     <div class="d-flex justify-content-end gap-2">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">Cancel</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">@L["Common_Cancel"]</button>
         <button type="submit" class="btn btn-primary">
-            <i class="bi bi-check-lg me-1"></i>Save Changes
+            <i class="bi bi-check-lg me-1"></i>@L["Common_SaveChanges"]
         </button>
     </div>
 </form>

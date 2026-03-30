@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Extensions, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Extensions, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51</value></resheader>
+  <data name="Nav_Dashboard" xml:space="preserve"><value>Panel</value></data>
+  <data name="Nav_Expenses" xml:space="preserve"><value>Gastos</value></data>
+  <data name="Nav_Income" xml:space="preserve"><value>Ingresos</value></data>
+  <data name="Nav_Categories" xml:space="preserve"><value>Categorías</value></data>
+  <data name="Nav_Accounts" xml:space="preserve"><value>Cuentas</value></data>
+  <data name="Nav_Transactions" xml:space="preserve"><value>Transacciones</value></data>
+  <data name="Nav_Recurring" xml:space="preserve"><value>Recurrentes</value></data>
+  <data name="Nav_Budget" xml:space="preserve"><value>Presupuesto</value></data>
+  <data name="Nav_MonthlyReport" xml:space="preserve"><value>Informe mensual</value></data>
+  <data name="Nav_Subscription" xml:space="preserve"><value>Suscripción</value></data>
+  <data name="Nav_Profile" xml:space="preserve"><value>Perfil</value></data>
+  <data name="Nav_Privacy" xml:space="preserve"><value>Privacidad</value></data>
+  <data name="Nav_ManageUsers" xml:space="preserve"><value>Gestionar usuarios</value></data>
+  <data name="Nav_UserFeedback" xml:space="preserve"><value>Comentarios de usuarios</value></data>
+  <data name="Nav_Feedback" xml:space="preserve"><value>Comentarios</value></data>
+  <data name="Nav_SignOut" xml:space="preserve"><value>Cerrar sesión</value></data>
+  <data name="Nav_DarkMode" xml:space="preserve"><value>Modo oscuro</value></data>
+  <data name="Nav_Navigation" xml:space="preserve"><value>Navegación</value></data>
+  <data name="Lang_English" xml:space="preserve"><value>Inglés</value></data>
+  <data name="Lang_Swahili" xml:space="preserve"><value>Swahili</value></data>
+  <data name="Lang_Spanish" xml:space="preserve"><value>Español</value></data>
+  <data name="Lang_Language" xml:space="preserve"><value>Idioma</value></data>
+  <data name="Api_InvalidCredentials" xml:space="preserve"><value>Correo o contraseña no válidos.</value></data>
+  <data name="Api_EmailRegistered" xml:space="preserve"><value>El correo electrónico ya está registrado.</value></data>
+  <data name="Api_InvalidRefresh" xml:space="preserve"><value>Token de actualización no válido o caducado.</value></data>
+  <data name="Api_UserNotFound" xml:space="preserve"><value>Usuario no encontrado.</value></data>
+  <data name="Dash_WelcomeBack" xml:space="preserve"><value>Bienvenido de nuevo, {0}. Así van tus finanzas.</value></data>
+  <data name="Dash_ThisMonth" xml:space="preserve"><value>Este mes</value></data>
+  <data name="Dash_NoExpensesStrong" xml:space="preserve"><value>Aún no hay gastos.</value></data>
+  <data name="Dash_NoExpensesLink" xml:space="preserve"><value>Añade tu primer gasto</value></data>
+  <data name="Dash_NoExpensesTail" xml:space="preserve"><value> para ver aquí el resumen y la tendencia de tus gastos.</value></data>
+  <data name="Dash_BudgetLimitStrong" xml:space="preserve"><value>Se alcanzó el límite del presupuesto.</value></data>
+  <data name="Dash_BudgetSpentBody" xml:space="preserve"><value>Este mes has gastado {0} {1} frente a tu presupuesto de {2} {3}.</value></data>
+  <data name="Dash_UpdateBudget" xml:space="preserve"><value>Actualizar presupuesto</value></data>
+  <data name="Dash_OrReduceSpending" xml:space="preserve"><value> o reducir el gasto.</value></data>
+  <data name="Dash_BudgetExceededLabel" xml:space="preserve"><value>presupuesto superado:</value></data>
+  <data name="Dash_BudgetNearLabel" xml:space="preserve"><value>cerca del límite del presupuesto (80%+):</value></data>
+  <data name="Dash_ManageBudgets" xml:space="preserve"><value>Gestionar presupuestos</value></data>
+  <data name="Dash_SetMonthlyBudgetStrong" xml:space="preserve"><value>Define un presupuesto mensual</value></data>
+  <data name="Dash_SetMonthlyBudgetTail" xml:space="preserve"><value> para recibir una alerta cuando tus gastos alcancen el límite.</value></data>
+  <data name="Dash_SetBudgetLink" xml:space="preserve"><value>Definir presupuesto</value></data>
+  <data name="KPI_TotalBalance" xml:space="preserve"><value>Saldo total</value></data>
+  <data name="KPI_MonthlyIncome" xml:space="preserve"><value>Ingresos del mes</value></data>
+  <data name="KPI_MonthlyExpense" xml:space="preserve"><value>Gastos del mes</value></data>
+  <data name="KPI_ActiveBudgets" xml:space="preserve"><value>Presupuestos activos</value></data>
+  <data name="KPI_Stable" xml:space="preserve"><value>Estable</value></data>
+  <data name="KPI_TotalSpend" xml:space="preserve"><value>Gasto total</value></data>
+  <data name="KPI_Categories" xml:space="preserve"><value>Categorías</value></data>
+  <data name="Dash_MonthlyCashFlow" xml:space="preserve"><value>Flujo de caja mensual</value></data>
+  <data name="Dash_OptionsAria" xml:space="preserve"><value>Opciones</value></data>
+  <data name="Dash_ViewBudget" xml:space="preserve"><value>Ver presupuesto</value></data>
+  <data name="Dash_IncomeMinusExpenses" xml:space="preserve"><value>Ingresos menos gastos este mes</value></data>
+  <data name="Dash_PctVsLastMonth" xml:space="preserve"><value>{0}% respecto al mes pasado</value></data>
+  <data name="Dash_RecentTransactions" xml:space="preserve"><value>Transacciones recientes</value></data>
+  <data name="Dash_ViewAll" xml:space="preserve"><value>Ver todo</value></data>
+  <data name="Table_Date" xml:space="preserve"><value>Fecha</value></data>
+  <data name="Table_Category" xml:space="preserve"><value>Categoría</value></data>
+  <data name="Table_Amount" xml:space="preserve"><value>Importe</value></data>
+  <data name="Table_Actions" xml:space="preserve"><value>Acciones</value></data>
+  <data name="Dash_NoRecentTx" xml:space="preserve"><value>No hay transacciones recientes.</value></data>
+  <data name="Dash_AddExpense" xml:space="preserve"><value>Añadir un gasto</value></data>
+  <data name="Dash_Or" xml:space="preserve"><value> o </value></data>
+  <data name="Dash_NewTransaction" xml:space="preserve"><value>nueva transacción</value></data>
+  <data name="Dash_ExpenseTrendTitle" xml:space="preserve"><value>Tendencia de gastos (últimos 30 días) — {0}</value></data>
+  <data name="Dash_AddExpensesChartHint" xml:space="preserve"><value>Añade gastos para ver el gráfico de tendencia.</value></data>
+  <data name="Chart_CashFlow" xml:space="preserve"><value>Flujo de caja</value></data>
+  <data name="Chart_DailyExpenses" xml:space="preserve"><value>Gastos diarios</value></data>
+  <data name="Chart_AmountAxis" xml:space="preserve"><value>Importe ({0})</value></data>
+  <data name="Generic_User" xml:space="preserve"><value>Usuario</value></data>
+  <data name="Generic_Category" xml:space="preserve"><value>Categoría</value></data>
+  <data name="Dash_OverviewHidden" xml:space="preserve"><value>Resumen del panel</value></data>
+  <data name="Common_Close" xml:space="preserve"><value>Cerrar</value></data>
+  <data name="Common_Cancel" xml:space="preserve"><value>Cancelar</value></data>
+  <data name="Common_Loading" xml:space="preserve"><value>Cargando…</value></data>
+  <data name="Common_Saving" xml:space="preserve"><value>Guardando…</value></data>
+  <data name="Common_Edit" xml:space="preserve"><value>Editar</value></data>
+  <data name="Common_Delete" xml:space="preserve"><value>Eliminar</value></data>
+  <data name="Common_SaveChanges" xml:space="preserve"><value>Guardar cambios</value></data>
+  <data name="Lbl_Description" xml:space="preserve"><value>Descripción</value></data>
+  <data name="Lbl_Currency" xml:space="preserve"><value>Moneda</value></data>
+  <data name="Lbl_Account" xml:space="preserve"><value>Cuenta</value></data>
+  <data name="Lbl_Note" xml:space="preserve"><value>Nota</value></data>
+  <data name="Lbl_Type" xml:space="preserve"><value>Tipo</value></data>
+  <data name="Lbl_Date" xml:space="preserve"><value>Fecha</value></data>
+  <data name="Lbl_ExpenseDate" xml:space="preserve"><value>Fecha del gasto</value></data>
+  <data name="Lbl_Category" xml:space="preserve"><value>Categoría</value></data>
+  <data name="Lbl_FromAccount" xml:space="preserve"><value>Cuenta origen</value></data>
+  <data name="Lbl_ToAccount" xml:space="preserve"><value>Cuenta destino</value></data>
+  <data name="Lbl_BudgetAmount" xml:space="preserve"><value>Importe del presupuesto</value></data>
+  <data name="Nav_ToggleTheme" xml:space="preserve"><value>Cambiar modo oscuro/claro</value></data>
+  <data name="Nav_Notifications" xml:space="preserve"><value>Notificaciones</value></data>
+  <data name="Aria_Menu" xml:space="preserve"><value>Menú</value></data>
+  <data name="Exp_PageTitle" xml:space="preserve"><value>Gastos</value></data>
+  <data name="Exp_Subtitle" xml:space="preserve"><value>Revise, añada y exporte sus gastos.</value></data>
+  <data name="Exp_AddNew" xml:space="preserve"><value>Añadir gasto</value></data>
+  <data name="Exp_DownloadExcel" xml:space="preserve"><value>Descargar Excel</value></data>
+  <data name="Exp_OffcanvasTitle" xml:space="preserve"><value>Gasto</value></data>
+  <data name="Exp_TableAria" xml:space="preserve"><value>Lista de gastos</value></data>
+  <data name="Exp_TableCaption" xml:space="preserve"><value>Lista de gastos con descripción, importe, moneda, categoría, fecha y acciones</value></data>
+  <data name="Exp_ColCurrency" xml:space="preserve"><value>Moneda</value></data>
+  <data name="Exp_ColAttachments" xml:space="preserve"><value>Archivos adjuntos / documentos</value></data>
+  <data name="Exp_ReceiptViewTitle" xml:space="preserve"><value>Ver recibo</value></data>
+  <data name="Exp_ReceiptPreviewTitle" xml:space="preserve"><value>Vista previa del recibo</value></data>
+  <data name="Exp_EditAria" xml:space="preserve"><value>Editar gasto</value></data>
+  <data name="Exp_DeleteAria" xml:space="preserve"><value>Eliminar gasto</value></data>
+  <data name="Exp_ReceiptModalTitle" xml:space="preserve"><value>Recibo / documento</value></data>
+  <data name="Exp_OpenNewTab" xml:space="preserve"><value>Abrir en pestaña nueva</value></data>
+  <data name="Exp_DTSearchPlaceholder" xml:space="preserve"><value>Buscar gastos…</value></data>
+  <data name="Exp_DTInfo" xml:space="preserve"><value>_TOTAL_ registros</value></data>
+  <data name="Exp_DTInfoFiltered" xml:space="preserve"><value>(filtrado de _MAX_)</value></data>
+  <data name="Exp_DTLengthMenu" xml:space="preserve"><value>Mostrar _MENU_ filas</value></data>
+  <data name="Exp_ErrLoadForm" xml:space="preserve"><value>No se pudo cargar el formulario.</value></data>
+  <data name="Exp_ErrLoadEdit" xml:space="preserve"><value>No se pudo cargar el formulario de edición.</value></data>
+  <data name="Exp_ErrLoadDelete" xml:space="preserve"><value>No se pudo cargar la confirmación.</value></data>
+  <data name="Exp_ErrLoadReceipt" xml:space="preserve"><value>No se pudo cargar el recibo.</value></data>
+  <data name="Exp_SelectCurrency" xml:space="preserve"><value>-- Seleccionar moneda --</value></data>
+  <data name="Exp_SelectCategory" xml:space="preserve"><value>-- Seleccionar categoría --</value></data>
+  <data name="Exp_LabelExpenseCategory" xml:space="preserve"><value>Categoría del gasto</value></data>
+  <data name="Exp_AccountOptional" xml:space="preserve"><value>(opcional — para el saldo)</value></data>
+  <data name="Exp_AccountNone" xml:space="preserve"><value>— Ninguna (solo seguimiento) —</value></data>
+  <data name="Exp_AccountHelp" xml:space="preserve"><value>Deje "Ninguna" si no usa cuentas; el gasto seguirá en listados e informes.</value></data>
+  <data name="Exp_ReceiptLabel" xml:space="preserve"><value>Recibo / documento</value></data>
+  <data name="Exp_ReceiptOptional" xml:space="preserve"><value>(opcional)</value></data>
+  <data name="Exp_ReceiptTypes" xml:space="preserve"><value>JPG, PNG, GIF, WebP o PDF. Máx. 5 MB.</value></data>
+  <data name="Exp_PdfWillUpload" xml:space="preserve"><value>PDF seleccionado — se subirá al guardar.</value></data>
+  <data name="Exp_CreateExpense" xml:space="preserve"><value>Crear gasto</value></data>
+  <data name="Exp_LegacyReceipt" xml:space="preserve"><value>Recibo original (heredado)</value></data>
+  <data name="Exp_View" xml:space="preserve"><value>Ver</value></data>
+  <data name="Exp_Preview" xml:space="preserve"><value>Vista previa</value></data>
+  <data name="Exp_PreviewInModal" xml:space="preserve"><value>Vista previa en ventana</value></data>
+  <data name="Exp_ViewNewTab" xml:space="preserve"><value>Ver recibo en pestaña nueva</value></data>
+  <data name="Exp_DeleteTitle" xml:space="preserve"><value>Confirmar eliminación</value></data>
+  <data name="Exp_DeleteBody" xml:space="preserve"><value>¿Seguro que desea eliminar el gasto "{0}" del {1} con importe {2}?</value></data>
+  <data name="Exp_ReceiptPdfTitle" xml:space="preserve"><value>Recibo PDF</value></data>
+  <data name="Bud_PageTitle" xml:space="preserve"><value>Presupuesto mensual</value></data>
+  <data name="Bud_Subtitle" xml:space="preserve"><value>Establezca su límite de gasto para {0} y manténgase al día.</value></data>
+  <data name="Bud_SavedAlert" xml:space="preserve"><value>El presupuesto de {0} se ha guardado.</value></data>
+  <data name="Bud_CatSaved" xml:space="preserve"><value>El presupuesto por categoría se ha guardado.</value></data>
+  <data name="Bud_CatRemoved" xml:space="preserve"><value>El presupuesto por categoría se ha eliminado.</value></data>
+  <data name="Bud_CatExceededTitle" xml:space="preserve"><value>Presupuesto de categoría superado en {0}</value></data>
+  <data name="Bud_CatExceededIntro" xml:space="preserve"><value>Las siguientes categorías han superado su presupuesto este mes:</value></data>
+  <data name="Bud_SetBudgetCardTitle" xml:space="preserve"><value>Definir presupuesto para {0}</value></data>
+  <data name="Bud_SetBudgetHelp" xml:space="preserve"><value>Cuando sus gastos alcancen este importe en la moneda seleccionada, verá una alerta en el panel.</value></data>
+  <data name="Bud_PlaceholderAmount" xml:space="preserve"><value>p. ej. 500000</value></data>
+  <data name="Bud_SaveBudget" xml:space="preserve"><value>Guardar presupuesto</value></data>
+  <data name="Bud_BackDashboard" xml:space="preserve"><value>Volver al panel</value></data>
+  <data name="Bud_CatBudgetsTitle" xml:space="preserve"><value>Presupuestos por categoría para {0}</value></data>
+  <data name="Bud_AddCatBudget" xml:space="preserve"><value>Añadir presupuesto de categoría</value></data>
+  <data name="Bud_CatBudgetHelp" xml:space="preserve"><value>Establezca límites opcionales por categoría. Recibirá alertas al alcanzarlos.</value></data>
+  <data name="Bud_ColSpentBudget" xml:space="preserve"><value>Gastado / Presupuesto</value></data>
+  <data name="Bud_Status" xml:space="preserve"><value>Estado</value></data>
+  <data name="Bud_OverLimit" xml:space="preserve"><value>Por encima</value></data>
+  <data name="Bud_NearLimit" xml:space="preserve"><value>Cerca del límite</value></data>
+  <data name="Bud_OnTrack" xml:space="preserve"><value>En camino</value></data>
+  <data name="Bud_RemoveConfirm" xml:space="preserve"><value>¿Quitar este presupuesto de categoría?</value></data>
+  <data name="Bud_RemoveAria" xml:space="preserve"><value>Quitar presupuesto de categoría</value></data>
+  <data name="Bud_NoCatBudgets" xml:space="preserve"><value>No hay presupuestos por categoría. Use el botón de arriba para añadir límites.</value></data>
+  <data name="Bud_OffcanvasPlaceholder" xml:space="preserve"><value>Pulse el botón para definir un límite por categoría.</value></data>
+  <data name="Bud_UnableLoadForm" xml:space="preserve"><value>No se pudo cargar el formulario.</value></data>
+  <data name="Bud_SaveCatBudget" xml:space="preserve"><value>Guardar presupuesto de categoría</value></data>
+  <data name="Bud_SelectCategory" xml:space="preserve"><value>-- Seleccionar categoría --</value></data>
+  <data name="Bud_CatAllSet" xml:space="preserve"><value>Todas sus categorías ya tienen presupuesto para {0}, o aún no tiene categorías.</value></data>
+  <data name="Bud_CatPlaceholder" xml:space="preserve"><value>p. ej. 100000</value></data>
+  <data name="Tx_PageTitle" xml:space="preserve"><value>Transacciones</value></data>
+  <data name="Tx_Subtitle" xml:space="preserve"><value>Todos los ingresos, gastos y transferencias entre cuentas.</value></data>
+  <data name="Tx_Add" xml:space="preserve"><value>Añadir transacción</value></data>
+  <data name="Tx_Transfer" xml:space="preserve"><value>Transferir</value></data>
+  <data name="Tx_OffcanvasTitle" xml:space="preserve"><value>Transacción</value></data>
+  <data name="Tx_EmptyPart1" xml:space="preserve"><value>Aún no hay transacciones. Pulse </value></data>
+  <data name="Tx_EmptyPart2" xml:space="preserve"><value> para empezar.</value></data>
+  <data name="Tx_AddStrong" xml:space="preserve"><value>Añadir transacción</value></data>
+  <data name="Tx_ColAccount" xml:space="preserve"><value>Cuenta</value></data>
+  <data name="Tx_ColType" xml:space="preserve"><value>Tipo</value></data>
+  <data name="Tx_ColNote" xml:space="preserve"><value>Nota</value></data>
+  <data name="Tx_BadgeTransfer" xml:space="preserve"><value>Transferencia</value></data>
+  <data name="Tx_DeleteConfirm" xml:space="preserve"><value>¿Eliminar esta transacción?</value></data>
+  <data name="Tx_FailedLoadForm" xml:space="preserve"><value>No se pudo cargar el formulario.</value></data>
+  <data name="Tx_Prev" xml:space="preserve"><value>‹ Ant.</value></data>
+  <data name="Tx_Next" xml:space="preserve"><value>Sig. ›</value></data>
+  <data name="Tx_PaginationAria" xml:space="preserve"><value>Paginación de transacciones</value></data>
+  <data name="Tx_TypeIncome" xml:space="preserve"><value>Ingreso</value></data>
+  <data name="Tx_TypeExpense" xml:space="preserve"><value>Gasto</value></data>
+  <data name="Tx_SelectAccount" xml:space="preserve"><value>— Seleccionar cuenta —</value></data>
+  <data name="Tx_SaveTransaction" xml:space="preserve"><value>Guardar transacción</value></data>
+  <data name="Tx_Recurring" xml:space="preserve"><value>Transacción recurrente</value></data>
+  <data name="Tx_CategoryOptional" xml:space="preserve"><value>(opcional — ingreso o gasto)</value></data>
+  <data name="Tx_CategoryFilterHint" xml:space="preserve"><value>Filtrado por tipo: Ingreso o Gasto.</value></data>
+  <data name="Tx_NotePlaceholder" xml:space="preserve"><value>p. ej. compra de comida</value></data>
+  <data name="Tx_TransferBlurb" xml:space="preserve"><value>Una transferencia crea dos transacciones vinculadas: cargo en origen y abono en destino.</value></data>
+  <data name="Tx_TransferNotePlaceholder" xml:space="preserve"><value>p. ej. transferencia de ahorro</value></data>
+  <data name="Tx_EditSummary" xml:space="preserve"><value>{0} en {1} ({2})</value></data>
+  <data name="Tx_None" xml:space="preserve"><value>— Ninguna —</value></data>
+  <data name="Notif_PageTitle" xml:space="preserve"><value>Notificaciones</value></data>
+  <data name="Notif_Subtitle" xml:space="preserve"><value>Alertas de presupuesto y actividad.</value></data>
+  <data name="Notif_Empty" xml:space="preserve"><value>Aún no hay notificaciones.</value></data>
+  <data name="Notif_GoDashboard" xml:space="preserve"><value>Ir al panel</value></data>
+  <data name="Notif_PageOf" xml:space="preserve"><value>Página {0} de {1} ({2} en total)</value></data>
+  <data name="Notif_Previous" xml:space="preserve"><value>Anterior</value></data>
+  <data name="Notif_Next" xml:space="preserve"><value>Siguiente</value></data>
+  <data name="Notif_DropdownTitle" xml:space="preserve"><value>Notificaciones</value></data>
+  <data name="Notif_MarkAllRead" xml:space="preserve"><value>Marcar todo leído</value></data>
+  <data name="Notif_MarkAllTitle" xml:space="preserve"><value>Marcar todo como leído</value></data>
+  <data name="Notif_ViewAll" xml:space="preserve"><value>Ver todo</value></data>
+  <data name="Notif_NoneDropdown" xml:space="preserve"><value>Sin notificaciones</value></data>
+  <data name="Notif_MarkOneTitle" xml:space="preserve"><value>Marcar como leído</value></data>
+  <data name="Inc_PageTitle" xml:space="preserve"><value>Ingresos</value></data>
+  <data name="Inc_Subtitle" xml:space="preserve"><value>Registre y gestione sus ingresos.</value></data>
+  <data name="Inc_Add" xml:space="preserve"><value>Añadir ingreso</value></data>
+  <data name="Inc_OffcanvasTitle" xml:space="preserve"><value>Ingreso</value></data>
+  <data name="Inc_EmptyPart1" xml:space="preserve"><value>Aún no hay ingresos. Pulse </value></data>
+  <data name="Inc_EmptyPart2" xml:space="preserve"><value> para empezar.</value></data>
+  <data name="Inc_AddStrong" xml:space="preserve"><value>Añadir ingreso</value></data>
+  <data name="Inc_ColDescSource" xml:space="preserve"><value>Descripción / Origen</value></data>
+  <data name="Inc_PaginationAria" xml:space="preserve"><value>Paginación de ingresos</value></data>
+  <data name="Inc_DeleteConfirm" xml:space="preserve"><value>¿Eliminar este ingreso?</value></data>
+  <data name="Inc_AccountOptional" xml:space="preserve"><value>(opcional — para el saldo)</value></data>
+  <data name="Inc_AccountOptionalShort" xml:space="preserve"><value>(opcional)</value></data>
+  <data name="Inc_AccountHelp" xml:space="preserve"><value>Deje "Ninguna" si no usa cuentas; el ingreso seguirá en listados e informes.</value></data>
+  <data name="Inc_IncomeCategory" xml:space="preserve"><value>Categoría de ingreso</value></data>
+  <data name="Inc_SourceHint" xml:space="preserve"><value>(p. ej. empleador, cliente)</value></data>
+  <data name="Inc_SupportingDoc" xml:space="preserve"><value>Documento de respaldo</value></data>
+  <data name="Inc_FileTypes" xml:space="preserve"><value>JPG, PNG, PDF, Word, Excel. Máx. 10 MB.</value></data>
+  <data name="Inc_AddIncomeBtn" xml:space="preserve"><value>Añadir ingreso</value></data>
+  <data name="Inc_Save" xml:space="preserve"><value>Guardar</value></data>
+  <data name="Lbl_Source" xml:space="preserve"><value>Origen</value></data>
+  <data name="Cat_PageTitle" xml:space="preserve"><value>Categorías</value></data>
+  <data name="Cat_Subtitle" xml:space="preserve"><value>Organice gastos e ingresos con categorías claras. Cada categoría es solo gastos, solo ingresos o ambas.</value></data>
+  <data name="Cat_AddNew" xml:space="preserve"><value>Añadir categoría</value></data>
+  <data name="Cat_FilterAria" xml:space="preserve"><value>Filtrar por tipo</value></data>
+  <data name="Cat_FilterAll" xml:space="preserve"><value>Todas</value></data>
+  <data name="Cat_FilterExpense" xml:space="preserve"><value>Solo gastos</value></data>
+  <data name="Cat_FilterIncome" xml:space="preserve"><value>Solo ingresos</value></data>
+  <data name="Cat_FilterBoth" xml:space="preserve"><value>Ambas</value></data>
+  <data name="Cat_OffcanvasTitle" xml:space="preserve"><value>Gestionar categoría</value></data>
+  <data name="Cat_OffcanvasAdd" xml:space="preserve"><value>Añadir categoría</value></data>
+  <data name="Cat_OffcanvasEdit" xml:space="preserve"><value>Editar categoría</value></data>
+  <data name="Cat_OffcanvasDelete" xml:space="preserve"><value>Eliminar categoría</value></data>
+  <data name="Cat_TableAria" xml:space="preserve"><value>Lista de categorías</value></data>
+  <data name="Cat_TableCaption" xml:space="preserve"><value>Lista de categorías con nombre, descripción y acciones</value></data>
+  <data name="Cat_ColName" xml:space="preserve"><value>Nombre</value></data>
+  <data name="Cat_ColUseFor" xml:space="preserve"><value>Uso</value></data>
+  <data name="Cat_ColDescription" xml:space="preserve"><value>Descripción</value></data>
+  <data name="Cat_ColActions" xml:space="preserve"><value>Acciones</value></data>
+  <data name="Cat_BadgeExpenseOnly" xml:space="preserve"><value>Solo gastos</value></data>
+  <data name="Cat_BadgeIncomeOnly" xml:space="preserve"><value>Solo ingresos</value></data>
+  <data name="Cat_BadgeBoth" xml:space="preserve"><value>Ambas</value></data>
+  <data name="Cat_DTSearchPlaceholder" xml:space="preserve"><value>Buscar categorías…</value></data>
+  <data name="Cat_DTInfo" xml:space="preserve"><value>_TOTAL_ registros</value></data>
+  <data name="Cat_DTInfoFiltered" xml:space="preserve"><value>(filtrado de _MAX_)</value></data>
+  <data name="Cat_DTLengthMenu" xml:space="preserve"><value>Mostrar _MENU_ filas</value></data>
+  <data name="Cat_NameLabel" xml:space="preserve"><value>Nombre de la categoría</value></data>
+  <data name="Cat_PlaceholderName" xml:space="preserve"><value>p. ej. Supermercado</value></data>
+  <data name="Cat_UseForLabel" xml:space="preserve"><value>Uso</value></data>
+  <data name="Cat_UseForHelpCreate" xml:space="preserve"><value>Solo gastos — al añadir gastos. Solo ingresos — al añadir ingresos. Ambas — en ambos formularios (p. ej. transferencia).</value></data>
+  <data name="Cat_UseForHelpEdit" xml:space="preserve"><value>Solo gastos — al añadir gastos. Solo ingresos — al añadir ingresos. Ambas — en ambos formularios.</value></data>
+  <data name="Cat_SelectIcon" xml:space="preserve"><value>Elegir icono</value></data>
+  <data name="Cat_BadgeColor" xml:space="preserve"><value>Color de la insignia</value></data>
+  <data name="Cat_BadgeColorHelp" xml:space="preserve"><value>Elija un color para la insignia de la categoría</value></data>
+  <data name="Cat_HexColorAria" xml:space="preserve"><value>Color hexadecimal</value></data>
+  <data name="Cat_DescPlaceholder" xml:space="preserve"><value>Añada una breve descripción...</value></data>
+  <data name="Cat_SaveCategory" xml:space="preserve"><value>Guardar categoría</value></data>
+  <data name="Cat_DeleteTitle" xml:space="preserve"><value>Eliminar categoría</value></data>
+  <data name="Cat_DeleteBody" xml:space="preserve"><value>¿Seguro que desea eliminar permanentemente la categoría "{0}"? Esta acción no se puede deshacer.</value></data>
+  <data name="Cat_ViewExpensesTitle" xml:space="preserve"><value>Ver gastos</value></data>
+  <data name="Cat_ViewExpensesAria" xml:space="preserve"><value>Ver gastos de esta categoría</value></data>
+  <data name="Cat_ViewIncomeTitle" xml:space="preserve"><value>Ver ingresos</value></data>
+  <data name="Cat_ViewIncomeAria" xml:space="preserve"><value>Ver ingresos</value></data>
+  <data name="Cat_EditAria" xml:space="preserve"><value>Editar categoría</value></data>
+  <data name="Cat_DeleteAria" xml:space="preserve"><value>Eliminar categoría</value></data>
+  <data name="Acc_PageTitle" xml:space="preserve"><value>Cuentas</value></data>
+  <data name="Acc_Subtitle" xml:space="preserve"><value>Gestione cuentas bancarias, efectivo e inversiones.</value></data>
+  <data name="Acc_Add" xml:space="preserve"><value>Añadir cuenta</value></data>
+  <data name="Acc_OffcanvasTitle" xml:space="preserve"><value>Cuenta</value></data>
+  <data name="Acc_EmptyPart1" xml:space="preserve"><value>Aún no hay cuentas. Pulse </value></data>
+  <data name="Acc_EmptyPart2" xml:space="preserve"><value> para empezar.</value></data>
+  <data name="Acc_AddStrong" xml:space="preserve"><value>Añadir cuenta</value></data>
+  <data name="Acc_Edit" xml:space="preserve"><value>Editar</value></data>
+  <data name="Acc_Deactivate" xml:space="preserve"><value>Desactivar</value></data>
+  <data name="Acc_DeactivateConfirm" xml:space="preserve"><value>¿Desactivar {0}?</value></data>
+  <data name="Acc_InactiveSummary" xml:space="preserve"><value>Cuentas inactivas ({0})</value></data>
+  <data name="Acc_InactiveBadge" xml:space="preserve"><value>Inactiva</value></data>
+  <data name="Acc_FailedLoadForm" xml:space="preserve"><value>No se pudo cargar el formulario.</value></data>
+  <data name="Acc_LblAccountName" xml:space="preserve"><value>Nombre de la cuenta</value></data>
+  <data name="Acc_LblAccountType" xml:space="preserve"><value>Tipo de cuenta</value></data>
+  <data name="Acc_PlaceholderName" xml:space="preserve"><value>p. ej. Ahorros CRDB</value></data>
+  <data name="Acc_LblInitialBalance" xml:space="preserve"><value>Saldo inicial</value></data>
+  <data name="Acc_DescPlaceholder" xml:space="preserve"><value>Nota breve sobre esta cuenta</value></data>
+  <data name="Acc_CreateAccount" xml:space="preserve"><value>Crear cuenta</value></data>
+  <data name="Acc_BalanceLabel" xml:space="preserve"><value>Saldo:</value></data>
+  <data name="Acc_ManageProfile" xml:space="preserve"><value>Gestionar su perfil</value></data>
+  <data name="Acc_Type_Checking" xml:space="preserve"><value>Cuenta corriente</value></data>
+  <data name="Acc_Type_Savings" xml:space="preserve"><value>Ahorros</value></data>
+  <data name="Acc_Type_CreditCard" xml:space="preserve"><value>Tarjeta de crédito</value></data>
+  <data name="Acc_Type_Cash" xml:space="preserve"><value>Efectivo</value></data>
+  <data name="Acc_Type_Investment" xml:space="preserve"><value>Inversión</value></data>
+  <data name="Acc_PlaceholderInitialBalance" xml:space="preserve"><value>0,00</value></data>
+  <data name="Priv_Title" xml:space="preserve"><value>Política de privacidad</value></data>
+  <data name="Priv_BadgeUpdated" xml:space="preserve"><value>Última actualización: 1 de marzo de 2026</value></data>
+  <data name="Priv_HeroLead" xml:space="preserve"><value>Creemos que sus datos financieros son suyos. Esta política explica qué recopilamos, cómo lo usamos y los controles que tiene.</value></data>
+  <data name="Priv_TocContents" xml:space="preserve"><value>Contenido</value></data>
+  <data name="Priv_TocNavAria" xml:space="preserve"><value>Secciones de la política</value></data>
+  <data name="Priv_Toc01" xml:space="preserve"><value>Resumen</value></data>
+  <data name="Priv_Toc02" xml:space="preserve"><value>Información que recopilamos</value></data>
+  <data name="Priv_Toc03" xml:space="preserve"><value>Cómo usamos sus datos</value></data>
+  <data name="Priv_Toc04" xml:space="preserve"><value>Almacenamiento y seguridad</value></data>
+  <data name="Priv_Toc05" xml:space="preserve"><value>Conservación de datos</value></data>
+  <data name="Priv_Toc06" xml:space="preserve"><value>Sus derechos</value></data>
+  <data name="Priv_Toc07" xml:space="preserve"><value>Servicios de terceros</value></data>
+  <data name="Priv_Toc08" xml:space="preserve"><value>Cookies</value></data>
+  <data name="Priv_Toc09" xml:space="preserve"><value>Cambios en la política</value></data>
+  <data name="Priv_Toc10" xml:space="preserve"><value>Contacto</value></data>
+  <data name="Priv_S1_H2" xml:space="preserve"><value>01 Resumen</value></data>
+  <data name="Priv_S1_P1" xml:space="preserve"><value>FinanceApp es una aplicación de finanzas personales. Nos comprometemos a proteger su privacidad y tratar sus datos con cuidado y transparencia. Esta política se aplica a todos los usuarios y describe cómo recopilamos, usamos y protegemos su información.</value></data>
+  <data name="Priv_S1_P2" xml:space="preserve"><value>Al usar FinanceApp acepta estas prácticas. Si no está de acuerdo, deje de usar la aplicación.</value></data>
+  <data name="Priv_S1_Highlight" xml:space="preserve"><value>En breve: Solo recopilamos lo necesario. No vendemos sus datos. Usted controla sus datos.</value></data>
+  <data name="Priv_S2_H2" xml:space="preserve"><value>02 Información que recopilamos</value></data>
+  <data name="Priv_S2_P1" xml:space="preserve"><value>Recopilamos la información mínima necesaria para el servicio:</value></data>
+  <data name="Priv_S2_AccountHdr" xml:space="preserve"><value>Información de cuenta</value></data>
+  <data name="Priv_S2_FinancialHdr" xml:space="preserve"><value>Datos financieros que introduce</value></data>
+  <data name="Priv_S2_TechHdr" xml:space="preserve"><value>Datos técnicos</value></data>
+  <data name="Priv_S3_H2" xml:space="preserve"><value>03 Cómo usamos sus datos</value></data>
+  <data name="Priv_S3_P1" xml:space="preserve"><value>Sus datos se usan exclusivamente para operar y mejorar FinanceApp:</value></data>
+  <data name="Priv_S3_P2" xml:space="preserve"><value>No usamos sus datos financieros para publicidad, perfiles ni venta a terceros.</value></data>
+  <data name="Priv_S4_H2" xml:space="preserve"><value>04 Almacenamiento y seguridad</value></data>
+  <data name="Priv_S4_P1" xml:space="preserve"><value>La seguridad es importante y aplicamos varias capas de protección:</value></data>
+  <data name="Priv_S5_H2" xml:space="preserve"><value>05 Conservación de datos</value></data>
+  <data name="Priv_S5_P1" xml:space="preserve"><value>Los datos se conservan mientras su cuenta esté activa. Al eliminar su cuenta:</value></data>
+  <data name="Priv_S5_P2" xml:space="preserve"><value>Puede solicitar la eliminación de registros concretos en cualquier momento desde la aplicación.</value></data>
+  <data name="Priv_S6_H2" xml:space="preserve"><value>06 Sus derechos y controles</value></data>
+  <data name="Priv_S6_P1" xml:space="preserve"><value>Tiene control total sobre sus datos en FinanceApp:</value></data>
+  <data name="Priv_S6_P2" xml:space="preserve"><value>Si necesita ayuda, contáctenos según la sección 10.</value></data>
+  <data name="Priv_S7_H2" xml:space="preserve"><value>07 Servicios de terceros</value></data>
+  <data name="Priv_S7_P1" xml:space="preserve"><value>FinanceApp carga recursos externos para la interfaz:</value></data>
+  <data name="Priv_S7_P2" xml:space="preserve"><value>Estos servicios solo reciben su IP y cabeceras HTTP. No se envían datos financieros. No usamos analítica ni publicidad.</value></data>
+  <data name="Priv_S8_H2" xml:space="preserve"><value>08 Cookies</value></data>
+  <data name="Priv_S8_P1" xml:space="preserve"><value>FinanceApp usa un conjunto mínimo de cookies estrictamente necesarias:</value></data>
+  <data name="Priv_S8_P2" xml:space="preserve"><value>No usamos cookies de publicidad ni seguimiento.</value></data>
+  <data name="Priv_TableCookie" xml:space="preserve"><value>Cookie</value></data>
+  <data name="Priv_TablePurpose" xml:space="preserve"><value>Finalidad</value></data>
+  <data name="Priv_TableDuration" xml:space="preserve"><value>Duración</value></data>
+  <data name="Priv_S9_H2" xml:space="preserve"><value>09 Cambios en esta política</value></data>
+  <data name="Priv_S9_P1" xml:space="preserve"><value>Podemos actualizar esta política ocasionalmente:</value></data>
+  <data name="Priv_S9_P2" xml:space="preserve"><value>El uso continuado tras un cambio implica aceptación. Revise esta página periódicamente.</value></data>
+  <data name="Priv_S10_H2" xml:space="preserve"><value>10 Contacto</value></data>
+  <data name="Priv_S10_P1" xml:space="preserve"><value>¿Preguntas, dudas o solicitud de datos? Estamos para ayudar.</value></data>
+  <data name="Priv_S10_P2" xml:space="preserve"><value>Intentamos responder en un plazo de 5 días laborables.</value></data>
+  <data name="Priv_S2_A1" xml:space="preserve"><value>Nombre, correo y contraseña (hash seguro — nunca en texto plano)</value></data>
+  <data name="Priv_S2_A2" xml:space="preserve"><value>Foto de perfil opcional</value></data>
+  <data name="Priv_S2_A3" xml:space="preserve"><value>Plan de suscripción y fecha de asignación</value></data>
+  <data name="Priv_S2_F1" xml:space="preserve"><value>Gastos: descripción, importe, moneda, fecha, categoría</value></data>
+  <data name="Priv_S2_F2" xml:space="preserve"><value>Cuentas: nombre, tipo, moneda, saldo</value></data>
+  <data name="Priv_S2_F3" xml:space="preserve"><value>Transacciones: tipo, importe, fecha, categoría, notas</value></data>
+  <data name="Priv_S2_F4" xml:space="preserve"><value>Presupuestos y configuración de categorías</value></data>
+  <data name="Priv_S2_F5" xml:space="preserve"><value>Documentos y recibos que adjuntas</value></data>
+  <data name="Priv_S2_T1" xml:space="preserve"><value>Tokens de autenticación e identificadores de sesión</value></data>
+  <data name="Priv_S2_T2" xml:space="preserve"><value>Tokens anti-falsificación</value></data>
+  <data name="Priv_S3_L1" xml:space="preserve"><value>Autenticarle y mantener una sesión segura</value></data>
+  <data name="Priv_S3_L2" xml:space="preserve"><value>Mostrar registros, resúmenes y presupuestos</value></data>
+  <data name="Priv_S3_L3" xml:space="preserve"><value>Generar exportaciones Excel bajo demanda</value></data>
+  <data name="Priv_S3_L4" xml:space="preserve"><value>Servirle archivos y recibos subidos</value></data>
+  <data name="Priv_S3_L5" xml:space="preserve"><value>Enviar correos de seguridad (p. ej. restablecimiento de contraseña)</value></data>
+  <data name="Priv_S3_L6" xml:space="preserve"><value>Mejorar el rendimiento y corregir errores</value></data>
+  <data name="Priv_S4_L1" xml:space="preserve"><value>Contraseñas con hash (PBKDF2) según Identity</value></data>
+  <data name="Priv_S4_L2" xml:space="preserve"><value>Autenticación con cookies seguras y validación anti-CSRF</value></data>
+  <data name="Priv_S4_L3" xml:space="preserve"><value>Base de datos aislada por despliegue</value></data>
+  <data name="Priv_S4_L4" xml:space="preserve"><value>Archivos en servidor solo para el propietario autenticado</value></data>
+  <data name="Priv_S4_L5" xml:space="preserve"><value>HTTPS obligatorio en producción</value></data>
+  <data name="Priv_S4_L6" xml:space="preserve"><value>Borrados lógicos: los registros se marcan como eliminados</value></data>
+  <data name="Priv_S5_L1" xml:space="preserve"><value>Se eliminan todos los registros financieros asociados</value></data>
+  <data name="Priv_S5_L2" xml:space="preserve"><value>Se borran archivos y recibos del servidor</value></data>
+  <data name="Priv_S5_L3" xml:space="preserve"><value>Se purgan credenciales del almacén de identidad</value></data>
+  <data name="Priv_S6_L1" xml:space="preserve"><value>Acceso — ver todos sus registros y documentos</value></data>
+  <data name="Priv_S6_L2" xml:space="preserve"><value>Corrección — editar mediante las funciones de edición</value></data>
+  <data name="Priv_S6_L3" xml:space="preserve"><value>Eliminación — borrar registros, documentos o toda la cuenta</value></data>
+  <data name="Priv_S6_L4" xml:space="preserve"><value>Exportación — descargar gastos en Excel desde la página de Gastos</value></data>
+  <data name="Priv_S6_L5" xml:space="preserve"><value>Perfil — actualizar nombre, correo y foto</value></data>
+  <data name="Priv_S7_L1" xml:space="preserve"><value>Google Fonts — puede registrar la petición de fuentes</value></data>
+  <data name="Priv_S7_L2" xml:space="preserve"><value>Bootstrap Icons CDN (jsDelivr) — iconos</value></data>
+  <data name="Priv_S7_L3" xml:space="preserve"><value>DataTables CDN — tablas</value></data>
+  <data name="Priv_S9_L1" xml:space="preserve"><value>Se actualizará la fecha "Última actualización"</value></data>
+  <data name="Priv_S9_L2" xml:space="preserve"><value>Los cambios importantes se comunicarán en la aplicación</value></data>
+  <data name="Priv_Cookie_R1C2" xml:space="preserve"><value>Mantiene su sesión autenticada</value></data>
+  <data name="Priv_Cookie_R1C3" xml:space="preserve"><value>Sesión / caducidad deslizante</value></data>
+  <data name="Priv_Cookie_R2C2" xml:space="preserve"><value>Previene ataques CSRF</value></data>
+  <data name="Priv_Cookie_R2C3" xml:space="preserve"><value>Sesión</value></data>
+  <data name="Priv_Cookie_R3C1" xml:space="preserve"><value>(almacenamiento local)</value></data>
+  <data name="Priv_Cookie_R3C2" xml:space="preserve"><value>Recuerda el modo claro/oscuro</value></data>
+  <data name="Priv_Cookie_R3C3" xml:space="preserve"><value>Persistente (almacenamiento local)</value></data>
+  <data name="Rpt_PageTitle" xml:space="preserve"><value>Informe mensual</value></data>
+  <data name="Rpt_Subtitle" xml:space="preserve"><value>Resumen de gastos y presupuesto para un mes. Compártelo o descárgalo como quieras.</value></data>
+  <data name="Rpt_Month" xml:space="preserve"><value>Mes</value></data>
+  <data name="Rpt_Year" xml:space="preserve"><value>Año</value></data>
+  <data name="Rpt_ShowReport" xml:space="preserve"><value>Ver informe</value></data>
+  <data name="Rpt_DownloadHtml" xml:space="preserve"><value>Descargar como HTML</value></data>
+  <data name="Rpt_GetShareLink" xml:space="preserve"><value>Obtener enlace para compartir</value></data>
+  <data name="Rpt_ShareCreatedStrong" xml:space="preserve"><value>Enlace para compartir creado.</value></data>
+  <data name="Rpt_ShareCreatedDetail" xml:space="preserve"><value>Caduca el {0}. Copia el enlace de abajo para compartir tu informe.</value></data>
+  <data name="Rpt_Copy" xml:space="preserve"><value>Copiar</value></data>
+  <data name="Rpt_Copied" xml:space="preserve"><value>¡Copiado!</value></data>
+  <data name="Rpt_TotalSpent" xml:space="preserve"><value>Total gastado</value></data>
+  <data name="Rpt_TotalIncome" xml:space="preserve"><value>Total ingresos</value></data>
+  <data name="Rpt_NetCashFlow" xml:space="preserve"><value>Flujo neto</value></data>
+  <data name="Rpt_MonthlyBudget" xml:space="preserve"><value>Presupuesto mensual</value></data>
+  <data name="Rpt_BudgetExceededBy" xml:space="preserve"><value>Superado por {0} {1}</value></data>
+  <data name="Rpt_BudgetLeftShort" xml:space="preserve"><value>Quedan: {0} {1}</value></data>
+  <data name="Rpt_ByCategory" xml:space="preserve"><value>Por categoría</value></data>
+  <data name="Rpt_ColSpent" xml:space="preserve"><value>Gastado</value></data>
+  <data name="Rpt_ColBudget" xml:space="preserve"><value>Presupuesto</value></data>
+  <data name="Rpt_ColLeft" xml:space="preserve"><value>Restante</value></data>
+  <data name="Rpt_TopExpenses" xml:space="preserve"><value>Principales gastos</value></data>
+  <data name="Rpt_ExpenseFallback" xml:space="preserve"><value>Gasto</value></data>
+  <data name="Rpt_Over" xml:space="preserve"><value>Por encima</value></data>
+  <data name="Rpt_EmptyMonth" xml:space="preserve"><value>No hay gastos registrados este mes.</value></data>
+  <data name="Rpt_Dash" xml:space="preserve"><value>—</value></data>
+  <data name="Rpt_DocTitle" xml:space="preserve"><value>Informe mensual - {0} - FinanceApp</value></data>
+  <data name="Rpt_GeneratedLine" xml:space="preserve"><value>Informe mensual FinanceApp — generado {0}</value></data>
+  <data name="Rpt_HtmlSaveHint" xml:space="preserve"><value>FinanceApp — informe mensual. Puedes guardar esta página (Archivo → Guardar como) para conservar una copia.</value></data>
+</root>

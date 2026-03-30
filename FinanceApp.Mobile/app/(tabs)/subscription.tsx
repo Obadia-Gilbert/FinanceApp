@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Platform } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import { useTheme } from '../../src/context/ThemeContext';
 import { Card } from '../../src/components/Card';
@@ -8,11 +8,11 @@ import { getSubscription } from '../../src/api/subscription';
 
 const FREE_FEATURES = ['Basic expense tracking', 'Budget management', 'Monthly reports', 'Up to 3 accounts'];
 const PRO_FEATURES = ['Unlimited Budgets', 'AI-Powered Insights', 'Receipt Scanning (OCR)', 'CSV & PDF Export', 'Custom Categories', 'Priority Support'];
-const ENTERPRISE_FEATURES = ['All Pro Features', 'Multi-user Access', 'API Integration', 'Dedicated Support', 'Custom Branding'];
+const PREMIUM_FEATURES = ['All Pro Features', 'Multi-user Access', 'API Integration', 'Dedicated Support', 'Custom Branding'];
 const FAQ_ITEMS = [
-  { q: 'What happens to my data if I cancel?', a: 'Your data remains available for export. We retain it for 30 days after cancellation.' },
-  { q: 'Can I switch plans anytime?', a: 'Yes. You can upgrade or downgrade your plan at any time from the web app or contact support.' },
-  { q: 'Do you offer annual billing?', a: 'Annual billing is available with a 20% discount. Check the web app for details.' },
+  { q: 'What happens to my data if I cancel?', a: 'Your data remains available. Subscription is billed by Apple or Google; cancellation follows their rules.' },
+  { q: 'How do I subscribe?', a: 'Use In-App Purchase on this device (App Store on iOS, Google Play on Android). The backend verifies your receipt before unlocking Pro or Premium.' },
+  { q: 'Can I use the website to pay?', a: 'Paid digital subscriptions use the mobile stores. The website may offer admin tools only.' },
 ];
 
 export default function SubscriptionScreen() {
@@ -25,6 +25,18 @@ export default function SubscriptionScreen() {
   });
 
   const currentPlan = sub?.currentPlan ?? 'Free';
+  const billing = sub?.billingSource ?? 'None';
+  const expires = sub?.subscriptionExpiresAtUtc
+    ? new Date(sub.subscriptionExpiresAtUtc).toLocaleString()
+    : null;
+
+  const onSubscribePress = () => {
+    Alert.alert(
+      'Subscribe',
+      'Wire StoreKit / Play Billing in the app (e.g. react-native-iap with an Expo dev build), then call verifyApplePurchase / verifyGooglePurchase with the signed transaction or purchase token.',
+      [{ text: 'OK' }]
+    );
+  };
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.bg.alt }]} contentContainerStyle={styles.content}>
@@ -37,6 +49,10 @@ export default function SubscriptionScreen() {
           <View>
             <Text style={[styles.currentLabel, { color: colors.text.primary }]}>Current Plan</Text>
             <Text style={[styles.currentPlan, { color: colors.brand }]}>{currentPlan}</Text>
+            <Text style={[styles.billingMeta, { color: colors.text.muted }]}>
+              Billing: {billing}
+              {expires ? ` · Renews/ends: ${expires}` : ''}
+            </Text>
           </View>
         </View>
       </Card>
@@ -81,7 +97,11 @@ export default function SubscriptionScreen() {
         <Text style={[styles.planDesc, { color: colors.text.muted }]}>
           AI insights and advanced tracking for power users.
         </Text>
-        <Button title="Upgrade to Pro" style={styles.upgradeBtn} onPress={() => {}} />
+        <Button
+          title={Platform.OS === 'ios' ? 'Subscribe with App Store' : 'Subscribe with Google Play'}
+          style={styles.upgradeBtn}
+          onPress={onSubscribePress}
+        />
         <View style={styles.featureList}>
           {PRO_FEATURES.map((f, i) => (
             <View key={i} style={styles.featureRow}>
@@ -92,21 +112,21 @@ export default function SubscriptionScreen() {
         </View>
       </Card>
 
-      {/* Enterprise card */}
+      {/* Premium card */}
       <Card style={styles.planCard}>
-        <Text style={[styles.planName, { color: colors.text.primary }]}>Enterprise</Text>
+        <Text style={[styles.planName, { color: colors.text.primary }]}>Premium</Text>
         <View style={styles.priceRow}>
           <Text style={[styles.price, { color: colors.text.primary }]}>$24.99</Text>
           <Text style={[styles.pricePeriod, { color: colors.text.muted }]}>/ month</Text>
         </View>
         <Text style={[styles.planDesc, { color: colors.text.muted }]}>
-          For teams and complex portfolio management.
+          Top tier with future advanced automation (same store checkout as Pro).
         </Text>
         <TouchableOpacity style={[styles.contactBtn, { backgroundColor: colors.bg.hover, borderColor: colors.border }]}>
           <Text style={[styles.contactBtnText, { color: colors.text.primary }]}>Contact Sales</Text>
         </TouchableOpacity>
         <View style={styles.featureList}>
-          {ENTERPRISE_FEATURES.map((f, i) => (
+          {PREMIUM_FEATURES.map((f, i) => (
             <View key={i} style={styles.featureRow}>
               <Text style={[styles.check, { color: colors.brand }]}>✓</Text>
               <Text style={[styles.featureText, { color: colors.text.body }]}>{f}</Text>
@@ -149,6 +169,7 @@ const styles = StyleSheet.create({
   currentIconWrap: { width: 44, height: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
   currentLabel: { fontSize: 13, fontWeight: '500' },
   currentPlan: { fontSize: 20, fontWeight: '700' },
+  billingMeta: { fontSize: 12, marginTop: 4 },
   chooseTitle: { fontSize: 20, fontWeight: '700', marginBottom: 16 },
   planCard: { marginBottom: 20, padding: 20, position: 'relative', overflow: 'visible' },
   mostPopular: { position: 'absolute', top: -12, right: 16, paddingHorizontal: 12, paddingVertical: 5, borderRadius: 8 },

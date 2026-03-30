@@ -45,6 +45,15 @@
                 </div>
                 <div class="col-md-8">
                     <div class="mb-3">
+                        <label asp-for="PreferredLanguage" class="form-label fw-600">@L["Lang_Language"]</label>
+                        <select asp-for="PreferredLanguage" class="form-select">
+                            <option value="en">@L["Lang_English"]</option>
+                            <option value="sw">@L["Lang_Swahili"]</option>
+                            <option value="es">@L["Lang_Spanish"]</option>
+                        </select>
+                        <span asp-validation-for="PreferredLanguage" class="invalid-feedback d-block small"></span>
+                    </div>
+                    <div class="mb-3">
                         <label asp-for="Email" class="form-label fw-600">Email</label>
                         <input asp-for="Email" class="form-control" readonly disabled />
                         <small class="text-muted">Email cannot be changed here.</small>

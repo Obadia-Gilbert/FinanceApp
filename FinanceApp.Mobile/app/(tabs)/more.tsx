@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../src/context/ThemeContext';
 import { useAuth } from '../../src/context/AuthContext';
 import { Card } from '../../src/components/Card';
@@ -45,15 +46,16 @@ function MenuSection({
 }
 
 export default function MoreScreen() {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const { signOut } = useAuth();
   const router = useRouter();
 
   const handleSignOut = () => {
-    Alert.alert('Sign out', 'Are you sure you want to sign out?', [
-      { text: 'Cancel', style: 'cancel' },
+    Alert.alert(t('more.signOutConfirmTitle'), t('more.signOutConfirmMessage'), [
+      { text: t('more.cancel'), style: 'cancel' },
       {
-        text: 'Sign out',
+        text: t('more.signOut'),
         style: 'destructive',
         onPress: async () => {
           await signOut();
@@ -64,20 +66,20 @@ export default function MoreScreen() {
   };
 
   const features: MenuItem[] = [
-    { label: 'Income', href: '/(tabs)/income', icon: '📥', iconBg: `${colors.success}15` },
-    { label: 'Accounts', href: '/(tabs)/accounts', icon: '🏦', iconBg: `${colors.brand}15` },
-    { label: 'Transactions', href: '/(tabs)/transactions', icon: '↔', iconBg: `${colors.info}15` },
-    { label: 'Recurring', href: '/(tabs)/recurring', icon: '🔄', iconBg: `${colors.warning}15` },
-    { label: 'Categories', href: '/(tabs)/categories', icon: '🏷', iconBg: `${colors.brand}15` },
-    { label: 'Monthly Report', href: '/(tabs)/reports', icon: '📊', iconBg: `${colors.success}15` },
-    { label: 'Notifications', href: '/(tabs)/notifications', icon: '🔔', iconBg: `${colors.danger}15` },
-    { label: 'Subscription', href: '/(tabs)/subscription', icon: '⭐', iconBg: `${colors.warning}15` },
+    { label: t('more.income'), href: '/(tabs)/income', icon: '📥', iconBg: `${colors.success}15` },
+    { label: t('more.accounts'), href: '/(tabs)/accounts', icon: '🏦', iconBg: `${colors.brand}15` },
+    { label: t('more.transactions'), href: '/(tabs)/transactions', icon: '↔', iconBg: `${colors.info}15` },
+    { label: t('more.recurring'), href: '/(tabs)/recurring', icon: '🔄', iconBg: `${colors.warning}15` },
+    { label: t('more.categories'), href: '/(tabs)/categories', icon: '🏷', iconBg: `${colors.brand}15` },
+    { label: t('more.monthlyReport'), href: '/(tabs)/reports', icon: '📊', iconBg: `${colors.success}15` },
+    { label: t('more.notifications'), href: '/(tabs)/notifications', icon: '🔔', iconBg: `${colors.danger}15` },
+    { label: t('more.subscription'), href: '/(tabs)/subscription', icon: '⭐', iconBg: `${colors.warning}15` },
   ];
 
   const general: MenuItem[] = [
-    { label: 'Profile', href: '/(tabs)/profile', icon: '👤', iconBg: `${colors.brand}15` },
-    { label: 'Feedback', href: '/(tabs)/feedback', icon: '💬', iconBg: `${colors.info}15` },
-    { label: 'Privacy Policy', href: '/(tabs)/privacy', icon: '🔒', iconBg: `${colors.text.subtle}20` },
+    { label: t('more.profile'), href: '/(tabs)/profile', icon: '👤', iconBg: `${colors.brand}15` },
+    { label: t('more.feedback'), href: '/(tabs)/feedback', icon: '💬', iconBg: `${colors.info}15` },
+    { label: t('more.privacyPolicy'), href: '/(tabs)/privacy', icon: '🔒', iconBg: `${colors.text.subtle}20` },
   ];
 
   return (
@@ -85,8 +87,8 @@ export default function MoreScreen() {
       style={[styles.container, { backgroundColor: colors.bg.alt }]}
       contentContainerStyle={[styles.content, { paddingTop: 16, paddingBottom: 40 }]}
     >
-      <MenuSection title="FEATURES" items={features} colors={colors} onPress={(href) => router.push(href as any)} />
-      <MenuSection title="GENERAL" items={general} colors={colors} onPress={(href) => router.push(href as any)} />
+      <MenuSection title={t('more.features')} items={features} colors={colors} onPress={(href) => router.push(href as any)} />
+      <MenuSection title={t('more.general')} items={general} colors={colors} onPress={(href) => router.push(href as any)} />
 
       <TouchableOpacity
         style={[styles.signOut, { borderColor: colors.danger }]}
@@ -94,7 +96,7 @@ export default function MoreScreen() {
         activeOpacity={0.7}
       >
         <Text style={{ fontSize: 18, marginRight: 8 }}>🚪</Text>
-        <Text style={[styles.signOutText, { color: colors.danger }]}>Sign out</Text>
+        <Text style={[styles.signOutText, { color: colors.danger }]}>{t('more.signOut')}</Text>
       </TouchableOpacity>
     </ScrollView>
   );

@@ -2,7 +2,7 @@
 
 Goal: improve production safety, architecture boundaries, UI consistency, and feature depth with clear day-by-day execution.
 
-**Handoff:** Resume from [WHERE_WE_LEFT_OFF.md](./WHERE_WE_LEFT_OFF.md). Mobile app is next; production checklist runs after mobile is done.
+**Handoff:** Start from [WHERE_WE_LEFT_OFF.md](./WHERE_WE_LEFT_OFF.md) (ordered next steps). The **Expo** app is in-repo; this roadmap covers **security/stability** work and **production** prep alongside mobile polish. Daily execution: [ROADMAP_KANBAN.md](./ROADMAP_KANBAN.md).
 
 ---
 
@@ -20,7 +20,7 @@ Goal: improve production safety, architecture boundaries, UI consistency, and fe
 
 **Commands**
 ```bash
-dotnet user-secrets --project "/Users/obadiagilbert/PROJECTS/FinanceApp/FinanceApp.Web/FinanceApp.Web.csproj" list
+dotnet user-secrets --project FinanceApp.Web/FinanceApp.Web.csproj list
 ```
 
 **Done when**
@@ -40,8 +40,8 @@ dotnet user-secrets --project "/Users/obadiagilbert/PROJECTS/FinanceApp/FinanceA
 
 **Commands**
 ```bash
-dotnet clean "/Users/obadiagilbert/PROJECTS/FinanceApp/FinanceApp.slnx"
-rm -rf "/Users/obadiagilbert/PROJECTS/FinanceApp/FinanceApp.Web/bin" "/Users/obadiagilbert/PROJECTS/FinanceApp/FinanceApp.Web/obj"
+dotnet clean FinanceApp.slnx
+rm -rf FinanceApp.Web/bin FinanceApp.Web/obj
 ```
 
 **Done when**
@@ -63,7 +63,7 @@ rm -rf "/Users/obadiagilbert/PROJECTS/FinanceApp/FinanceApp.Web/bin" "/Users/oba
 
 **Commands**
 ```bash
-dotnet build "/Users/obadiagilbert/PROJECTS/FinanceApp/FinanceApp.Web/FinanceApp.Web.csproj"
+dotnet build FinanceApp.Web/FinanceApp.Web.csproj
 ```
 
 **Done when**
@@ -99,7 +99,7 @@ dotnet build "/Users/obadiagilbert/PROJECTS/FinanceApp/FinanceApp.Web/FinanceApp
 
 **Commands**
 ```bash
-dotnet test "/Users/obadiagilbert/PROJECTS/FinanceApp/FinanceApp.slnx"
+dotnet test FinanceApp.slnx
 ```
 
 **Done when**
@@ -255,11 +255,11 @@ dotnet test "/Users/obadiagilbert/PROJECTS/FinanceApp/FinanceApp.slnx"
 
 - [ ] Run build:
   ```bash
-  dotnet build "/Users/obadiagilbert/PROJECTS/FinanceApp/FinanceApp.Web/FinanceApp.Web.csproj"
+  dotnet build FinanceApp.Web/FinanceApp.Web.csproj
   ```
 - [ ] Run tests (from Day 5 onward):
   ```bash
-  dotnet test "/Users/obadiagilbert/PROJECTS/FinanceApp/FinanceApp.slnx"
+  dotnet test FinanceApp.slnx
   ```
 - [ ] Manually test changed flows in browser.
 - [ ] Verify `git status` does not include secrets/local files.

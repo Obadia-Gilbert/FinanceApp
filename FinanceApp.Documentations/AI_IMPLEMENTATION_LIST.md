@@ -181,4 +181,4 @@ A prioritized, actionable list of AI capabilities to add to FinanceApp. Use this
 
 ---
 
-*Last updated: March 2025. Update status and checkboxes as items are implemented.*
+*Last updated: March 2026. Refresh the footer date and checkboxes when AI scope or implementation status changes.*

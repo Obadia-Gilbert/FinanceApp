@@ -18,7 +18,10 @@
       "bundleIdentifier": "com.financeapp.mobile",
       "infoPlist": {
         "NSCameraUsageDescription": "FinanceApp needs camera access to take photos of receipts and supporting documents for expenses and income.",
-        "NSPhotoLibraryUsageDescription": "FinanceApp needs photo library access to attach receipts and supporting documents for expenses and income."
+        "NSPhotoLibraryUsageDescription": "FinanceApp needs photo library access to attach receipts and supporting documents for expenses and income.",
+        "NSAppTransportSecurity": {
+          "NSAllowsLocalNetworking": true
+        }
       }
     },
     "android": {
