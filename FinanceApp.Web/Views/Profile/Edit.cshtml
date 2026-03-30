@@ -102,7 +102,8 @@
         var phoneInput = document.getElementById('profilePhoneNumber');
         if (!countrySelect || !phoneInput) return;
         var lib = window.libphonenumber;
-        if (!lib) return;
+        // Important: do NOT hard-return if the CDN failed to expose libphonenumber-js.
+        // We still want to insert "+<dialingCode>" using our fallback map.
 
         function getCountry() {
             var code = (countrySelect.value || '').trim().toUpperCase();
@@ -114,15 +115,52 @@
             if (typeof lib.getCountryCallingCode === 'function') {
                 try { return lib.getCountryCallingCode(country) || null; } catch (e) { return null; }
             }
+
+            // Reliable fallback for our supported profile country list.
+            // (CDN globals can vary; this guarantees prefix insertion.)
+            var FALLBACK_CALLING_CODES = {
+                TZ: '255',
+                UG: '256',
+                KE: '254',
+                RW: '250',
+                US: '1',
+                GB: '44',
+                CA: '1',
+                AU: '61',
+                DE: '49',
+                FR: '33',
+                IN: '91',
+                ZA: '27',
+                NG: '234',
+                GH: '233',
+                ET: '251',
+                CN: '86',
+                JP: '81',
+                BR: '55',
+                MX: '52',
+                NL: '31',
+                CH: '41',
+                AE: '971',
+                SA: '966',
+                EG: '20',
+                ZW: '263',
+                ZM: '260',
+                MW: '265',
+                MZ: '258',
+                BW: '267',
+                NA: '264',
+            };
+
             // Fallback: derive calling code by parsing a dummy value in the selected region.
             // This keeps behavior working even if the CDN global doesn't expose getCountryCallingCode.
             try {
                 var formatter = new lib.AsYouType(country);
                 formatter.input('0');
                 var num = formatter.getNumber();
-                return num && num.countryCallingCode ? String(num.countryCallingCode) : null;
+                var derived = num && num.countryCallingCode ? String(num.countryCallingCode) : null;
+                return derived || FALLBACK_CALLING_CODES[country] || null;
             } catch (e2) {
-                return null;
+                return FALLBACK_CALLING_CODES[country] || null;
             }
         }
 
