@@ -39,6 +39,11 @@
     "version": "FinanceApp v1.0.0",
     "validationFirstName": "Jina la kwanza lazima liwe angalau herufi 2",
     "validationLastName": "Jina la mwisho lazima liwe angalau herufi 2",
+    "country": "Nchi",
+    "selectCountry": "— Chagua nchi —",
+    "phoneNumber": "Namba ya simu",
+    "phonePlaceholder": "Mfano: +255 712 345 678",
+    "phonePrefixHint": "Kiambishi hutokana na nchi. Andika tarakimu zilizobaki.",
     "updateFailed": "Imeshindwa kusasisha wasifu"
   }
 }

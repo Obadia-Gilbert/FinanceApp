@@ -39,6 +39,11 @@
     "version": "FinanceApp v1.0.0",
     "validationFirstName": "El nombre debe tener al menos 2 caracteres",
     "validationLastName": "Los apellidos deben tener al menos 2 caracteres",
+    "country": "País",
+    "selectCountry": "— Selecciona país —",
+    "phoneNumber": "Número de teléfono",
+    "phonePlaceholder": "Ej. +255 712 345 678",
+    "phonePrefixHint": "El prefijo se deriva del país. Escribe los dígitos restantes.",
     "updateFailed": "No se pudo actualizar el perfil"
   }
 }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
+  Modal,
   View,
   Text,
   StyleSheet,
@@ -8,6 +9,7 @@ import {
   Switch,
   Alert,
   Image,
+  TextInput,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -20,6 +22,8 @@ import { Button } from '../../src/components/Button';
 import { getProfile, updateProfile } from '../../src/api/profile';
 import { ApiError } from '../../src/api/client';
 import { normalizeAppLanguage, setAppLanguage, type AppLanguage } from '../../src/i18n/i18n';
+import { AsYouType, getCountryCallingCode } from 'libphonenumber-js';
+import { COUNTRY_OPTIONS, type CountryOption } from '../../src/utils/countryList';
 
 export default function ProfileScreen() {
   const { t, i18n: i18nInstance } = useTranslation();
@@ -30,6 +34,11 @@ export default function ProfileScreen() {
   const [editing, setEditing] = useState(false);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [countryCode, setCountryCode] = useState<string>('');
+  const [phoneDisplay, setPhoneDisplay] = useState<string>('');
+  const [phoneNationalDigits, setPhoneNationalDigits] = useState<string>('');
+  const [phoneSelection, setPhoneSelection] = useState<{ start: number; end: number }>({ start: 0, end: 0 });
+  const [countryPickerOpen, setCountryPickerOpen] = useState(false);
   const [error, setError] = useState('');
 
   const { data: profile } = useQuery({
@@ -43,6 +52,25 @@ export default function ProfileScreen() {
       setLastName(profile.lastName ?? '');
     }
   }, [profile]);
+
+  useEffect(() => {
+    if (!profile) return;
+    // Only sync these fields from the server when not actively editing.
+    if (editing) return;
+
+    const nextCountry = profile.countryCode ?? '';
+    setCountryCode(nextCountry);
+
+    const nextRawPhone = profile.phoneNumber ?? '';
+    const digitsOnly = nextRawPhone.replace(/\D/g, '');
+    const callingCode = getCallingCodeSafe(nextCountry);
+    const nationalDigits = callingCode ? stripCallingCode(digitsOnly, callingCode) : digitsOnly;
+
+    setPhoneNationalDigits(nationalDigits);
+    const formatted = formatPhonePretty(nextCountry, nationalDigits);
+    setPhoneDisplay(formatted);
+    setPhoneSelection({ start: formatted.length, end: formatted.length });
+  }, [profile, editing]);
 
   useEffect(() => {
     if (!profile?.preferredLanguage) return;
@@ -73,7 +101,78 @@ export default function ProfileScreen() {
       setError(t('profile.validationLastName'));
       return;
     }
-    updateMutation.mutate({ firstName: firstName.trim(), lastName: lastName.trim() });
+    const payload: Parameters<typeof updateProfile>[0] = {
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      countryCode: countryCode ? countryCode : null,
+      phoneNumber: phoneNationalDigits ? phoneDisplay.trim() : null,
+    };
+
+    updateMutation.mutate(payload);
+  };
+
+  function getCallingCodeSafe(countryIso: string): string | null {
+    if (!countryIso) return null;
+    try {
+      return String(getCountryCallingCode(countryIso as any));
+    } catch {
+      return null;
+    }
+  }
+
+  function stripCallingCode(digitsOnly: string, callingCode: string): string {
+    if (!digitsOnly) return '';
+    if (digitsOnly.startsWith(callingCode)) return digitsOnly.slice(callingCode.length);
+    return digitsOnly;
+  }
+
+  function formatPhonePretty(countryIso: string, nationalDigits: string): string {
+    const callingCode = getCallingCodeSafe(countryIso);
+    if (!callingCode) return nationalDigits || '';
+
+    const prefix = `+${callingCode}`;
+    if (!nationalDigits) return `${prefix} `;
+
+    try {
+      const formatter = new AsYouType(countryIso as any);
+      formatter.input(nationalDigits);
+      const num = formatter.getNumber();
+      return num ? num.formatInternational() : `${prefix} ${nationalDigits}`;
+    } catch {
+      return `${prefix} ${nationalDigits}`;
+    }
+  }
+
+  function getCountryName(code: string): string {
+    return COUNTRY_OPTIONS.find((c) => c.code === code)?.name ?? '';
+  }
+
+  const handleCountrySelected = (next: CountryOption) => {
+    const nextCode = next.code;
+    setCountryCode(nextCode);
+
+    const digitsOnly = (phoneDisplay || '').replace(/\D/g, '');
+    const callingCode = getCallingCodeSafe(nextCode);
+    const nationalDigits = callingCode ? stripCallingCode(digitsOnly, callingCode) : digitsOnly;
+
+    setPhoneNationalDigits(nationalDigits);
+    const formatted = formatPhonePretty(nextCode, nationalDigits);
+    setPhoneDisplay(formatted);
+    setPhoneSelection({ start: formatted.length, end: formatted.length });
+    setCountryPickerOpen(false);
+  };
+
+  const handlePhoneChange = (text: string) => {
+    const selected = countryCode;
+    const digitsOnly = (text || '').replace(/\D/g, '');
+
+    const callingCode = getCallingCodeSafe(selected);
+    const nationalDigits = callingCode ? stripCallingCode(digitsOnly, callingCode) : digitsOnly;
+
+    setPhoneNationalDigits(nationalDigits);
+    const formatted = selected ? formatPhonePretty(selected, nationalDigits) : digitsOnly;
+    setPhoneDisplay(formatted);
+    setPhoneSelection({ start: formatted.length, end: formatted.length });
   };
 
   const pickLanguage = (code: AppLanguage) => {
@@ -156,6 +255,77 @@ export default function ProfileScreen() {
         <Card style={styles.editCard}>
           <Input label={t('profile.firstName')} value={firstName} onChangeText={setFirstName} placeholder={t('profile.firstName')} />
           <Input label={t('profile.lastName')} value={lastName} onChangeText={setLastName} placeholder={t('profile.lastName')} />
+
+          {/* Country selector + pretty international phone */}
+          <TouchableOpacity
+            onPress={() => setCountryPickerOpen(true)}
+            style={[
+              styles.selectLike,
+              {
+                backgroundColor: colors.bg.default,
+                borderColor: colors.border,
+              },
+            ]}
+          >
+            <Text style={[styles.selectLabel, { color: colors.text.body }]}>{t('profile.country')}</Text>
+            <Text style={[styles.selectValue, { color: colors.text.primary }]}>
+              {countryCode ? getCountryName(countryCode) : t('profile.selectCountry')}
+            </Text>
+          </TouchableOpacity>
+
+          <Text style={[styles.label, { color: colors.text.body }]}>{t('profile.phoneNumber')}</Text>
+          <TextInput
+            value={phoneDisplay}
+            onChangeText={handlePhoneChange}
+            placeholder={t('profile.phonePlaceholder')}
+            placeholderTextColor={colors.text.subtle}
+            keyboardType="phone-pad"
+            autoCapitalize="none"
+            autoCorrect={false}
+            selection={phoneSelection}
+            style={[
+              styles.phoneInput,
+              {
+                backgroundColor: colors.bg.default,
+                borderColor: colors.border,
+                color: colors.text.primary,
+              },
+            ]}
+          />
+          <Text style={[styles.hint, { color: colors.text.subtle }]}>{t('profile.phonePrefixHint')}</Text>
+
+          <Modal visible={countryPickerOpen} transparent animationType="fade" onRequestClose={() => setCountryPickerOpen(false)}>
+            <TouchableOpacity style={styles.modalBackdrop} activeOpacity={1} onPress={() => setCountryPickerOpen(false)}>
+              <View style={[styles.countryModal, { backgroundColor: colors.bg.card, borderColor: colors.border }]}>
+                <Text style={[styles.countryModalTitle, { color: colors.text.primary }]}>{t('profile.selectCountry')}</Text>
+                <ScrollView style={styles.countryScroll}>
+                  {COUNTRY_OPTIONS.map((c) => (
+                    <TouchableOpacity
+                      key={c.code || 'none'}
+                      onPress={() => handleCountrySelected(c)}
+                      style={[
+                        styles.countryItem,
+                        {
+                          borderBottomColor: colors.border,
+                          backgroundColor: c.code === countryCode ? `${colors.brand}15` : 'transparent',
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={{
+                          color: c.code === countryCode ? colors.brand : colors.text.primary,
+                          fontWeight: c.code === countryCode ? '700' : '500',
+                        }}
+                      >
+                        {c.name}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            </TouchableOpacity>
+          </Modal>
+
           {error ? (
             <View style={[styles.errorCard, { backgroundColor: `${colors.danger}10` }]}>
               <Text style={[styles.err, { color: colors.danger }]}>{error}</Text>
@@ -267,6 +437,21 @@ const styles = StyleSheet.create({
   editBtns: { flexDirection: 'row', gap: 12, marginTop: 8 },
   editBtn: { flex: 1 },
   err: { fontSize: 14 },
+
+  // Profile phone formatting UI
+  selectLike: { borderWidth: 1, borderRadius: 12, paddingVertical: 12, paddingHorizontal: 14, marginBottom: 16 },
+  selectLabel: { fontSize: 14, fontWeight: '500', marginBottom: 6 },
+  selectValue: { fontSize: 16, fontWeight: '600' },
+  label: { fontSize: 14, fontWeight: '500', marginTop: 6, marginBottom: 6 },
+  phoneInput: { borderWidth: 1, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: 16, borderColor: '#E5E7EB' },
+  hint: { fontSize: 12, marginTop: 6 },
+
+  modalBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.35)', justifyContent: 'center', alignItems: 'center', padding: 16 },
+  countryModal: { width: '100%', maxHeight: 520, borderRadius: 14, borderWidth: 1, overflow: 'hidden' },
+  countryModalTitle: { fontSize: 16, fontWeight: '700', paddingHorizontal: 16, paddingVertical: 12 },
+  countryScroll: { maxHeight: 460 },
+  countryItem: { paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1 },
+
   sectionLabel: { fontSize: 12, fontWeight: '600', letterSpacing: 0.5, marginBottom: 8, marginLeft: 4 },
   menuCard: { marginBottom: 20, padding: 0, overflow: 'hidden' },
   menuRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 16, borderBottomWidth: 1 },
