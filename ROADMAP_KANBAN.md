@@ -2,7 +2,7 @@
 
 Use this board for daily execution tracking. Move items from **Backlog** to **This Week**, then to **Done**.
 
-**Handoff:** See [WHERE_WE_LEFT_OFF.md](./WHERE_WE_LEFT_OFF.md) for current state and next steps (mobile app → production).
+**Handoff:** [WHERE_WE_LEFT_OFF.md](./WHERE_WE_LEFT_OFF.md) — current state and ordered next steps (mobile v1 polish → production). **Current-State:** [FinanceApp.Documentations/Current-State.md](./FinanceApp.Documentations/Current-State.md).
 
 ---
 
@@ -64,6 +64,7 @@ Use this board for daily execution tracking. Move items from **Backlog** to **Th
 
 ## Done
 
+- [x] **Language switching (i18n)** — baseline: `FinanceApp.Localization` (en + es, sw), Web `UseRequestLocalization` + `IStringLocalizer`, API culture from `Accept-Language` / profile, Mobile i18next + `Accept-Language`. Details: [README.md](./README.md) (Localization), [LANGUAGE_SWITCHING_TODO.md](./FinanceApp.Documentations/LANGUAGE_SWITCHING_TODO.md).
 - [x] Added Google/Facebook/Twitter provider wiring in `Program.cs`.
 - [x] Added provider config placeholders to `appsettings.Example.json`.
 - [x] Styled branded social provider buttons (light/dark mode).
@@ -77,8 +78,9 @@ Use this board for daily execution tracking. Move items from **Backlog** to **Th
 ## Daily Commands
 
 ```bash
-dotnet build "/Users/obadiagilbert/PROJECTS/FinanceApp/FinanceApp.Web/FinanceApp.Web.csproj"
-dotnet test "/Users/obadiagilbert/PROJECTS/FinanceApp/FinanceApp.slnx"
+# From repository root:
+dotnet build FinanceApp.Web/FinanceApp.Web.csproj
+dotnet test FinanceApp.slnx
 ```
 
 ---

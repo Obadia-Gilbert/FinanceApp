@@ -1,8 +1,11 @@
 using FinanceApp.Infrastructure.Identity;
+using FinanceApp.Localization;
 using FinanceApp.Web.Helpers;
 using FinanceApp.Web.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -32,7 +35,8 @@ public class ProfileController : Controller
             Country = user.Country,
             CountryCode = user.CountryCode,
             CurrentProfileImagePath = user.ProfileImagePath,
-            Email = user.Email
+            Email = user.Email,
+            PreferredLanguage = SupportedLanguages.Normalize(user.PreferredLanguage)
         };
         ViewBag.Countries = new SelectList(
             CountryList.All.Select(c => new SelectListItem { Value = c.Code, Text = c.Name }),
@@ -56,6 +60,7 @@ public class ProfileController : Controller
             user.PhoneNumber = string.IsNullOrWhiteSpace(model.PhoneNumber) ? null : model.PhoneNumber?.Trim();
             user.CountryCode = string.IsNullOrWhiteSpace(model.CountryCode) ? null : model.CountryCode?.Trim();
             user.Country = CountryList.GetNameByCode(user.CountryCode) ?? model.Country?.Trim();
+            user.PreferredLanguage = SupportedLanguages.Normalize(model.PreferredLanguage);
 
             if (model.ProfileImage != null && model.ProfileImage.Length > 0)
             {
@@ -76,6 +81,7 @@ public class ProfileController : Controller
             var result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
             {
+                AppendCultureCookie(user.PreferredLanguage);
                 TempData["ProfileUpdated"] = true;
                 return RedirectToAction(nameof(Edit));
             }
@@ -94,5 +100,20 @@ public class ProfileController : Controller
             "Text",
             model.CountryCode);
         return View(model);
+    }
+
+    private void AppendCultureCookie(string culture)
+    {
+        culture = SupportedLanguages.Normalize(culture);
+        Response.Cookies.Append(
+            CookieRequestCultureProvider.DefaultCookieName,
+            CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
+            new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddYears(1),
+                IsEssential = true,
+                Path = "/",
+                SameSite = SameSiteMode.Lax
+            });
     }
 }

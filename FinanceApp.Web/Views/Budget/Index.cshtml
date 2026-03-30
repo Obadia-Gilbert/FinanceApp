@@ -1,6 +1,7 @@
 @model FinanceApp.Web.Models.BudgetViewModel
+@using System.Text.Json
 @{
-    ViewData["Title"] = "Monthly Budget";
+    ViewData["Title"] = L["Bud_PageTitle"].Value;
     var monthName = ViewBag.MonthName as string ?? new DateTime(Model.Year, Model.Month, 1).ToString("MMMM yyyy");
     var saved = TempData["BudgetSaved"] as bool? == true;
     var categoryBudgetSaved = TempData["CategoryBudgetSaved"] as bool? == true;
@@ -8,42 +9,46 @@
     var categoryBudgetError = TempData["CategoryBudgetError"] as string;
     var categoryBudgets = ViewBag.CategoryBudgets as IEnumerable<FinanceApp.Web.Models.CategoryBudgetItemViewModel> ?? Enumerable.Empty<FinanceApp.Web.Models.CategoryBudgetItemViewModel>();
     var exceededCategories = ViewBag.CategoryBudgetExceeded as IEnumerable<string> ?? Enumerable.Empty<string>();
+    var jsBudAddTitle = JsonSerializer.Serialize(L["Bud_AddCatBudget"].Value);
+    var jsBudSaving = JsonSerializer.Serialize(L["Common_Saving"].Value);
+    var jsBudSaveCat = JsonSerializer.Serialize(L["Bud_SaveCatBudget"].Value);
+    var jsBudUnable = JsonSerializer.Serialize(L["Bud_UnableLoadForm"].Value);
 }
 
 <div class="container-fluid">
     <div class="row mb-4">
         <div class="col-12">
-            <h1 class="visually-hidden">Monthly Budget</h1>
-            <p class="page-subtitle mb-0">Set your spending limit for @monthName and stay on track.</p>
+            <h1 class="visually-hidden">@L["Bud_PageTitle"]</h1>
+            <p class="page-subtitle mb-0">@L["Bud_Subtitle", monthName]</p>
         </div>
     </div>
 
     @if (saved)
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle me-2"></i>Budget for @monthName has been saved.
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <i class="bi bi-check-circle me-2"></i>@L["Bud_SavedAlert", monthName]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="@L["Common_Close"]"></button>
         </div>
     }
     @if (categoryBudgetSaved)
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle me-2"></i>Category budget has been saved.
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <i class="bi bi-check-circle me-2"></i>@L["Bud_CatSaved"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="@L["Common_Close"]"></button>
         </div>
     }
     @if (categoryBudgetDeleted)
     {
         <div class="alert alert-info alert-dismissible fade show" role="alert">
-            <i class="bi bi-info-circle me-2"></i>Category budget has been removed.
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <i class="bi bi-info-circle me-2"></i>@L["Bud_CatRemoved"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="@L["Common_Close"]"></button>
         </div>
     }
     @if (!string.IsNullOrEmpty(categoryBudgetError))
     {
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
             <i class="bi bi-exclamation-triangle me-2"></i>@categoryBudgetError
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="@L["Common_Close"]"></button>
         </div>
     }
     @if (exceededCategories.Any())
@@ -51,8 +56,8 @@
         <div class="alert alert-danger d-flex align-items-start mb-3" role="alert">
             <i class="bi bi-exclamation-triangle-fill fs-5 me-3 mt-1"></i>
             <div class="flex-grow-1">
-                <strong>Category budget exceeded for @monthName</strong>
-                <p class="mb-0 mt-1">The following categories have exceeded their budget this month:</p>
+                <strong>@L["Bud_CatExceededTitle", monthName]</strong>
+                <p class="mb-0 mt-1">@L["Bud_CatExceededIntro"]</p>
                 <ul class="mb-0 mt-2">
                     @foreach (var cat in exceededCategories)
                     {
@@ -67,8 +72,8 @@
         <div class="col-lg-6">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Set budget for @monthName</h5>
-                    <p class="text-muted small">When your expenses reach this amount in the selected currency, you'll see an alert on the dashboard.</p>
+                    <h5 class="card-title">@L["Bud_SetBudgetCardTitle", monthName]</h5>
+                    <p class="text-muted small">@L["Bud_SetBudgetHelp"]</p>
 
                     <form asp-action="Set" method="post" class="mt-3">
                         <input type="hidden" asp-for="Month" />
@@ -76,13 +81,13 @@
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
 
                         <div class="mb-3">
-                            <label asp-for="Amount" class="form-label">Budget amount</label>
-                            <input asp-for="Amount" class="form-control" type="number" step="0.01" min="0.01" placeholder="e.g. 500000" />
+                            <label asp-for="Amount" class="form-label">@L["Lbl_BudgetAmount"]</label>
+                            <input asp-for="Amount" class="form-control" type="number" step="0.01" min="0.01" placeholder="@L["Bud_PlaceholderAmount"]" />
                             <span asp-validation-for="Amount" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Currency" class="form-label">Currency</label>
+                            <label asp-for="Currency" class="form-label">@L["Lbl_Currency"]</label>
                             <select asp-for="Currency" class="form-select">
                                 @foreach (var c in Enum.GetValues(typeof(FinanceApp.Domain.Enums.Currency)))
                                 {
@@ -91,8 +96,8 @@
                             </select>
                         </div>
 
-                        <button type="submit" class="btn btn-primary">Save budget</button>
-                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Back to Dashboard</a>
+                        <button type="submit" class="btn btn-primary">@L["Bud_SaveBudget"]</button>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">@L["Bud_BackDashboard"]</a>
                     </form>
                 </div>
             </div>
@@ -102,21 +107,21 @@
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="card-title mb-0">Category budgets for @monthName</h5>
+                        <h5 class="card-title mb-0">@L["Bud_CatBudgetsTitle", monthName]</h5>
                         <button type="button" id="btnAddCategoryBudget" class="btn btn-sm btn-primary">
-                            <i class="bi bi-plus-circle"></i> Add category budget
+                            <i class="bi bi-plus-circle"></i> @L["Bud_AddCatBudget"]
                         </button>
                     </div>
-                    <p class="text-muted small">Set optional spending limits per category. You'll see alerts when a category reaches its limit.</p>
+                    <p class="text-muted small">@L["Bud_CatBudgetHelp"]</p>
                     @if (categoryBudgets.Any())
                     {
                         <div class="table-responsive">
                             <table class="table table-sm table-hover mb-0">
                                 <thead>
                                     <tr>
-                                        <th>Category</th>
-                                        <th>Spent / Budget</th>
-                                        <th>Status</th>
+                                        <th>@L["Lbl_Category"]</th>
+                                        <th>@L["Bud_ColSpentBudget"]</th>
+                                        <th>@L["Bud_Status"]</th>
                                         <th style="width: 80px;"></th>
                                     </tr>
                                 </thead>
@@ -131,17 +136,17 @@
                                             <td>@cb.Spent.ToString("N0") / @cb.Amount.ToString("N0") @currency</td>
                                             <td>
                                                 @if (isOver)
-                                                { <span class="badge bg-danger">Over limit</span> }
+                                                { <span class="badge bg-danger">@L["Bud_OverLimit"]</span> }
                                                 else if (isWarning)
-                                                { <span class="badge bg-warning text-dark">Near limit</span> }
+                                                { <span class="badge bg-warning text-dark">@L["Bud_NearLimit"]</span> }
                                                 else
-                                                { <span class="badge bg-success">On track</span> }
+                                                { <span class="badge bg-success">@L["Bud_OnTrack"]</span> }
                                             </td>
                                             <td>
-                                                <form asp-action="DeleteCategoryBudget" method="post" class="d-inline" onsubmit="return confirm('Remove this category budget?');">
+                                                <form asp-action="DeleteCategoryBudget" method="post" class="d-inline" onsubmit="return confirm(@Html.Raw(JsonSerializer.Serialize(L["Bud_RemoveConfirm"].Value)));">
                                                     <input type="hidden" name="id" value="@cb.Id" />
                                                     @Html.AntiForgeryToken()
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove" aria-label="Remove category budget">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="@L["Common_Delete"]" aria-label="@L["Bud_RemoveAria"]">
                                                         <i class="bi bi-trash"></i>
                                                     </button>
                                                 </form>
@@ -154,7 +159,7 @@
                     }
                     else
                     {
-                        <p class="text-muted mb-0">No category budgets set. Click "Add category budget" to set limits for specific categories.</p>
+                        <p class="text-muted mb-0">@L["Bud_NoCatBudgets"]</p>
                     }
                 </div>
             </div>
@@ -165,11 +170,11 @@
 <!-- Offcanvas for add category budget -->
 <div class="offcanvas offcanvas-end" tabindex="-1" id="categoryBudgetOffcanvas" aria-labelledby="categoryBudgetOffcanvasLabel">
     <div class="offcanvas-header border-bottom">
-        <h5 class="offcanvas-title fw-600" id="categoryBudgetOffcanvasLabel">Add category budget</h5>
-        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        <h5 class="offcanvas-title fw-600" id="categoryBudgetOffcanvasLabel">@L["Bud_AddCatBudget"]</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="@L["Common_Close"]"></button>
     </div>
     <div class="offcanvas-body px-0" id="categoryBudgetOffcanvasContent">
-        <div class="p-3 text-center text-muted">Click "Add category budget" to set a limit for a category.</div>
+        <div class="p-3 text-center text-muted">@L["Bud_OffcanvasPlaceholder"]</div>
     </div>
 </div>
 
@@ -184,12 +189,12 @@
             if (!btn || !content) return;
 
             btn.addEventListener('click', async function() {
-                label.textContent = 'Add category budget';
-                content.innerHTML = '<div class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Loading…</div>';
+                label.textContent = @Html.Raw(jsBudAddTitle);
+                content.innerHTML = '<div class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>' + @Html.Raw(JsonSerializer.Serialize(L["Common_Loading"].Value)) + '</div>';
                 if (offcanvasEl) { var o = new bootstrap.Offcanvas(offcanvasEl); o.show(); }
                 var url = '@Url.Action("AddCategoryBudget", "Budget")?partial=true';
                 var res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-                if (!res.ok) { content.innerHTML = '<div class="p-3 text-danger">Unable to load form.</div>'; return; }
+                if (!res.ok) { content.innerHTML = '<div class="p-3 text-danger">' + @Html.Raw(jsBudUnable) + '</div>'; return; }
                 var html = await res.text();
                 content.innerHTML = html;
 
@@ -198,7 +203,7 @@
                     form.addEventListener('submit', async function(e) {
                         e.preventDefault();
                         var submitBtn = form.querySelector('button[type="submit"]');
-                        if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>Saving…'; }
+                        if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>' + @Html.Raw(jsBudSaving); }
                         var formData = new FormData(form);
                         var postRes = await fetch(form.action, {
                             method: 'POST',
@@ -211,7 +216,7 @@
                         }
                         var errHtml = await postRes.text();
                         content.innerHTML = errHtml;
-                        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = 'Save category budget'; }
+                        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = @Html.Raw(jsBudSaveCat); }
                     });
                 }
             });

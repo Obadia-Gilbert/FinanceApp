@@ -6,4 +6,6 @@ public class SubscriptionViewModel
 {
     public SubscriptionPlan CurrentPlan { get; set; }
     public DateTimeOffset SubscriptionAssignedAt { get; set; }
+    public DateTimeOffset? SubscriptionExpiresAtUtc { get; set; }
+    public SubscriptionBillingSource BillingSource { get; set; }
 }

@@ -5,20 +5,36 @@ using Microsoft.EntityFrameworkCore;
 using FinanceApp.Infrastructure.Identity;   
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.Twitter;
-using FinanceApp.Application.Interfaces.Services; // for IExpenseService
+using FinanceApp.Application.Interfaces.Services; // application service interfaces
 using FinanceApp.Application.Services;
-using FinanceApp.Infrastructure.Services;       // for ExpenseService
+using FinanceApp.Infrastructure.Services; // EmailService, UserService, SubscriptionEntitlementService
+using FinanceApp.Infrastructure.Subscription;
+using FinanceApp.Localization;
+using FinanceApp.Web.Infrastructure;
 using FinanceApp.Web.Services;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Configuration.Json;
 
 
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Shared billing + default LocalDB fallback — must load *first* so user secrets / env override ConnectionStrings.
+var sharedSettings = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, "..", "Shared", "appsettings.shared.json"));
+var sharedSource = new JsonConfigurationSource
+{
+    Path = sharedSettings,
+    Optional = true,
+    ReloadOnChange = true
+};
+sharedSource.ResolveFileProvider();
+builder.Configuration.Sources.Insert(0, sharedSource);
+
 // Add services to the container.
-builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<FinanceDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -47,6 +63,10 @@ builder.Services.AddScoped<IBudgetNotificationService, BudgetNotificationService
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 builder.Services.AddScoped<IExpenseQueryService, FinanceApp.Infrastructure.Services.ExpenseQueryService>();
 builder.Services.AddScoped<IMonthlyReportService, MonthlyReportService>();
+builder.Services.AddSingleton<SubscriptionProductMapper>();
+builder.Services.AddScoped<IAppleStoreTransactionVerifier, AppleStoreTransactionVerifier>();
+builder.Services.AddScoped<IGooglePlaySubscriptionVerifier, GooglePlaySubscriptionVerifier>();
+builder.Services.AddScoped<ISubscriptionEntitlementService, SubscriptionEntitlementService>();
 builder.Services.AddScoped<ISharedReportService, SharedReportService>();
 builder.Services.AddSingleton<ICurrencyConversionService, CurrencyConversionService>();
 //builder.Services.AddTransient<IEmailSender, IdentityEmailSender>();
@@ -77,6 +97,14 @@ if (!string.IsNullOrWhiteSpace(googleClientId) && !string.IsNullOrWhiteSpace(goo
     {
         options.ClientId = googleClientId;
         options.ClientSecret = googleClientSecret;
+        // Ensure email/name claims are available for Identity external login (avoids empty ClaimTypes.Email).
+        options.Scope.Add("openid");
+        options.Scope.Add("email");
+        options.Scope.Add("profile");
+        options.ClaimActions.MapJsonKey(System.Security.Claims.ClaimTypes.Email, "email");
+        options.ClaimActions.MapJsonKey(System.Security.Claims.ClaimTypes.Name, "name");
+        options.ClaimActions.MapJsonKey(System.Security.Claims.ClaimTypes.GivenName, "given_name");
+        options.ClaimActions.MapJsonKey(System.Security.Claims.ClaimTypes.Surname, "family_name");
         if (isDevelopment)
         {
             // Avoid OAuth correlation cookie issues during local HTTP testing.
@@ -128,6 +156,27 @@ builder.Services.Configure<EmailSettings>(
 builder.Services.AddTransient<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender, IdentityEmailSender>();
 builder.Services.AddRazorPages(); // For Identity UI
 
+builder.Services.AddLocalization();
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    options.SetDefaultCulture("en")
+        .AddSupportedCultures(SupportedLanguages.Codes)
+        .AddSupportedUICultures(SupportedLanguages.Codes);
+    options.RequestCultureProviders =
+    [
+        new CookieRequestCultureProvider(),
+        new UserLanguageRequestCultureProvider(),
+        new QueryStringRequestCultureProvider { QueryStringKey = "culture", UIQueryStringKey = "ui-culture" },
+        new AcceptLanguageHeaderRequestCultureProvider()
+    ];
+});
+builder.Services.AddControllersWithViews()
+    .AddViewLocalization(Microsoft.AspNetCore.Mvc.Razor.LanguageViewLocationExpanderFormat.Suffix)
+    .AddDataAnnotationsLocalization(o =>
+    {
+        o.DataAnnotationLocalizerProvider = (_, factory) => factory.Create(typeof(SharedResource));
+    });
+
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
@@ -151,6 +200,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseRequestLocalization();
 
 app.UseAuthentication(); // Add this before UseAuthorization
 app.UseAuthorization();

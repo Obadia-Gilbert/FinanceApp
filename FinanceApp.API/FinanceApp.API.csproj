@@ -15,6 +15,7 @@
     <ProjectReference Include="..\FinanceApp.Application\FinanceApp.Application.csproj" />
     <ProjectReference Include="..\FinanceApp.Domain\FinanceApp.Domain.csproj" />
     <ProjectReference Include="..\FinanceApp.Infrastructure\FinanceApp.Infrastructure.csproj" />
+    <ProjectReference Include="..\FinanceApp.Localization\FinanceApp.Localization.csproj" />
   </ItemGroup>
 
   <ItemGroup>

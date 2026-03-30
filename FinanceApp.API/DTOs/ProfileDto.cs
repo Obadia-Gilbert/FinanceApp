@@ -7,4 +7,5 @@ public record ProfileDto(
     string? PhoneNumber,
     string? Country,
     string? CountryCode,
-    string? ProfileImagePath);
+    string? ProfileImagePath,
+    string PreferredLanguage);

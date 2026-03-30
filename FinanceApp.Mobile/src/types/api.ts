@@ -140,6 +140,7 @@ export interface ProfileDto {
   country: string | null;
   countryCode: string | null;
   profileImagePath: string | null;
+  preferredLanguage: string;
 }
 
 export interface UpdateProfileRequest {
@@ -147,6 +148,7 @@ export interface UpdateProfileRequest {
   lastName?: string;
   phoneNumber?: string | null;
   countryCode?: string | null;
+  preferredLanguage?: string;
 }
 
 /** Income */
@@ -307,6 +309,8 @@ export interface MonthlyReportResult {
 export interface SubscriptionDto {
   currentPlan: string;
   subscriptionAssignedAt: string | null;
+  subscriptionExpiresAtUtc: string | null;
+  billingSource: string;
 }
 
 /** Recurring templates */

@@ -308,6 +308,35 @@ h1, h2, h3, h4, h5, h6 {
   --bs-table-bg-state: var(--color-bg-hover);
 }
 
+/* Monthly report — over-budget row (Bootstrap `table-danger` is fixed light pink; breaks dark theme) */
+/* Use primary text tokens + explicit --bs-table-color so Bootstrap table styles don’t hide copy */
+.table tbody tr.report-row-over-budget > * {
+  background-color: rgba(220, 53, 69, 0.1) !important;
+  --bs-table-color: var(--color-text-dark);
+  --bs-table-striped-color: var(--color-text-dark);
+  --bs-table-hover-color: var(--color-text-dark);
+  --bs-table-active-color: var(--color-text-dark);
+  color: var(--color-text-dark) !important;
+  font-weight: 500;
+}
+.table-hover > tbody > tr.report-row-over-budget:hover > * {
+  background-color: rgba(220, 53, 69, 0.16) !important;
+  --bs-table-color-state: var(--color-text-dark);
+  color: var(--color-text-dark) !important;
+}
+[data-theme="dark"] .table tbody tr.report-row-over-budget > * {
+  background-color: rgba(248, 113, 113, 0.14) !important;
+  --bs-table-color: var(--color-text-dark);
+  --bs-table-striped-color: var(--color-text-dark);
+  --bs-table-hover-color: var(--color-text-dark);
+  color: var(--color-text-dark) !important;
+}
+[data-theme="dark"] .table-hover > tbody > tr.report-row-over-budget:hover > * {
+  background-color: rgba(248, 113, 113, 0.22) !important;
+  --bs-table-color-state: var(--color-text-dark);
+  color: var(--color-text-dark) !important;
+}
+
 /* ============================================================
    FORM CONTROLS
    ============================================================ */
@@ -560,6 +589,21 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 }
 .navbar .dropdown-menu.dropdown-menu-end {
   right: 0 !important; left: auto !important;
+}
+
+/* Notification dropdown: same as profile — below navbar, right-aligned to bell */
+#notificationDropdownWrap .dropdown-notification .dropdown-menu {
+  margin-top: 0.25rem;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: auto;
+}
+#notificationDropdownWrap .dropdown-notification .dropdown-menu::before,
+#notificationDropdownWrap .dropdown-notification .dropdown-menu::after {
+  left: auto;
+  right: 0.75rem;
+  transform: translateX(0);
 }
 .navbar .dropdown-menu .dropdown-item {
   padding: 0.5rem 1rem;

@@ -83,7 +83,7 @@ Then still set `EXPO_PUBLIC_API_URL` to a URL the phone can reach (e.g. a deploy
 - **Accounts:** List, add, edit, deactivate; balance display.
 - **Transactions:** List; add income/expense; transfer between accounts.
 - **Budget:** View/set monthly budget; progress bar; over-budget alert.
-- **More:** Profile, Income, Accounts, Transactions, Categories, Monthly report, Notifications, Subscription, Privacy, Sign out.
+- **More:** Profile (incl. language / locale where exposed), Income, Accounts, Transactions, Categories, Monthly report, Notifications, Subscription, Privacy, Sign out.
 - **Notifications:** List, mark read, mark all read.
 - **Reports:** Monthly report (spent, income, net cash flow, by category, top expenses).
 - **Subscription:** View current plan.
@@ -94,7 +94,8 @@ Then still set `EXPO_PUBLIC_API_URL` to a URL the phone can reach (e.g. a deploy
 - **Expo** ~52, **React Native** 0.76
 - **Expo Router** (file-based routing: `app/`)
 - **TanStack Query** (server state)
-- **SecureStore** (tokens), **AsyncStorage** (theme preference)
+- **SecureStore** (tokens), **AsyncStorage** (theme preference, locale / i18n persistence)
+- **i18next** (translations); API requests include **`Accept-Language`**
 
 ## Project structure
 
@@ -105,6 +106,15 @@ Then still set `EXPO_PUBLIC_API_URL` to a URL the phone can reach (e.g. a deploy
 - `src/components/` — Card, Button, Input.
 
 ## Troubleshooting
+
+**HTTP 404 on `/api/...` (often many calls in a row)**
+
+The mobile app only talks to **FinanceApp.API**. On the default dev setup, **FinanceApp.Web** and the API **Mobile** profile both use port **5279**. If you start the **web** project on 5279, the simulator still reaches a server — but it is **MVC**, not the REST API, so paths like `/api/dashboard` return **404**.
+
+- Run the API: `dotnet run --project FinanceApp.API --launch-profile Mobile` (or use port **5022** with the default API profile and set `EXPO_PUBLIC_API_URL=http://127.0.0.1:5022`).
+- Do not run **FinanceApp.Web** on the same port you use for `EXPO_PUBLIC_API_URL` while testing the mobile app, unless you intentionally proxy API traffic elsewhere.
+
+**`EXPO_PUBLIC_API_URL` must not end with `/api`** — paths in code already start with `/api/...`. A base like `http://host:5279/api` produces `/api/api/...` and 404s.
 
 **"Unable to run simctl: xcrun simctl help exited with non-zero code: 72"**
 
@@ -127,3 +137,8 @@ To start without triggering the simulator check, you can run the dev server for 
 
 - **Income:** Use `GET/POST /api/income` (see API controllers).
 - **Accounts, Transactions, Recurring, Reports, Subscription, Notifications:** Add API modules and screens under `(tabs)` or nested stacks as needed.
+
+## Localization
+
+- **Implemented (baseline):** **i18next** + locale JSON (**en**, **es**, **sw** aligned with the backend); persisted language; **`Accept-Language`** on API calls. Expand translated strings or add UI entry points as needed.
+- See [LANGUAGE_SWITCHING_TODO.md](../FinanceApp.Documentations/LANGUAGE_SWITCHING_TODO.md) and root [README.md](../README.md) (Localization).

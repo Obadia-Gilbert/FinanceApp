@@ -32,4 +32,8 @@ public class ProfileEditViewModel
     public string? CurrentProfileImagePath { get; set; }
 
     public string? Email { get; set; }
+
+    [RegularExpression("^(en|sw|es)$")]
+    [Display(Name = "Language")]
+    public string PreferredLanguage { get; set; } = "en";
 }

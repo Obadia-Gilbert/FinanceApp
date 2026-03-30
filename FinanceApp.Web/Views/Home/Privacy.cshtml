@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Privacy Policy";
+    ViewData["Title"] = L["Priv_Title"].Value;
 }
 
 <style>
@@ -161,28 +161,28 @@
 <!-- Hero Header -->
 <div class="privacy-hero">
     <div class="badge-updated">
-        <i class="bi bi-calendar3"></i> Last updated: March 1, 2026
+        <i class="bi bi-calendar3"></i> @L["Priv_BadgeUpdated"]
     </div>
-    <h1>Privacy Policy</h1>
-    <p class="lead">We believe your financial data belongs to you. This policy explains clearly what we collect, how we use it, and the controls you have over it.</p>
+    <h1>@L["Priv_Title"]</h1>
+    <p class="lead">@L["Priv_HeroLead"]</p>
 </div>
 
 <div class="row g-4">
 
     <!-- Sticky TOC — desktop sidebar -->
     <div class="col-lg-3 d-none d-lg-block">
-        <nav class="privacy-toc" aria-label="Policy sections">
-            <p class="toc-title">Contents</p>
-            <a href="#s1"><span class="toc-num">01</span> Overview</a>
-            <a href="#s2"><span class="toc-num">02</span> Information We Collect</a>
-            <a href="#s3"><span class="toc-num">03</span> How We Use Your Data</a>
-            <a href="#s4"><span class="toc-num">04</span> Storage &amp; Security</a>
-            <a href="#s5"><span class="toc-num">05</span> Data Retention</a>
-            <a href="#s6"><span class="toc-num">06</span> Your Rights</a>
-            <a href="#s7"><span class="toc-num">07</span> Third-Party Services</a>
-            <a href="#s8"><span class="toc-num">08</span> Cookies</a>
-            <a href="#s9"><span class="toc-num">09</span> Policy Changes</a>
-            <a href="#s10"><span class="toc-num">10</span> Contact Us</a>
+        <nav class="privacy-toc" aria-label="@L["Priv_TocNavAria"]">
+            <p class="toc-title">@L["Priv_TocContents"]</p>
+            <a href="#s1"><span class="toc-num">01</span> @L["Priv_Toc01"]</a>
+            <a href="#s2"><span class="toc-num">02</span> @L["Priv_Toc02"]</a>
+            <a href="#s3"><span class="toc-num">03</span> @L["Priv_Toc03"]</a>
+            <a href="#s4"><span class="toc-num">04</span> @L["Priv_Toc04"]</a>
+            <a href="#s5"><span class="toc-num">05</span> @L["Priv_Toc05"]</a>
+            <a href="#s6"><span class="toc-num">06</span> @L["Priv_Toc06"]</a>
+            <a href="#s7"><span class="toc-num">07</span> @L["Priv_Toc07"]</a>
+            <a href="#s8"><span class="toc-num">08</span> @L["Priv_Toc08"]</a>
+            <a href="#s9"><span class="toc-num">09</span> @L["Priv_Toc09"]</a>
+            <a href="#s10"><span class="toc-num">10</span> @L["Priv_Toc10"]</a>
         </nav>
     </div>
 
@@ -194,13 +194,13 @@
             <div class="card-body">
                 <div class="section-header">
                     <span class="section-icon bg-primary bg-opacity-10 text-primary"><i class="bi bi-shield-check"></i></span>
-                    <h2>01 &nbsp;Overview</h2>
+                    <h2>@L["Priv_S1_H2"]</h2>
                 </div>
-                <p>FinanceApp is a personal finance management application. We are committed to protecting your privacy and handling your data with care, transparency, and respect. This policy applies to all users of FinanceApp and describes how we collect, use, and safeguard your information when you use our service.</p>
-                <p>By using FinanceApp you agree to the practices described in this policy. If you do not agree, please discontinue use of the application.</p>
+                <p>@L["Priv_S1_P1"]</p>
+                <p>@L["Priv_S1_P2"]</p>
                 <div class="privacy-highlight">
                     <i class="bi bi-info-circle me-2"></i>
-                    <strong>Short version:</strong> We collect only what we need to run the app. We never sell your data. You control your data.
+                    @L["Priv_S1_Highlight"]
                 </div>
             </div>
         </div>
@@ -210,27 +210,27 @@
             <div class="card-body">
                 <div class="section-header">
                     <span class="section-icon bg-info bg-opacity-10 text-info"><i class="bi bi-collection"></i></span>
-                    <h2>02 &nbsp;Information We Collect</h2>
+                    <h2>@L["Priv_S2_H2"]</h2>
                 </div>
-                <p>We collect the minimum information necessary to provide the service:</p>
-                <p class="fw-600 mb-1" style="font-size:.875rem;">Account information</p>
+                <p>@L["Priv_S2_P1"]</p>
+                <p class="fw-600 mb-1" style="font-size:.875rem;">@L["Priv_S2_AccountHdr"]</p>
                 <ul>
-                    <li>Name, email address, and password (stored as a secure hash — we never store plain-text passwords)</li>
-                    <li>Optional profile photo you upload</li>
-                    <li>Subscription plan and assignment date</li>
+                    <li>@L["Priv_S2_A1"]</li>
+                    <li>@L["Priv_S2_A2"]</li>
+                    <li>@L["Priv_S2_A3"]</li>
                 </ul>
-                <p class="fw-600 mb-1 mt-3" style="font-size:.875rem;">Financial data you enter</p>
+                <p class="fw-600 mb-1 mt-3" style="font-size:.875rem;">@L["Priv_S2_FinancialHdr"]</p>
                 <ul>
-                    <li>Expense records: description, amount, currency, date, category</li>
-                    <li>Account records: name, type, currency, balance</li>
-                    <li>Transaction records: type, amount, date, category, notes</li>
-                    <li>Budget settings and category configurations</li>
-                    <li>Supporting documents and receipt files you attach</li>
+                    <li>@L["Priv_S2_F1"]</li>
+                    <li>@L["Priv_S2_F2"]</li>
+                    <li>@L["Priv_S2_F3"]</li>
+                    <li>@L["Priv_S2_F4"]</li>
+                    <li>@L["Priv_S2_F5"]</li>
                 </ul>
-                <p class="fw-600 mb-1 mt-3" style="font-size:.875rem;">Technical data</p>
+                <p class="fw-600 mb-1 mt-3" style="font-size:.875rem;">@L["Priv_S2_TechHdr"]</p>
                 <ul>
-                    <li>Authentication tokens and session identifiers</li>
-                    <li>Anti-forgery tokens for security</li>
+                    <li>@L["Priv_S2_T1"]</li>
+                    <li>@L["Priv_S2_T2"]</li>
                 </ul>
             </div>
         </div>
@@ -240,18 +240,18 @@
             <div class="card-body">
                 <div class="section-header">
                     <span class="section-icon bg-warning bg-opacity-10 text-warning"><i class="bi bi-gear"></i></span>
-                    <h2>03 &nbsp;How We Use Your Data</h2>
+                    <h2>@L["Priv_S3_H2"]</h2>
                 </div>
-                <p>Your data is used exclusively to operate and improve FinanceApp. Specifically, we use it to:</p>
+                <p>@L["Priv_S3_P1"]</p>
                 <ul>
-                    <li>Authenticate you and maintain a secure session</li>
-                    <li>Display your financial records, summaries, and budgets</li>
-                    <li>Generate Excel exports of your data on demand</li>
-                    <li>Serve uploaded receipt and document files back to you</li>
-                    <li>Send security-related emails (e.g. password reset) when you request them</li>
-                    <li>Improve application performance and fix bugs</li>
+                    <li>@L["Priv_S3_L1"]</li>
+                    <li>@L["Priv_S3_L2"]</li>
+                    <li>@L["Priv_S3_L3"]</li>
+                    <li>@L["Priv_S3_L4"]</li>
+                    <li>@L["Priv_S3_L5"]</li>
+                    <li>@L["Priv_S3_L6"]</li>
                 </ul>
-                <p class="mt-2 mb-0"><strong>We do not</strong> use your financial data for advertising, profiling, or selling to third parties.</p>
+                <p class="mt-2 mb-0">@L["Priv_S3_P2"]</p>
             </div>
         </div>
 
@@ -260,16 +260,16 @@
             <div class="card-body">
                 <div class="section-header">
                     <span class="section-icon bg-success bg-opacity-10 text-success"><i class="bi bi-lock"></i></span>
-                    <h2>04 &nbsp;Storage &amp; Security</h2>
+                    <h2>@L["Priv_S4_H2"]</h2>
                 </div>
-                <p>We take security seriously and have implemented multiple layers of protection:</p>
+                <p>@L["Priv_S4_P1"]</p>
                 <ul>
-                    <li><strong>Passwords</strong> are hashed using ASP.NET Core Identity's industry-standard algorithm (PBKDF2 with HMAC-SHA256) — the original password is never stored</li>
-                    <li><strong>Authentication</strong> uses secure, HTTP-only session cookies with anti-forgery token validation on every state-changing request</li>
-                    <li><strong>Database</strong> is isolated per deployment — your data is not commingled with other users' data without access controls</li>
-                    <li><strong>Uploaded files</strong> are stored server-side and accessed only by the authenticated owner</li>
-                    <li><strong>HTTPS</strong> is enforced in production to encrypt all data in transit</li>
-                    <li><strong>Soft deletes</strong> are used — when you delete a record it is flagged as deleted and excluded from queries, providing a safety net against accidental loss</li>
+                    <li>@L["Priv_S4_L1"]</li>
+                    <li>@L["Priv_S4_L2"]</li>
+                    <li>@L["Priv_S4_L3"]</li>
+                    <li>@L["Priv_S4_L4"]</li>
+                    <li>@L["Priv_S4_L5"]</li>
+                    <li>@L["Priv_S4_L6"]</li>
                 </ul>
             </div>
         </div>
@@ -279,15 +279,15 @@
             <div class="card-body">
                 <div class="section-header">
                     <span class="section-icon bg-secondary bg-opacity-10 text-secondary"><i class="bi bi-clock-history"></i></span>
-                    <h2>05 &nbsp;Data Retention</h2>
+                    <h2>@L["Priv_S5_H2"]</h2>
                 </div>
-                <p>Your data is retained for as long as your account remains active. When you delete your account:</p>
+                <p>@L["Priv_S5_P1"]</p>
                 <ul>
-                    <li>All financial records associated with your account are permanently removed</li>
-                    <li>Uploaded files and receipts are deleted from the server</li>
-                    <li>Account credentials are purged from the identity store</li>
+                    <li>@L["Priv_S5_L1"]</li>
+                    <li>@L["Priv_S5_L2"]</li>
+                    <li>@L["Priv_S5_L3"]</li>
                 </ul>
-                <p>You can request deletion of specific records at any time from within the application using the delete actions on each record.</p>
+                <p>@L["Priv_S5_P2"]</p>
             </div>
         </div>
 
@@ -296,17 +296,17 @@
             <div class="card-body">
                 <div class="section-header">
                     <span class="section-icon bg-primary bg-opacity-10 text-primary"><i class="bi bi-person-check"></i></span>
-                    <h2>06 &nbsp;Your Rights &amp; Controls</h2>
+                    <h2>@L["Priv_S6_H2"]</h2>
                 </div>
-                <p>You have full control over your data within FinanceApp:</p>
+                <p>@L["Priv_S6_P1"]</p>
                 <ul>
-                    <li><strong>Access</strong> — view all your financial records, account details, and uploaded documents at any time</li>
-                    <li><strong>Correction</strong> — edit any record through the application's edit functions</li>
-                    <li><strong>Deletion</strong> — delete any record, document, or your entire account</li>
-                    <li><strong>Export</strong> — download your expense data as an Excel file at any time via the Export button on the Expenses page</li>
-                    <li><strong>Profile management</strong> — update your name, email, and profile photo from the Edit Profile page</li>
+                    <li>@L["Priv_S6_L1"]</li>
+                    <li>@L["Priv_S6_L2"]</li>
+                    <li>@L["Priv_S6_L3"]</li>
+                    <li>@L["Priv_S6_L4"]</li>
+                    <li>@L["Priv_S6_L5"]</li>
                 </ul>
-                <p class="mb-0">If you need assistance exercising any of these rights, please contact us using the information in Section 10.</p>
+                <p class="mb-0">@L["Priv_S6_P2"]</p>
             </div>
         </div>
 
@@ -315,15 +315,15 @@
             <div class="card-body">
                 <div class="section-header">
                     <span class="section-icon bg-warning bg-opacity-10 text-warning"><i class="bi bi-box-arrow-up-right"></i></span>
-                    <h2>07 &nbsp;Third-Party Services</h2>
+                    <h2>@L["Priv_S7_H2"]</h2>
                 </div>
-                <p>FinanceApp loads the following third-party resources to power the interface:</p>
+                <p>@L["Priv_S7_P1"]</p>
                 <ul>
-                    <li><strong>Google Fonts</strong> (fonts.googleapis.com) — loads the Inter typeface for display; Google may log the font request</li>
-                    <li><strong>Bootstrap Icons CDN</strong> (cdn.jsdelivr.net) — loads icon fonts; jsDelivr may log the asset request</li>
-                    <li><strong>DataTables CDN</strong> (cdn.jsdelivr.net) — loads table enhancement scripts</li>
+                    <li>@L["Priv_S7_L1"]</li>
+                    <li>@L["Priv_S7_L2"]</li>
+                    <li>@L["Priv_S7_L3"]</li>
                 </ul>
-                <p class="mb-0">These services receive only your IP address and browser headers as part of standard HTTP requests. No financial data is transmitted to any of these services. We do not use analytics tools, advertising networks, or any tracking pixels.</p>
+                <p class="mb-0">@L["Priv_S7_P2"]</p>
             </div>
         </div>
 
@@ -332,38 +332,38 @@
             <div class="card-body">
                 <div class="section-header">
                     <span class="section-icon bg-info bg-opacity-10 text-info"><i class="bi bi-browser-chrome"></i></span>
-                    <h2>08 &nbsp;Cookies</h2>
+                    <h2>@L["Priv_S8_H2"]</h2>
                 </div>
-                <p>FinanceApp uses a minimal set of cookies, all strictly necessary for the application to function:</p>
+                <p>@L["Priv_S8_P1"]</p>
                 <div class="table-responsive mt-2">
                     <table class="table table-sm table-bordered mb-0" style="font-size:.85rem;">
                         <thead class="table-light">
                             <tr>
-                                <th>Cookie</th>
-                                <th>Purpose</th>
-                                <th>Duration</th>
+                                <th>@L["Priv_TableCookie"]</th>
+                                <th>@L["Priv_TablePurpose"]</th>
+                                <th>@L["Priv_TableDuration"]</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td><code>.AspNetCore.Cookies</code></td>
-                                <td>Maintains your authenticated session</td>
-                                <td>Session / sliding expiry</td>
+                                <td>@L["Priv_Cookie_R1C2"]</td>
+                                <td>@L["Priv_Cookie_R1C3"]</td>
                             </tr>
                             <tr>
                                 <td><code>.AspNetCore.Antiforgery.*</code></td>
-                                <td>Prevents cross-site request forgery (CSRF) attacks</td>
-                                <td>Session</td>
+                                <td>@L["Priv_Cookie_R2C2"]</td>
+                                <td>@L["Priv_Cookie_R2C3"]</td>
                             </tr>
                             <tr>
-                                <td><code>theme</code> (localStorage)</td>
-                                <td>Remembers your light/dark mode preference</td>
-                                <td>Persistent (local storage)</td>
+                                <td><code>theme</code> @L["Priv_Cookie_R3C1"]</td>
+                                <td>@L["Priv_Cookie_R3C2"]</td>
+                                <td>@L["Priv_Cookie_R3C3"]</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <p class="mt-2 mb-0">We do not use advertising cookies, tracking cookies, or any cookies from third-party ad networks.</p>
+                <p class="mt-2 mb-0">@L["Priv_S8_P2"]</p>
             </div>
         </div>
 
@@ -372,14 +372,14 @@
             <div class="card-body">
                 <div class="section-header">
                     <span class="section-icon bg-secondary bg-opacity-10 text-secondary"><i class="bi bi-pencil-square"></i></span>
-                    <h2>09 &nbsp;Changes to This Policy</h2>
+                    <h2>@L["Priv_S9_H2"]</h2>
                 </div>
-                <p>We may update this policy from time to time to reflect changes in the application or applicable law. When we do:</p>
+                <p>@L["Priv_S9_P1"]</p>
                 <ul>
-                    <li>The "Last updated" date at the top of this page will be revised</li>
-                    <li>Significant changes will be communicated through the application</li>
+                    <li>@L["Priv_S9_L1"]</li>
+                    <li>@L["Priv_S9_L2"]</li>
                 </ul>
-                <p class="mb-0">Continued use of FinanceApp after a policy update constitutes acceptance of the revised policy. We encourage you to review this page periodically.</p>
+                <p class="mb-0">@L["Priv_S9_P2"]</p>
             </div>
         </div>
 
@@ -389,18 +389,18 @@
                 <div class="contact-icon">
                     <i class="bi bi-envelope-open"></i>
                 </div>
-                <h2 style="font-size:1.0625rem; margin-bottom:.375rem;">10 &nbsp;Contact Us</h2>
-                <p class="text-muted mb-3" style="font-size:.9rem;">Have questions, concerns, or a data request? We're here to help.</p>
+                <h2 style="font-size:1.0625rem; margin-bottom:.375rem;">@L["Priv_S10_H2"]</h2>
+                <p class="text-muted mb-3" style="font-size:.9rem;">@L["Priv_S10_P1"]</p>
                 <div class="d-flex flex-wrap justify-content-center gap-2">
                     <a href="mailto:privacy@financeapp.local" class="btn btn-success btn-sm">
                         <i class="bi bi-envelope me-1"></i> privacy@financeapp.local
                     </a>
                     <a asp-area="" asp-controller="Profile" asp-action="Edit" class="btn btn-outline-secondary btn-sm">
-                        <i class="bi bi-person-gear me-1"></i> Manage your profile
+                        <i class="bi bi-person-gear me-1"></i> @L["Acc_ManageProfile"]
                     </a>
                 </div>
                 <p class="text-muted mt-3 mb-0" style="font-size:.8rem;">
-                    We aim to respond to all privacy-related inquiries within 5 business days.
+                    @L["Priv_S10_P2"]
                 </p>
             </div>
         </div>

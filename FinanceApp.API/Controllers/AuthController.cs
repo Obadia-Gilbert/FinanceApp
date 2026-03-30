@@ -5,9 +5,11 @@ using FinanceApp.API.DTOs;
 using FinanceApp.Application.Interfaces.Services;
 using FinanceApp.Domain.Enums;
 using FinanceApp.Infrastructure.Identity;
+using FinanceApp.Localization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
 
 namespace FinanceApp.API.Controllers;
@@ -20,17 +22,20 @@ public class AuthController : ControllerBase
     private readonly IRefreshTokenService _refreshTokenService;
     private readonly ICategoryService _categoryService;
     private readonly IConfiguration _config;
+    private readonly IStringLocalizer<SharedResource> _localizer;
 
     public AuthController(
         UserManager<ApplicationUser> userManager,
         IRefreshTokenService refreshTokenService,
         ICategoryService categoryService,
-        IConfiguration config)
+        IConfiguration config,
+        IStringLocalizer<SharedResource> localizer)
     {
         _userManager = userManager;
         _refreshTokenService = refreshTokenService;
         _categoryService = categoryService;
         _config = config;
+        _localizer = localizer;
     }
 
     // POST /api/auth/register
@@ -41,7 +46,7 @@ public class AuthController : ControllerBase
     {
         var existing = await _userManager.FindByEmailAsync(request.Email);
         if (existing != null)
-            return BadRequest(new { message = "Email is already registered." });
+            return BadRequest(new { message = _localizer["Api_EmailRegistered"].Value });
 
         var user = new ApplicationUser
         {
@@ -73,7 +78,7 @@ public class AuthController : ControllerBase
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
         if (user == null || !await _userManager.CheckPasswordAsync(user, request.Password))
-            return Unauthorized(new { message = "Invalid email or password." });
+            return Unauthorized(new { message = _localizer["Api_InvalidCredentials"].Value });
 
         var response = await BuildLoginResponseAsync(user);
         return Ok(response);
@@ -87,11 +92,11 @@ public class AuthController : ControllerBase
     {
         var stored = await _refreshTokenService.GetByTokenAsync(request.RefreshToken);
         if (stored == null || !stored.IsActive)
-            return Unauthorized(new { message = "Invalid or expired refresh token." });
+            return Unauthorized(new { message = _localizer["Api_InvalidRefresh"].Value });
 
         var user = await _userManager.FindByIdAsync(stored.UserId);
         if (user == null)
-            return Unauthorized(new { message = "User not found." });
+            return Unauthorized(new { message = _localizer["Api_UserNotFound"].Value });
 
         // Rotate: revoke old token, issue new pair
         await _refreshTokenService.RevokeAsync(request.RefreshToken);

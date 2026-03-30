@@ -1,5 +1,6 @@
+@using System.Text.Json
 @{
-    ViewData["Title"] = "Dashboard";
+    ViewData["Title"] = L["Nav_Dashboard"].Value;
     var totalSpend = ViewBag.TotalSpend is decimal t ? t : 0m;
     var totalSpendUsd = ViewBag.TotalSpendUsd is decimal tu ? tu : 0m;
     var thisMonthSpendUsd = ViewBag.ThisMonthSpendUsd is decimal mu ? mu : 0m;
@@ -15,7 +16,7 @@
     var thisMonthSpendInBudgetCurrency = ViewBag.ThisMonthSpendInBudgetCurrency is decimal b ? b : 0m;
     var isOverBudget = ViewBag.IsOverBudget as bool? == true;
     var categoryBudgetAlerts = ViewBag.CategoryBudgetAlerts as IEnumerable<FinanceApp.Web.Models.CategoryBudgetAlertViewModel> ?? Enumerable.Empty<FinanceApp.Web.Models.CategoryBudgetAlertViewModel>();
-    var userFirstName = ViewBag.UserFirstName as string ?? "User";
+    var userFirstName = ViewBag.UserFirstName as string ?? L["Generic_User"].Value;
     var totalBalance = ViewBag.TotalBalance is decimal tb ? tb : 0m;
     var monthlyIncome = ViewBag.MonthlyIncome is decimal mi ? mi : 0m;
     var momIncomeChange = ViewBag.MoMIncomeChange as decimal?;
@@ -26,18 +27,21 @@
     var recentActivity = ViewBag.RecentActivity as IEnumerable<FinanceApp.Web.Models.RecentActivityViewModel> ?? Enumerable.Empty<FinanceApp.Web.Models.RecentActivityViewModel>();
     var cashFlowThisMonth = ViewBag.CashFlowThisMonth is decimal cf ? cf : (monthlyIncome - thisMonthSpend);
     var cashFlowMoMChange = ViewBag.CashFlowMoMChange as decimal?;
+    var jsChartCashFlow = JsonSerializer.Serialize(L["Chart_CashFlow"].Value);
+    var jsChartDailyExpenses = JsonSerializer.Serialize(L["Chart_DailyExpenses"].Value);
+    var jsChartAmountAxis = JsonSerializer.Serialize(L["Chart_AmountAxis", chartCurrency].Value);
 }
 
 <div class="container-fluid dashboard-page">
     <div class="row mb-3 mb-md-4">
         <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
             <div>
-                <h1 class="visually-hidden">Dashboard</h1>
-                <h2 class="visually-hidden">Dashboard Overview</h2>
-                <p class="text-muted small mb-0">Welcome back, @userFirstName. Here's what's happening with your finances.</p>
+                <h1 class="visually-hidden">@L["Nav_Dashboard"]</h1>
+                <h2 class="visually-hidden">@L["Dash_OverviewHidden"]</h2>
+                <p class="text-muted small mb-0">@L["Dash_WelcomeBack", userFirstName]</p>
             </div>
             <div class="d-flex gap-2">
-                <span class="btn btn-outline-secondary btn-sm"><i class="bi bi-calendar3 me-1"></i>This Month</span>
+                <span class="btn btn-outline-secondary btn-sm"><i class="bi bi-calendar3 me-1"></i>@L["Dash_ThisMonth"]</span>
             </div>
         </div>
     </div>
@@ -47,8 +51,8 @@
         <div class="alert alert-info d-flex align-items-center mb-3 dashboard-alert" role="alert">
             <i class="bi bi-info-circle fs-4 me-3"></i>
             <div>
-                <strong>No expenses yet.</strong>
-                <a asp-controller="Expense" asp-action="Index" class="alert-link">Add your first expense</a> to see your spending summary and trends here.
+                <strong>@L["Dash_NoExpensesStrong"]</strong>
+                <a asp-controller="Expense" asp-action="Index" class="alert-link">@L["Dash_NoExpensesLink"]</a>@L["Dash_NoExpensesTail"]
             </div>
         </div>
     }
@@ -58,24 +62,24 @@
         <div class="alert alert-danger d-flex align-items-center mb-3 dashboard-alert" role="alert">
             <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
             <div class="flex-grow-1">
-                <strong>Budget limit reached.</strong>
-                This month you have spent <strong>@thisMonthSpendInBudgetCurrency.ToString("N0") @budgetCurrency</strong> against your budget of <strong>@(budgetAmount?.ToString("N0")) @budgetCurrency</strong>.
-                <a asp-controller="Budget" asp-action="Index" class="alert-link">Update your budget</a> or reduce spending.
+                <strong>@L["Dash_BudgetLimitStrong"]</strong>
+                @L["Dash_BudgetSpentBody", thisMonthSpendInBudgetCurrency.ToString("N0"), budgetCurrency, budgetAmount?.ToString("N0") ?? "0", budgetCurrency]
+                <a asp-controller="Budget" asp-action="Index" class="alert-link">@L["Dash_UpdateBudget"]</a>@L["Dash_OrReduceSpending"]
             </div>
         </div>
     }
     @foreach (var alert in categoryBudgetAlerts)
     {
         var isOver = alert.IsOver;
-        var catName = alert.CategoryName ?? "Category";
+        var catName = alert.CategoryName ?? L["Generic_Category"].Value;
         var spent = alert.Spent;
         var budget = alert.Budget;
         var curr = alert.Currency ?? "TZS";
         <div class="alert @(isOver ? "alert-danger" : "alert-warning") d-flex align-items-center mb-3 dashboard-alert" role="alert">
             <i class="bi @(isOver ? "bi-exclamation-triangle-fill" : "bi-exclamation-circle") fs-4 me-3"></i>
             <div class="flex-grow-1">
-                <strong>@catName</strong> @(isOver ? "budget exceeded:" : "near budget limit (80%+):") <strong>@spent.ToString("N0") / @budget.ToString("N0") @curr</strong>.
-                <a asp-controller="Budget" asp-action="Index" class="alert-link">Manage budgets</a>
+                <strong>@catName</strong> @(isOver ? L["Dash_BudgetExceededLabel"].Value : L["Dash_BudgetNearLabel"].Value) <strong>@spent.ToString("N0") / @budget.ToString("N0") @curr</strong>.
+                <a asp-controller="Budget" asp-action="Index" class="alert-link">@L["Dash_ManageBudgets"]</a>
             </div>
         </div>
     }
@@ -84,8 +88,8 @@
         <div class="alert alert-secondary d-flex align-items-center mb-3 dashboard-alert" role="alert">
             <i class="bi bi-wallet2 fs-4 me-3"></i>
             <div>
-                <strong>Set a monthly budget</strong> to get an alert when your expenses reach your limit.
-                <a asp-controller="Budget" asp-action="Index" class="alert-link">Set budget</a>
+                <strong>@L["Dash_SetMonthlyBudgetStrong"]</strong>@L["Dash_SetMonthlyBudgetTail"]
+                <a asp-controller="Budget" asp-action="Index" class="alert-link">@L["Dash_SetBudgetLink"]</a>
             </div>
         </div>
     }
@@ -97,7 +101,7 @@
                     <div class="d-flex align-items-start justify-content-between">
                         <div class="dashboard-kpi-icon dashboard-kpi-icon-balance rounded-2"><i class="bi bi-wallet2"></i></div>
                     </div>
-                    <p class="small text-muted text-uppercase mb-1 mt-2">Total Balance</p>
+                    <p class="small text-muted text-uppercase mb-1 mt-2">@L["KPI_TotalBalance"]</p>
                     <p class="fw-bold mb-0 fs-5">@totalBalance.ToString("N2") <small class="fw-normal text-muted">@displayCurrency</small></p>
                 </div>
             </div>
@@ -112,7 +116,7 @@
                             <span class="small @(momIncomeChange >= 0 ? "text-success" : "text-danger")"><i class="bi bi-graph-up-arrow"></i> @(momIncomeChange >= 0 ? "+" : "")@momIncomeChange.Value.ToString("F1")%</span>
                         }
                     </div>
-                    <p class="small text-muted text-uppercase mb-1 mt-2">Monthly Income</p>
+                    <p class="small text-muted text-uppercase mb-1 mt-2">@L["KPI_MonthlyIncome"]</p>
                     <p class="fw-bold mb-0 fs-5">@monthlyIncome.ToString("N2") <small class="fw-normal text-muted">@displayCurrency</small></p>
                 </div>
             </div>
@@ -127,7 +131,7 @@
                             <span class="small @(momSpendChange <= 0 ? "text-success" : "text-danger")"><i class="bi bi-graph-down-arrow"></i> @(momSpendChange >= 0 ? "+" : "")@momSpendChange.Value.ToString("F1")%</span>
                         }
                     </div>
-                    <p class="small text-muted text-uppercase mb-1 mt-2">Monthly Expense</p>
+                    <p class="small text-muted text-uppercase mb-1 mt-2">@L["KPI_MonthlyExpense"]</p>
                     <p class="fw-bold mb-0 fs-5">@thisMonthSpend.ToString("N2") <small class="fw-normal text-muted">@displayCurrency</small></p>
                 </div>
             </div>
@@ -137,9 +141,9 @@
                 <div class="card-body">
                     <div class="d-flex align-items-start justify-content-between">
                         <div class="dashboard-kpi-icon dashboard-kpi-icon-budget rounded-2"><i class="bi bi-pie-chart"></i></div>
-                        <span class="small text-muted">Stable</span>
+                        <span class="small text-muted">@L["KPI_Stable"]</span>
                     </div>
-                    <p class="small text-muted text-uppercase mb-1 mt-2">Active Budgets</p>
+                    <p class="small text-muted text-uppercase mb-1 mt-2">@L["KPI_ActiveBudgets"]</p>
                     <p class="fw-bold mb-0 fs-5">@activeBudgetsCount</p>
                 </div>
             </div>
@@ -150,7 +154,7 @@
                     <div class="d-flex align-items-start justify-content-between">
                         <div class="dashboard-kpi-icon dashboard-kpi-icon-spend rounded-2"><i class="bi bi-currency-dollar"></i></div>
                     </div>
-                    <p class="small text-muted text-uppercase mb-1 mt-2">Total Spend</p>
+                    <p class="small text-muted text-uppercase mb-1 mt-2">@L["KPI_TotalSpend"]</p>
                     <p class="fw-bold mb-0 fs-5">@totalSpend.ToString("N0") <small class="fw-normal text-muted">@displayCurrency</small></p>
                 </div>
             </div>
@@ -161,7 +165,7 @@
                     <div class="d-flex align-items-start justify-content-between">
                         <div class="dashboard-kpi-icon dashboard-kpi-icon-categories rounded-2"><i class="bi bi-tags"></i></div>
                     </div>
-                    <p class="small text-muted text-uppercase mb-1 mt-2">Categories</p>
+                    <p class="small text-muted text-uppercase mb-1 mt-2">@L["KPI_Categories"]</p>
                     <p class="fw-bold mb-0 fs-5">@categoryCount</p>
                 </div>
             </div>
@@ -173,20 +177,20 @@
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="card-title mb-0">Monthly Cash Flow</h5>
+                        <h5 class="card-title mb-0">@L["Dash_MonthlyCashFlow"]</h5>
                         <div class="dropdown">
-                            <button class="btn btn-link btn-sm p-0 text-secondary" type="button" data-bs-toggle="dropdown" aria-label="Options"><i class="bi bi-three-dots-vertical"></i></button>
-                            <ul class="dropdown-menu dropdown-menu-end"><li><a class="dropdown-item" asp-controller="Budget" asp-action="Index">View budget</a></li></ul>
+                            <button class="btn btn-link btn-sm p-0 text-secondary" type="button" data-bs-toggle="dropdown" aria-label="@L["Dash_OptionsAria"]"><i class="bi bi-three-dots-vertical"></i></button>
+                            <ul class="dropdown-menu dropdown-menu-end"><li><a class="dropdown-item" asp-controller="Budget" asp-action="Index">@L["Dash_ViewBudget"]</a></li></ul>
                         </div>
                     </div>
                     <p class="fw-bold fs-4 mb-1">@cashFlowThisMonth.ToString("N2") <small class="fw-normal text-muted">@displayCurrency</small></p>
                     @if (cashFlowMoMChange.HasValue)
                     {
-                        <p class="small @(cashFlowMoMChange >= 0 ? "text-success" : "text-danger") mb-3">@(cashFlowMoMChange >= 0 ? "+" : "")@cashFlowMoMChange.Value.ToString("F0")% vs last month</p>
+                        <p class="small @(cashFlowMoMChange >= 0 ? "text-success" : "text-danger") mb-3">@L["Dash_PctVsLastMonth", (cashFlowMoMChange >= 0 ? "+" : "") + cashFlowMoMChange.Value.ToString("F0")]</p>
                     }
                     else
                     {
-                        <p class="small text-muted mb-3">Income minus expenses this month</p>
+                        <p class="small text-muted mb-3">@L["Dash_IncomeMinusExpenses"]</p>
                     }
                     <div class="dashboard-bar-chart-wrap" style="height: 140px;">
                         <canvas id="cashFlowChart" height="140"></canvas>
@@ -198,17 +202,17 @@
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="card-title mb-0">Recent Transactions</h5>
-                        <a asp-controller="Transaction" asp-action="Index" class="btn btn-link btn-sm p-0 text-decoration-none">View All</a>
+                        <h5 class="card-title mb-0">@L["Dash_RecentTransactions"]</h5>
+                        <a asp-controller="Transaction" asp-action="Index" class="btn btn-link btn-sm p-0 text-decoration-none">@L["Dash_ViewAll"]</a>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-sm table-hover mb-0">
                             <thead>
                                 <tr>
-                                    <th class="text-muted small text-uppercase">Date</th>
-                                    <th class="text-muted small text-uppercase">Category</th>
-                                    <th class="text-muted small text-uppercase text-end">Amount</th>
-                                    <th class="text-muted small text-uppercase" style="width: 40px;">Actions</th>
+                                    <th class="text-muted small text-uppercase">@L["Table_Date"]</th>
+                                    <th class="text-muted small text-uppercase">@L["Table_Category"]</th>
+                                    <th class="text-muted small text-uppercase text-end">@L["Table_Amount"]</th>
+                                    <th class="text-muted small text-uppercase" style="width: 40px;">@L["Table_Actions"]</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -225,13 +229,13 @@
                                                 </span>
                                             </td>
                                             <td class="text-end fw-semibold @(a.IsIncome ? "text-success" : "text-danger")">@(a.IsIncome ? "+" : "-")@Math.Abs(a.Amount).ToString("N2") @a.Currency</td>
-                                            <td><button type="button" class="btn btn-link btn-sm p-0 text-secondary" aria-label="Actions"><i class="bi bi-three-dots-vertical"></i></button></td>
+                                            <td><button type="button" class="btn btn-link btn-sm p-0 text-secondary" aria-label="@L["Table_Actions"]"><i class="bi bi-three-dots-vertical"></i></button></td>
                                         </tr>
                                     }
                                 }
                                 else
                                 {
-                                    <tr><td colspan="4" class="text-muted small text-center py-3">No recent transactions. <a asp-controller="Expense" asp-action="Index">Add an expense</a> or <a asp-controller="Transaction" asp-action="Create">new transaction</a>.</td></tr>
+                                    <tr><td colspan="4" class="text-muted small text-center py-3">@L["Dash_NoRecentTx"] <a asp-controller="Expense" asp-action="Index">@L["Dash_AddExpense"]</a>@L["Dash_Or"]<a asp-controller="Transaction" asp-action="Create">@L["Dash_NewTransaction"]</a>.</td></tr>
                                 }
                             </tbody>
                         </table>
@@ -245,10 +249,10 @@
         <div class="col-12">
             <div class="card expense-trend-card border-0 shadow-sm">
                 <div class="card-body py-3">
-                    <h5 class="card-title mb-2">Expense Trend (Last 30 Days) — @chartCurrency</h5>
+                    <h5 class="card-title mb-2">@L["Dash_ExpenseTrendTitle", chartCurrency]</h5>
                     @if (expenseCount == 0)
                     {
-                        <p class="text-muted mb-0">Add expenses to see your trend chart.</p>
+                        <p class="text-muted mb-0">@L["Dash_AddExpensesChartHint"]</p>
                     }
                     else
                     {
@@ -284,7 +288,7 @@
                     type: 'bar',
                     data: {
                         labels: cfLabels,
-                        datasets: [{ label: 'Cash Flow', data: cfData, backgroundColor: barColors, borderColor: barColors, borderWidth: 1 }]
+                        datasets: [{ label: @Html.Raw(jsChartCashFlow), data: cfData, backgroundColor: barColors, borderColor: barColors, borderWidth: 1 }]
                     },
                     options: {
                         responsive: true,
@@ -303,14 +307,13 @@
             var ctx = canvas.getContext('2d');
             var labels = @Html.Raw(chartLabels);
             var data = @Html.Raw(chartData);
-            var chartCurrency = '@chartCurrency';
             var colors = chartColors();
             var chart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Daily Expenses',
+                        label: @Html.Raw(jsChartDailyExpenses),
                         data: data,
                         borderColor: colors.border,
                         backgroundColor: colors.fill,
@@ -333,7 +336,7 @@
                             beginAtZero: true,
                             ticks: { color: colors.text },
                             grid: { color: colors.grid },
-                            title: { display: true, text: 'Amount (' + chartCurrency + ')', color: colors.text }
+                            title: { display: true, text: @Html.Raw(jsChartAmountAxis), color: colors.text }
                         }
                     }
                 }

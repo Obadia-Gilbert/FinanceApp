@@ -220,13 +220,15 @@ document.addEventListener('DOMContentLoaded', function () {
 		if (!listEl) return;
 		listEl.innerHTML = '';
 		if (!items || items.length === 0) {
-			listEl.insertAdjacentHTML('beforeend', '<li class="list-group-item text-muted small text-center py-3">No notifications</li>');
+			var emptyMsg = (window.__financeAppI18n && window.__financeAppI18n.notifEmpty) ? window.__financeAppI18n.notifEmpty : 'No notifications';
+			listEl.insertAdjacentHTML('beforeend', '<li class="list-group-item text-muted small text-center py-3">' + emptyMsg + '</li>');
 			return;
 		}
 		items.forEach(function (n) {
 			var link = (n.relatedLink && n.relatedLink.length) ? ('<a href="' + n.relatedLink + '" class="list-group-item list-group-item-action py-2 ' + (n.isRead ? '' : 'notification-unread') + '">') : ('<div class="list-group-item py-2 ' + (n.isRead ? '' : 'notification-unread') + '">');
 			var close = (n.relatedLink && n.relatedLink.length) ? '</a>' : '</div>';
-			var readBtn = n.isRead ? '' : '<button type="button" class="btn btn-link btn-sm p-0 float-end notification-mark-one" data-id="' + n.id + '" title="Mark as read"><i class="bi bi-check2"></i></button>';
+			var markReadTitle = (window.__financeAppI18n && window.__financeAppI18n.notifMarkRead) ? window.__financeAppI18n.notifMarkRead : 'Mark as read';
+			var readBtn = n.isRead ? '' : '<button type="button" class="btn btn-link btn-sm p-0 float-end notification-mark-one" data-id="' + n.id + '" title="' + markReadTitle.replace(/"/g, '&quot;') + '"><i class="bi bi-check2"></i></button>';
 			listEl.insertAdjacentHTML('beforeend', link + readBtn + '<div class="small fw-semibold">' + (n.title || '') + '</div><div class="small text-muted">' + (n.message || '') + '</div>' + close);
 		});
 		listEl.querySelectorAll('.notification-mark-one').forEach(function (btn) {

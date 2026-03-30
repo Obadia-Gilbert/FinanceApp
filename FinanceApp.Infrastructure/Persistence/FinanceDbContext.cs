@@ -35,6 +35,7 @@ public class FinanceDbContext
     public DbSet<Income> Incomes { get; set; } = null!;
     public DbSet<RecurringTemplate> RecurringTemplates { get; set; } = null!;
     public DbSet<UserFeedback> UserFeedbacks { get; set; } = null!;
+    public DbSet<SubscriptionPurchaseRecord> SubscriptionPurchaseRecords { get; set; } = null!;
 
     // ==============================
     // Automatically handle CreatedAt and UpdatedAt
@@ -94,6 +95,11 @@ public class FinanceDbContext
             entity.Property(u => u.SubscriptionAssignedAt)
                   .HasDefaultValueSql("GETUTCDATE()")
                   .IsRequired();
+
+            entity.Property(u => u.SubscriptionBillingSource).HasConversion<int>().IsRequired();
+            entity.Property(u => u.AppleOriginalTransactionId).HasMaxLength(128);
+            entity.Property(u => u.GooglePurchaseToken).HasMaxLength(2048);
+            entity.Property(u => u.PreferredLanguage).HasMaxLength(10).HasDefaultValue("en");
         });
 
         // ==============================
@@ -335,6 +341,19 @@ public class FinanceDbContext
             entity.HasIndex(f => f.UserId);
             entity.HasIndex(f => f.Status);
             entity.HasIndex(f => f.Type);
+        });
+
+        modelBuilder.Entity<SubscriptionPurchaseRecord>(entity =>
+        {
+            entity.ToTable("SubscriptionPurchaseRecords");
+            entity.Property(p => p.UserId).HasMaxLength(450).IsRequired();
+            entity.Property(p => p.ProductId).HasMaxLength(256).IsRequired();
+            entity.Property(p => p.ExternalTransactionId).HasMaxLength(512).IsRequired();
+            entity.Property(p => p.Notes).HasMaxLength(2000);
+            entity.Property(p => p.BillingSource).HasConversion<int>().IsRequired();
+            entity.Property(p => p.Plan).HasConversion<int>().IsRequired();
+            entity.HasIndex(p => p.UserId);
+            entity.HasIndex(p => new { p.BillingSource, p.ExternalTransactionId });
         });
     }
 }

@@ -524,6 +524,58 @@ namespace FinanceApp.Infrastructure.Migrations
                     b.ToTable("SharedReports", (string)null);
                 });
 
+            modelBuilder.Entity("FinanceApp.Domain.Entities.SubscriptionPurchaseRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("BillingSource")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("ExpiresAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ExternalTransactionId")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<int>("Plan")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductId")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("BillingSource", "ExternalTransactionId");
+
+                    b.ToTable("SubscriptionPurchaseRecords", (string)null);
+                });
+
             modelBuilder.Entity("FinanceApp.Domain.Entities.SupportingDocument", b =>
                 {
                     b.Property<Guid>("Id")
@@ -702,6 +754,10 @@ namespace FinanceApp.Infrastructure.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<string>("AppleOriginalTransactionId")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
@@ -723,6 +779,10 @@ namespace FinanceApp.Infrastructure.Migrations
 
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GooglePurchaseToken")
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
 
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
@@ -750,6 +810,13 @@ namespace FinanceApp.Infrastructure.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("PreferredLanguage")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)")
+                        .HasDefaultValue("en");
+
                     b.Property<string>("ProfileImagePath")
                         .HasColumnType("nvarchar(max)");
 
@@ -760,6 +827,12 @@ namespace FinanceApp.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetimeoffset")
                         .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<int>("SubscriptionBillingSource")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("SubscriptionExpiresAtUtc")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<int>("SubscriptionPlan")
                         .ValueGeneratedOnAdd()

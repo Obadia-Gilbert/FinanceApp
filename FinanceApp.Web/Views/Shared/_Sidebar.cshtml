@@ -6,78 +6,79 @@
 }
 <nav class="sidebar">
     <div class="position-sticky pt-1 px-2">
-        <div class="sidebar-heading text-uppercase small fw-semibold px-2 mb-2 visually-hidden">Navigation</div>
+        <div class="d-md-none mb-2 px-1"><partial name="_LanguageSwitcher" /></div>
+        <div class="sidebar-heading text-uppercase small fw-semibold px-2 mb-2 visually-hidden">@L["Nav_Navigation"]</div>
         <ul class="nav flex-column app-sidebar-nav">
             <li class="nav-item">
                 <a class="nav-link @(IsActive("Home", "Index") ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index">
                     <span class="nav-icon"><i class="bi bi-speedometer2"></i></span>
-                    <span class="nav-label">Dashboard</span>
+                    <span class="nav-label">@L["Nav_Dashboard"]</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link @(IsActive("Expense") ? "active" : "")" asp-area="" asp-controller="Expense" asp-action="Index">
                     <span class="nav-icon"><i class="bi bi-cash"></i></span>
-                    <span class="nav-label">Expenses</span>
+                    <span class="nav-label">@L["Nav_Expenses"]</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link @(IsActive("Income") ? "active" : "")" asp-area="" asp-controller="Income" asp-action="Index">
                     <span class="nav-icon"><i class="bi bi-cash-stack"></i></span>
-                    <span class="nav-label">Income</span>
+                    <span class="nav-label">@L["Nav_Income"]</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link @(IsActive("Category") ? "active" : "")" asp-area="" asp-controller="Category" asp-action="Index">
                     <span class="nav-icon"><i class="bi bi-tags"></i></span>
-                    <span class="nav-label">Categories</span>
+                    <span class="nav-label">@L["Nav_Categories"]</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link @(IsActive("Account") ? "active" : "")" asp-area="" asp-controller="Account" asp-action="Index">
                     <span class="nav-icon"><i class="bi bi-bank"></i></span>
-                    <span class="nav-label">Accounts</span>
+                    <span class="nav-label">@L["Nav_Accounts"]</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link @(IsActive("Transaction") ? "active" : "")" asp-area="" asp-controller="Transaction" asp-action="Index">
                     <span class="nav-icon"><i class="bi bi-arrow-left-right"></i></span>
-                    <span class="nav-label">Transactions</span>
+                    <span class="nav-label">@L["Nav_Transactions"]</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link @(IsActive("Recurring") ? "active" : "")" asp-area="" asp-controller="Recurring" asp-action="Index">
                     <span class="nav-icon"><i class="bi bi-arrow-repeat"></i></span>
-                    <span class="nav-label">Recurring</span>
+                    <span class="nav-label">@L["Nav_Recurring"]</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link @(IsActive("Budget") ? "active" : "")" asp-area="" asp-controller="Budget" asp-action="Index">
                     <span class="nav-icon"><i class="bi bi-wallet2"></i></span>
-                    <span class="nav-label">Budget</span>
+                    <span class="nav-label">@L["Nav_Budget"]</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link @(IsActive("Report") ? "active" : "")" asp-area="" asp-controller="Report" asp-action="Index">
                     <span class="nav-icon"><i class="bi bi-file-earmark-text"></i></span>
-                    <span class="nav-label">Monthly report</span>
+                    <span class="nav-label">@L["Nav_MonthlyReport"]</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link @(IsActive("Subscription") ? "active" : "")" asp-area="" asp-controller="Subscription" asp-action="Index">
                     <span class="nav-icon"><i class="bi bi-stars"></i></span>
-                    <span class="nav-label">Subscription</span>
+                    <span class="nav-label">@L["Nav_Subscription"]</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link @(IsActive("Profile", "Edit") ? "active" : "")" asp-area="" asp-controller="Profile" asp-action="Edit">
                     <span class="nav-icon"><i class="bi bi-person-circle"></i></span>
-                    <span class="nav-label">Profile</span>
+                    <span class="nav-label">@L["Nav_Profile"]</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link @(IsActive("Home", "Privacy") ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Privacy">
                     <span class="nav-icon"><i class="bi bi-shield-lock"></i></span>
-                    <span class="nav-label">Privacy</span>
+                    <span class="nav-label">@L["Nav_Privacy"]</span>
                 </a>
             </li>
             @if (User.IsInRole("Admin"))
@@ -85,14 +86,14 @@
                 <li class="nav-item">
                     <a class="nav-link @(controller == "Admin" && action == "Users" ? "active" : "")" asp-area="Admin" asp-controller="Admin" asp-action="Users">
                         <span class="nav-icon"><i class="bi bi-people"></i></span>
-                        <span class="nav-label">Manage Users</span>
+                        <span class="nav-label">@L["Nav_ManageUsers"]</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     @{ var area = ViewContext.RouteData.Values["area"]?.ToString() ?? ""; }
                     <a class="nav-link @(area == "Admin" && controller == "Feedback" ? "active" : "")" asp-area="Admin" asp-controller="Feedback" asp-action="Index">
                         <span class="nav-icon"><i class="bi bi-chat-dots"></i></span>
-                        <span class="nav-label">User feedback</span>
+                        <span class="nav-label">@L["Nav_UserFeedback"]</span>
                     </a>
                 </li>
             }
@@ -101,21 +102,21 @@
         <div class="pt-3 mt-auto border-top border-secondary border-opacity-25 px-2">
             <a class="nav-link @(IsActive("Feedback") ? "active" : "") sidebar-signout-btn d-flex align-items-center gap-2 px-2 py-2 rounded" asp-area="" asp-controller="Feedback" asp-action="Index">
                 <span class="nav-icon"><i class="bi bi-chat-square-text"></i></span>
-                <span class="nav-label">Feedback</span>
+                <span class="nav-label">@L["Nav_Feedback"]</span>
             </a>
         </div>
         <div class="sidebar-signout pt-2 border-top border-secondary border-opacity-25">
             <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" class="px-2">
                 <button type="submit" class="sidebar-signout-btn nav-link btn btn-link w-100 text-start d-flex align-items-center gap-2 px-2">
                     <span class="nav-icon"><i class="bi bi-box-arrow-right"></i></span>
-                    <span class="nav-label">Sign out</span>
+                    <span class="nav-label">@L["Nav_SignOut"]</span>
                 </button>
             </form>
         </div>
         @* Mobile only: theme toggle (navbar shows only logo + hamburger) *@
         <div class="d-md-none mt-3 pt-3 border-top border-secondary border-opacity-25">
             <button type="button" class="theme-toggle btn btn-sm btn-outline-secondary w-100" title="Toggle dark/light mode" aria-label="Toggle dark mode">
-                <i class="bi bi-moon"></i> Dark mode
+                <i class="bi bi-moon"></i> @L["Nav_DarkMode"]
             </button>
         </div>
     </div>

@@ -16,4 +16,7 @@ public class UpdateProfileRequest
 
     [StringLength(10)]
     public string? CountryCode { get; set; }
+
+    [RegularExpression("^(en|sw|es)$")]
+    public string? PreferredLanguage { get; set; }
 }

@@ -1,6 +1,6 @@
 @using FinanceApp.Domain.Entities
 @{
-    ViewData["Title"] = "Notifications";
+    ViewData["Title"] = L["Notif_PageTitle"].Value;
     var notifications = ViewBag.Notifications as IEnumerable<Notification> ?? Enumerable.Empty<Notification>();
     var totalItems = ViewBag.TotalItems as int? ?? 0;
     var pageNumber = ViewBag.PageNumber as int? ?? 1;
@@ -11,8 +11,8 @@
 <div class="container-fluid">
     <div class="row mb-4">
         <div class="col-12">
-            <h1 class="visually-hidden">Notifications</h1>
-            <p class="text-muted small mb-0">Budget alerts and activity.</p>
+            <h1 class="visually-hidden">@L["Notif_PageTitle"]</h1>
+            <p class="text-muted small mb-0">@L["Notif_Subtitle"]</p>
         </div>
     </div>
 
@@ -23,8 +23,8 @@
                 <div class="card border-0 shadow-sm">
                     <div class="card-body text-center py-5 text-muted">
                         <i class="bi bi-bell display-4 d-block mb-2"></i>
-                        <p class="mb-0">No notifications yet.</p>
-                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary btn-sm mt-3">Go to Dashboard</a>
+                        <p class="mb-0">@L["Notif_Empty"]</p>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary btn-sm mt-3">@L["Notif_GoDashboard"]</a>
                     </div>
                 </div>
             }
@@ -62,15 +62,15 @@
                 @if (totalPages > 1)
                 {
                     <nav class="mt-3 d-flex justify-content-between align-items-center">
-                        <div class="small text-muted">Page @pageNumber of @totalPages (@totalItems total)</div>
+                        <div class="small text-muted">@L["Notif_PageOf", pageNumber, totalPages, totalItems]</div>
                         <div>
                             @if (pageNumber > 1)
                             {
-                                <a asp-action="Index" asp-route-page="@(pageNumber - 1)" asp-route-pageSize="@pageSize" class="btn btn-outline-secondary btn-sm">Previous</a>
+                                <a asp-action="Index" asp-route-page="@(pageNumber - 1)" asp-route-pageSize="@pageSize" class="btn btn-outline-secondary btn-sm">@L["Notif_Previous"]</a>
                             }
                             @if (pageNumber < totalPages)
                             {
-                                <a asp-action="Index" asp-route-page="@(pageNumber + 1)" asp-route-pageSize="@pageSize" class="btn btn-outline-secondary btn-sm ms-1">Next</a>
+                                <a asp-action="Index" asp-route-page="@(pageNumber + 1)" asp-route-pageSize="@pageSize" class="btn btn-outline-secondary btn-sm ms-1">@L["Notif_Next"]</a>
                             }
                         </div>
                     </nav>

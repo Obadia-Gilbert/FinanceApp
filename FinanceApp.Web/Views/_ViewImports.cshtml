@@ -1,6 +1,11 @@
-﻿@using FinanceApp.Web
+@using System.Globalization
+@using FinanceApp.Web
+@using FinanceApp.Web.Helpers
 @using FinanceApp.Web.Models
 @using FinanceApp.Infrastructure.Identity
+@using FinanceApp.Localization
 @using Microsoft.AspNetCore.Identity
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> L
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 

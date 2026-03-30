@@ -4,6 +4,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -17,8 +18,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
-using FinanceApp.Domain.Enums;
 using FinanceApp.Infrastructure.Identity;
+using FinanceApp.Application.Interfaces.Services;
+using FinanceApp.Domain.Enums;
 
 namespace FinanceApp.Web.Areas.Identity.Pages.Account
 {
@@ -31,13 +33,15 @@ namespace FinanceApp.Web.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly IEmailSender _emailSender;
         private readonly ILogger<ExternalLoginModel> _logger;
+        private readonly ICategoryService _categoryService;
 
         public ExternalLoginModel(
             SignInManager<ApplicationUser> signInManager,
             UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
             ILogger<ExternalLoginModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            ICategoryService categoryService)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -45,6 +49,7 @@ namespace FinanceApp.Web.Areas.Identity.Pages.Account
             _emailStore = GetEmailStore();
             _logger = logger;
             _emailSender = emailSender;
+            _categoryService = categoryService;
         }
 
         /// <summary>
@@ -124,20 +129,129 @@ namespace FinanceApp.Web.Areas.Identity.Pages.Account
             {
                 return RedirectToPage("./Lockout");
             }
-            else
+
+            // No external login row yet: resolve email (Google may use "email" JSON key until mapped in Program.cs).
+            var emailFromProvider = ResolveEmailFromExternalLogin(info);
+            if (!string.IsNullOrWhiteSpace(emailFromProvider))
             {
-                // If the user does not have an account, then ask the user to create an account.
-                ReturnUrl = returnUrl;
-                ProviderDisplayName = info.ProviderDisplayName;
-                if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
+                var existingUser = await _userManager.FindByEmailAsync(emailFromProvider);
+                if (existingUser != null)
                 {
-                    Input = new InputModel
+                    if (await _userManager.IsLockedOutAsync(existingUser))
+                        return RedirectToPage("./Lockout");
+
+                    var addLogin = await _userManager.AddLoginAsync(existingUser, info);
+                    if (addLogin.Succeeded)
                     {
-                        Email = info.Principal.FindFirstValue(ClaimTypes.Email)
-                    };
+                        await _signInManager.SignInAsync(existingUser, isPersistent: false);
+                        _logger.LogInformation(
+                            "User {Email} signed in with {Provider}; external login was linked to existing account.",
+                            emailFromProvider, info.LoginProvider);
+                        return LocalRedirect(returnUrl);
+                    }
+
+                    foreach (var err in addLogin.Errors)
+                        ModelState.AddModelError(string.Empty, err.Description);
+                    ErrorMessage = string.Join(" ", addLogin.Errors.Select(e => e.Description));
+                    return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
                 }
-                return Page();
+
+                // First-time Google user: create account and sign in (no extra "complete registration" step).
+                var created = await TryCreateAndSignInExternalUserAsync(info, emailFromProvider, returnUrl);
+                if (created)
+                    return LocalRedirect(returnUrl);
             }
+
+            // No email from provider (rare): fall back to manual confirmation page.
+            ReturnUrl = returnUrl;
+            ProviderDisplayName = info.ProviderDisplayName;
+            if (!string.IsNullOrWhiteSpace(emailFromProvider))
+                Input = new InputModel { Email = emailFromProvider };
+            return Page();
+        }
+
+        /// <summary>Reads email from common claim types (Google userinfo + standard mappings).</summary>
+        private static string ResolveEmailFromExternalLogin(ExternalLoginInfo info)
+        {
+            var p = info.Principal;
+            if (p == null) return null;
+            var e = p.FindFirstValue(ClaimTypes.Email);
+            if (!string.IsNullOrWhiteSpace(e)) return e.Trim();
+            e = p.FindFirstValue("email");
+            if (!string.IsNullOrWhiteSpace(e)) return e.Trim();
+            foreach (var claim in p.Claims)
+            {
+                if (string.Equals(claim.Type, "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", StringComparison.OrdinalIgnoreCase))
+                    return claim.Value?.Trim();
+            }
+            return null;
+        }
+
+        /// <summary>Creates local user + external login + default categories, then signs in.</summary>
+        private async Task<bool> TryCreateAndSignInExternalUserAsync(ExternalLoginInfo info, string email, string returnUrl)
+        {
+            var user = CreateUser();
+            user.EmailConfirmed = true;
+            user.SubscriptionPlan = SubscriptionPlan.Free;
+            user.SubscriptionAssignedAt = DateTimeOffset.UtcNow;
+
+            var given = info.Principal.FindFirstValue(ClaimTypes.GivenName);
+            var family = info.Principal.FindFirstValue(ClaimTypes.Surname);
+            if (string.IsNullOrWhiteSpace(given) && string.IsNullOrWhiteSpace(family))
+            {
+                var full = info.Principal.FindFirstValue(ClaimTypes.Name) ?? info.Principal.FindFirstValue("name");
+                if (!string.IsNullOrWhiteSpace(full))
+                {
+                    var parts = full.Trim().Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+                    given = parts.Length > 0 ? parts[0] : null;
+                    family = parts.Length > 1 ? parts[1] : null;
+                }
+            }
+            user.FirstName = string.IsNullOrWhiteSpace(given) ? null : given.Trim();
+            user.LastName = string.IsNullOrWhiteSpace(family) ? null : family.Trim();
+
+            await _userStore.SetUserNameAsync(user, email, CancellationToken.None);
+            await _emailStore.SetEmailAsync(user, email, CancellationToken.None);
+
+            var createResult = await _userManager.CreateAsync(user);
+            if (!createResult.Succeeded)
+            {
+                var dup = createResult.Errors.Any(e =>
+                    e.Code == "DuplicateUserName" || e.Code == "DuplicateEmail");
+                if (dup)
+                {
+                    var other = await _userManager.FindByEmailAsync(email);
+                    if (other != null && !await _userManager.IsLockedOutAsync(other))
+                    {
+                        var linkDup = await _userManager.AddLoginAsync(other, info);
+                        if (linkDup.Succeeded)
+                        {
+                            await _signInManager.SignInAsync(other, isPersistent: false);
+                            _logger.LogInformation("Linked {Provider} to existing {Email} after duplicate create race.", info.LoginProvider, email);
+                            return true;
+                        }
+                    }
+                }
+                _logger.LogWarning("External auto-register failed for {Email}: {Errors}", email,
+                    string.Join("; ", createResult.Errors.Select(e => e.Description)));
+                return false;
+            }
+
+            var userId = await _userManager.GetUserIdAsync(user);
+            await _userManager.AddToRoleAsync(user, "User");
+            await _categoryService.AssignDefaultCategoriesToUserAsync(userId);
+
+            var addLogin = await _userManager.AddLoginAsync(user, info);
+            if (!addLogin.Succeeded)
+            {
+                await _userManager.DeleteAsync(user);
+                _logger.LogError("AddLogin failed after user create for {Email}", email);
+                return false;
+            }
+
+            await _signInManager.SignInAsync(user, isPersistent: false);
+            _logger.LogInformation("New user {Email} registered via {Provider}.", email, info.LoginProvider);
+            return true;
         }
 
         public async Task<IActionResult> OnPostConfirmationAsync(string returnUrl = null)

@@ -2,6 +2,7 @@ using System.Security.Claims;
 using FinanceApp.API.DTOs;
 using FinanceApp.API.Helpers;
 using FinanceApp.Infrastructure.Identity;
+using FinanceApp.Localization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -33,7 +34,8 @@ public class ProfileController : ControllerBase
         if (user == null) return NotFound();
         return Ok(new ProfileDto(
             user.FirstName, user.LastName, user.Email, user.PhoneNumber,
-            user.Country, user.CountryCode, user.ProfileImagePath));
+            user.Country, user.CountryCode, user.ProfileImagePath,
+            SupportedLanguages.Normalize(user.PreferredLanguage)));
     }
 
     [HttpPut]
@@ -51,11 +53,14 @@ public class ProfileController : ControllerBase
         user.PhoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber) ? null : request.PhoneNumber?.Trim();
         user.CountryCode = string.IsNullOrWhiteSpace(request.CountryCode) ? null : request.CountryCode?.Trim();
         user.Country = CountryHelper.GetNameByCode(user.CountryCode) ?? user.Country;
+        if (request.PreferredLanguage != null)
+            user.PreferredLanguage = SupportedLanguages.Normalize(request.PreferredLanguage);
         var result = await _userManager.UpdateAsync(user);
         if (!result.Succeeded)
             return BadRequest(new { errors = result.Errors.Select(e => e.Description) });
         return Ok(new ProfileDto(
             user.FirstName, user.LastName, user.Email, user.PhoneNumber,
-            user.Country, user.CountryCode, user.ProfileImagePath));
+            user.Country, user.CountryCode, user.ProfileImagePath,
+            SupportedLanguages.Normalize(user.PreferredLanguage)));
     }
 }

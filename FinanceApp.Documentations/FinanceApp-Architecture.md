@@ -1,7 +1,7 @@
 # FinanceApp – API-First Clean Architecture
 
-**Version:** 1.1  
-**Last updated:** March 2025
+**Version:** 1.2  
+**Last updated:** 29 March 2026 — refresh the “Where We Are Now” table when major capabilities shift; [Current-State.md](./Current-State.md) is the concise snapshot.
 
 ---
 
@@ -9,30 +9,23 @@
 
 ### Where We Are Now
 
-FinanceApp is a **working personal finance web app** with:
+FinanceApp is a **working multi-client personal finance platform**:
 
 | Area | Status |
 |------|--------|
-| **Solution** | Domain, Application, Infrastructure, Web (4 projects) |
-| **Data model** | Expenses, Categories, Budgets, CategoryBudgets |
-| **Auth** | Cookie auth; external OAuth (Google, Facebook, Twitter) |
-| **Features** | Expense tracking, receipts, categories, monthly + category budgets, dashboard, admin panel, user profile, subscriptions |
-| **Storage** | Receipts in `wwwroot/uploads/receipts`; profile images in `wwwroot/uploads/profiles` |
-| **API** | None — web-only |
+| **Solution** | Domain, Application, Infrastructure, **Web**, **API**, **Localization**, tests; **Expo mobile** in-repo (`FinanceApp.Mobile`) |
+| **Data model** | Expenses, Income, Categories, Budgets, CategoryBudgets, Accounts, Transactions, SupportingDocuments, Notifications, SharedReport, RecurringTemplate, … |
+| **Auth** | Cookie + Identity (web); **JWT + refresh** (API / mobile); external OAuth (Google, Facebook, Twitter) |
+| **Features** | Full web + API parity for core flows; dashboard; documents; monthly report + share; recurring job; subscriptions; **localization (en / es / sw)** via `FinanceApp.Localization` |
+| **Storage** | Uploads under web/API `wwwroot` / configured paths; same database for web + API + mobile clients |
+| **API** | **FinanceApp.API** — REST, OpenAPI at `/openapi/v1.json` |
+| **Mobile** | **FinanceApp.Mobile** — Expo, consumes API with JWT; i18next + `Accept-Language` |
 
 ### Where We Are Heading
 
-The target is an **API-first, multi-client platform**:
+Ongoing work: **production hardening**, subscription enforcement polish, broader automated tests, mobile store readiness, and optional **i18n** string coverage expansion — see root [README.md](../README.md), [WHERE_WE_LEFT_OFF.md](../WHERE_WE_LEFT_OFF.md), [Current-State.md](./Current-State.md).
 
-| Area | Target |
-|------|--------|
-| **Solution** | Add FinanceApp.API |
-| **Data model** | Accounts, Transactions (double-entry), SupportingDocuments |
-| **Auth** | Cookie (web) + JWT (API) + refresh tokens |
-| **Clients** | Web + React Native mobile |
-| **Storage** | SupportingDocuments table; optional cloud storage |
-
-See [Section 2](#2-current-vs-target-state) for the full comparison and migration path.
+> **Historical note:** [Section 2](#2-current-vs-target-state) below describes the **migration** from web-only toward API + mobile. That migration is **largely complete** in the codebase; use Section 2 as narrative context, not as “not yet built.”
 
 ---
 
@@ -77,7 +70,11 @@ The system will support:
 
 ## 2. Current vs Target State
 
+> **As of 2026:** The codebase **includes** `FinanceApp.API`, `FinanceApp.Mobile`, `FinanceApp.Localization`, accounts/transactions/supporting documents, JWT, and mobile clients. The subsections **2.1–2.3** describe the **original** migration from web-only; treat them as **historical context**. For an accurate snapshot of what is deployed in code today, see [Current-State.md](./Current-State.md) and the root [README.md](../README.md).
+
 ### 2.1 Current State (Implemented)
+
+*Historical snapshot (pre–API/mobile expansion):*
 
 **Solution structure:**
 ```
@@ -106,7 +103,9 @@ FinanceApp.sln
 
 **Current data model:** Expense, Category, Budget, CategoryBudget (all with UserId isolation).
 
-### 2.2 Target State (Planned)
+### 2.2 Target State (Planned — largely achieved in repo)
+
+*Original roadmap targets; most items are now implemented.*
 
 | Area | Target |
 |------|--------|
@@ -116,7 +115,7 @@ FinanceApp.sln
 | **Storage** | SupportingDocuments table; cloud storage (optional) |
 | **Clients** | Web + React Native mobile |
 
-### 2.3 Migration Path (Where We Are Heading)
+### 2.3 Migration Path (historical phases)
 
 1. **Phase 1:** Add FinanceApp.API; expose existing Expense/Category/Budget via REST.
 2. **Phase 2:** Introduce JWT; keep cookie auth for web.
@@ -130,14 +129,18 @@ FinanceApp.sln
 ### 3.1 Solution Structure
 
 ```
-FinanceApp.sln
+FinanceApp.sln  (see root README for full layout)
 │
 ├── FinanceApp.Domain
 ├── FinanceApp.Application
 ├── FinanceApp.Infrastructure
-├── FinanceApp.API      ← Planned
-└── FinanceApp.Web
+├── FinanceApp.API
+├── FinanceApp.Localization
+├── FinanceApp.Web
+├── FinanceApp.Tests
+└── FinanceApp.API.Tests
 ```
+*(Mobile: `FinanceApp.Mobile` in-repo, often listed outside the same .slnx file.)*
 
 ### 3.2 Layer Responsibilities
 

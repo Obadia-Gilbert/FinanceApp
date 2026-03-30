@@ -1,6 +1,17 @@
 import * as SecureStore from 'expo-secure-store';
+import { getStoredLanguage } from '../i18n/i18n';
 
-const API_BASE = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:5279';
+/** Base URL only (scheme + host + port). No path; do not append `/api` (paths already include `/api/...`). */
+function normalizeApiBase(raw: string | undefined): string {
+  let base = (raw ?? 'http://localhost:5279').trim();
+  base = base.replace(/\/+$/, '');
+  if (base.toLowerCase().endsWith('/api')) {
+    base = base.slice(0, -4).replace(/\/+$/, '');
+  }
+  return base;
+}
+
+const API_BASE = normalizeApiBase(process.env.EXPO_PUBLIC_API_URL);
 
 const TOKEN_KEY = 'auth_token';
 const REFRESH_KEY = 'refresh_token';
@@ -45,9 +56,10 @@ export async function getStoredUser(): Promise<StoredUser | null> {
 async function refreshAuth(): Promise<boolean> {
   const refreshToken = await SecureStore.getItemAsync(REFRESH_KEY);
   if (!refreshToken) return false;
+  const acceptLang = await getStoredLanguage();
   const res = await fetch(`${API_BASE}/api/auth/refresh`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'Accept-Language': acceptLang },
     body: JSON.stringify({ refreshToken }),
   });
   if (!res.ok) {
@@ -71,9 +83,12 @@ export async function apiFetch<T>(
   const url = path.startsWith('http') ? path : `${API_BASE}${path}`;
   let token: string | null = skipAuth ? null : await getStoredToken();
 
+  const acceptLang = await getStoredLanguage();
+
   const doRequest = (authToken: string | null) => {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
+      'Accept-Language': acceptLang,
       ...(init.headers as Record<string, string>),
     };
     if (authToken) headers['Authorization'] = `Bearer ${authToken}`;

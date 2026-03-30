@@ -7,21 +7,21 @@
 
 <form asp-action="Create" method="post" enctype="multipart/form-data" class="p-3">
     <div class="mb-3">
-        <label asp-for="Description" class="form-label">Description</label>
+        <label asp-for="Description" class="form-label">@L["Lbl_Description"]</label>
         <input asp-for="Description" class="form-control" />
         <span asp-validation-for="Description" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
-        <label asp-for="Amount" class="form-label">Amount</label>
+        <label asp-for="Amount" class="form-label">@L["Table_Amount"]</label>
         <input asp-for="Amount" class="form-control" />
         <span asp-validation-for="Amount" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
-        <label asp-for="Currency" class="form-label">Currency</label>
+        <label asp-for="Currency" class="form-label">@L["Lbl_Currency"]</label>
         <select asp-for="Currency" class="form-select">
-            <option value="">-- Select Currency --</option>
+            <option value="">@L["Exp_SelectCurrency"]</option>
             @foreach (var currency in Enum.GetValues(typeof(FinanceApp.Domain.Enums.Currency)))
             {
                 <option value="@currency">@currency</option>
@@ -30,15 +30,15 @@
     </div>
 
     <div class="mb-3">
-        <label asp-for="ExpenseDate" class="form-label">Expense Date</label>
+        <label asp-for="ExpenseDate" class="form-label">@L["Lbl_ExpenseDate"]</label>
         <input asp-for="ExpenseDate" type="date" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
         <span asp-validation-for="ExpenseDate" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
-        <label asp-for="CategoryId" class="form-label">Expense category</label>
+        <label asp-for="CategoryId" class="form-label">@L["Exp_LabelExpenseCategory"]</label>
         <select asp-for="CategoryId" class="form-select">
-            <option value="">-- Select Category --</option>
+            <option value="">@L["Exp_SelectCategory"]</option>
             @foreach (var cat in categories ?? Enumerable.Empty<FinanceApp.Domain.Entities.Category>())
             {
                 <option value="@cat.Id">@cat.Name</option>
@@ -47,9 +47,9 @@
     </div>
 
     <div class="mb-3">
-        <label asp-for="AccountId" class="form-label">Account <span class="text-muted">(optional — for balance tracking)</span></label>
+        <label asp-for="AccountId" class="form-label">@L["Lbl_Account"] <span class="text-muted">@L["Exp_AccountOptional"]</span></label>
         <select asp-for="AccountId" class="form-select">
-            <option value="">— None (tracking only) —</option>
+            <option value="">@L["Exp_AccountNone"]</option>
             @if (accounts != null)
             {
                 @foreach (var acc in accounts)
@@ -58,24 +58,24 @@
                 }
             }
         </select>
-        <small class="text-muted">Leave as "None" if you don't use accounts; your expense will still be listed and included in reports.</small>
+        <small class="text-muted">@L["Exp_AccountHelp"]</small>
     </div>
 
     <div class="mb-3">
-        <label asp-for="ReceiptFile" class="form-label">Receipt / supporting document <span class="text-muted fw-normal">(optional)</span></label>
+        <label asp-for="ReceiptFile" class="form-label">@L["Exp_ReceiptLabel"] <span class="text-muted fw-normal">@L["Exp_ReceiptOptional"]</span></label>
         <input asp-for="ReceiptFile" type="file" class="form-control receipt-file-input" accept=".jpg,.jpeg,.png,.gif,.webp,.pdf" />
-        <small class="text-muted">JPG, PNG, GIF, WebP or PDF. Max 5MB.</small>
+        <small class="text-muted">@L["Exp_ReceiptTypes"]</small>
         <div class="receipt-preview mt-2 d-none">
             <img src="" alt="Preview" class="receipt-preview-img rounded border" style="max-height: 120px; max-width: 100%; object-fit: contain;" />
-            <p class="receipt-preview-pdf small text-muted mt-1 d-none">PDF selected — will be uploaded on save.</p>
+            <p class="receipt-preview-pdf small text-muted mt-1 d-none">@L["Exp_PdfWillUpload"]</p>
         </div>
     </div>
 
     <div class="d-flex justify-content-end gap-2">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">Cancel</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">@L["Common_Cancel"]</button>
         <button type="submit" class="btn btn-primary" id="expenseCreateSubmit">
-            <span class="btn-text"><i class="bi bi-check-lg me-1"></i>Create Expense</span>
-            <span class="btn-loading d-none"><span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Saving…</span>
+            <span class="btn-text"><i class="bi bi-check-lg me-1"></i>@L["Exp_CreateExpense"]</span>
+            <span class="btn-loading d-none"><span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>@L["Common_Saving"]</span>
         </button>
     </div>
 </form>

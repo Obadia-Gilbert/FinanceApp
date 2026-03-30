@@ -1,32 +1,42 @@
 @model IEnumerable<FinanceApp.Web.Models.TransactionViewModel>
-
+@using System.Text.Json
+@using FinanceApp.Domain.Enums
 @{
-    ViewData["Title"] = "Transactions";
+    ViewData["Title"] = L["Tx_PageTitle"].Value;
     int pageNumber = ViewBag.PageNumber;
     int totalPages = ViewBag.TotalPages;
     int totalItems = ViewBag.TotalItems;
+    var jsTxFail = JsonSerializer.Serialize(L["Tx_FailedLoadForm"].Value);
+    var jsTxDelConfirm = JsonSerializer.Serialize(L["Tx_DeleteConfirm"].Value);
+    string TxTypeLabel(TransactionType t) => t switch
+    {
+        TransactionType.Income => L["Tx_TypeIncome"].Value,
+        TransactionType.Expense => L["Tx_TypeExpense"].Value,
+        TransactionType.Transfer => L["Tx_BadgeTransfer"].Value,
+        _ => t.ToString()
+    };
 }
 
 <div class="mb-4">
-    <h1 class="visually-hidden">Transactions</h1>
-    <p class="page-subtitle mb-3">All income, expense and transfer records across your accounts.</p>
+    <h1 class="visually-hidden">@L["Tx_PageTitle"]</h1>
+    <p class="page-subtitle mb-3">@L["Tx_Subtitle"]</p>
     <div class="d-flex gap-2 mb-3">
         <button id="btnAddTransaction" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Add Transaction
+            <i class="bi bi-plus-circle"></i> @L["Tx_Add"]
         </button>
         <button id="btnTransfer" class="btn btn-outline-primary">
-            <i class="bi bi-arrow-left-right"></i> Transfer
+            <i class="bi bi-arrow-left-right"></i> @L["Tx_Transfer"]
         </button>
     </div>
 
     <div class="offcanvas offcanvas-end" tabindex="-1" id="txOffcanvas" aria-labelledby="txOffcanvasLabel">
         <div class="offcanvas-header">
-            <h5 id="txOffcanvasLabel">Transaction</h5>
-            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            <h5 id="txOffcanvasLabel">@L["Tx_OffcanvasTitle"]</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="@L["Common_Close"]"></button>
         </div>
         <div class="offcanvas-body px-0">
             <div class="p-3 d-flex align-items-center justify-content-center min-vh-25" id="txOffcanvasContent">
-                <div class="text-center text-muted"><span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Loading…</div>
+                <div class="text-center text-muted"><span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>@L["Common_Loading"]</div>
             </div>
         </div>
     </div>
@@ -35,7 +45,7 @@
 @if (!Model.Any())
 {
     <div class="alert alert-info">
-        <i class="bi bi-info-circle me-2"></i>No transactions yet. Click <strong>Add Transaction</strong> to get started.
+        <i class="bi bi-info-circle me-2"></i>@L["Tx_EmptyPart1"]<strong>@L["Tx_AddStrong"]</strong>@L["Tx_EmptyPart2"]
     </div>
 }
 else
@@ -46,12 +56,12 @@ else
                 <table id="txTable" class="table table-hover mb-0">
                     <thead>
                         <tr>
-                            <th>Date</th>
-                            <th>Account</th>
-                            <th>Type</th>
-                            <th>Category</th>
-                            <th class="text-end">Amount</th>
-                            <th>Note</th>
+                            <th>@L["Table_Date"]</th>
+                            <th>@L["Tx_ColAccount"]</th>
+                            <th>@L["Tx_ColType"]</th>
+                            <th>@L["Lbl_Category"]</th>
+                            <th class="text-end">@L["Table_Amount"]</th>
+                            <th>@L["Tx_ColNote"]</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -66,11 +76,11 @@ else
                                 <td>@tx.AccountName</td>
                                 <td>
                                     <span class="@typeClass">
-                                        <i class="bi @typeIcon me-1"></i>@tx.Type
+                                        <i class="bi @typeIcon me-1"></i>@TxTypeLabel(tx.Type)
                                     </span>
                                     @if (tx.TransferGroupId.HasValue)
                                     {
-                                        <span class="badge bg-info text-dark ms-1">Transfer</span>
+                                        <span class="badge bg-info text-dark ms-1">@L["Tx_BadgeTransfer"]</span>
                                     }
                                     @if (tx.IsRecurring)
                                     {
@@ -88,7 +98,7 @@ else
                                         <a href="@Url.Action("Edit", "Transaction", new { id = tx.Id })" class="btn btn-sm btn-outline-secondary btn-edit me-1">
                                             <i class="bi bi-pencil"></i>
                                         </a>
-                                        <form method="post" asp-action="Delete" asp-controller="Transaction" asp-route-id="@tx.Id" style="display:inline" onsubmit="return confirm('Delete this transaction?');">
+                                        <form method="post" asp-action="Delete" asp-controller="Transaction" asp-route-id="@tx.Id" style="display:inline" onsubmit="return confirm(@Html.Raw(jsTxDelConfirm));">
                                             @Html.AntiForgeryToken()
                                             <button type="submit" class="btn btn-sm btn-outline-danger">
                                                 <i class="bi bi-trash"></i>
@@ -97,7 +107,7 @@ else
                                     }
                                     else
                                     {
-                                        <span class="text-muted small">Transfer</span>
+                                        <span class="text-muted small">@L["Tx_BadgeTransfer"]</span>
                                     }
                                 </td>
                             </tr>
@@ -110,10 +120,10 @@ else
 
     @if (totalPages > 1)
     {
-        <nav class="mt-3" aria-label="Transactions pagination">
+        <nav class="mt-3" aria-label="@L["Tx_PaginationAria"]">
             <ul class="pagination justify-content-center mb-0">
                 <li class="page-item @(pageNumber <= 1 ? "disabled" : "")">
-                    <a class="page-link" asp-action="Index" asp-route-pageNumber="@(pageNumber - 1)">‹ Prev</a>
+                    <a class="page-link" asp-action="Index" asp-route-pageNumber="@(pageNumber - 1)">@L["Tx_Prev"]</a>
                 </li>
                 @for (int p = 1; p <= totalPages; p++)
                 {
@@ -122,7 +132,7 @@ else
                     </li>
                 }
                 <li class="page-item @(pageNumber >= totalPages ? "disabled" : "")">
-                    <a class="page-link" asp-action="Index" asp-route-pageNumber="@(pageNumber + 1)">Next ›</a>
+                    <a class="page-link" asp-action="Index" asp-route-pageNumber="@(pageNumber + 1)">@L["Tx_Next"]</a>
                 </li>
             </ul>
         </nav>
@@ -136,10 +146,10 @@ else
             const content = document.getElementById('txOffcanvasContent');
 
             async function loadIntoOffcanvas(url) {
-                content.innerHTML = '<div class="text-center text-muted p-4"><span class="spinner-border spinner-border-sm me-2"></span>Loading…</div>';
+                content.innerHTML = '<div class="text-center text-muted p-4"><span class="spinner-border spinner-border-sm me-2"></span>' + @Html.Raw(JsonSerializer.Serialize(L["Common_Loading"].Value)) + '</div>';
                 bootstrap.Offcanvas.getOrCreateInstance(offcanvasEl).show();
                 const res = await fetch(url, { credentials: 'include', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-                if (!res.ok) { if (typeof showToast === 'function') showToast('Failed to load form.'); return; }
+                if (!res.ok) { if (typeof showToast === 'function') showToast(@Html.Raw(jsTxFail)); return; }
                 content.innerHTML = await res.text();
             }
 

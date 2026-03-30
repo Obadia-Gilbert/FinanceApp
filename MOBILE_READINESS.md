@@ -1,6 +1,6 @@
 # Mobile app readiness – FinanceApp API
 
-**Short answer:** The backend is **mostly ready** for a mobile app. You have a solid API with JWT auth and most features exposed. A few API gaps and config tweaks will make the move to mobile smooth.
+**Short answer:** The backend is **ready** for the in-repo mobile app: JWT auth, core finance flows, recurring, feedback, and baseline localization are exposed. Remaining work is mainly **production hardening** (secrets, CORS, file storage) — see [DEPLOYMENT_READINESS.md](./DEPLOYMENT_READINESS.md).
 
 ---
 
@@ -21,28 +21,12 @@
 | **Supporting documents** | ✅ Ready | Upload, list, download, preview. |
 | **Notifications** | ✅ Ready | List, unread count, mark read. |
 | **Reports** | ✅ Ready | Monthly report (e.g. `GET /api/reports/monthly?year=&month=`). |
+| **Recurring** | ✅ Ready | `RecurringTemplatesController` — `api/recurring` (JWT): list, get, create, update, deactivate, delete templates. |
+| **Feedback** | ✅ Ready | `FeedbackController` — `api/feedback` (JWT): list “my” feedback, get by id, create. |
+| **Localization** | ✅ Ready | Request culture from **`Accept-Language`** and the user’s preferred language (aligned with web profile). See root [README.md](./README.md) → Localization. |
 | **Infrastructure** | ✅ Ready | JWT auth, CORS enabled, OpenAPI at `/openapi/v1.json`. |
 
-So for a **first mobile version**, you can already build: login/register, dashboard, expenses, income, categories, budgets, accounts, transactions, profile, notifications, and reports.
-
----
-
-## Gaps to fix for full parity (optional but recommended)
-
-1. **Recurring templates**
-   - **Web:** Recurring templates (create, list, deactivate) exist in the Web app.
-   - **API:** `IRecurringTemplateService` is registered but there is **no** `RecurringController` (no endpoints).
-   - **For mobile:** Add e.g. `GET/POST /api/recurring` (and optionally PUT/DELETE) so the app can list and create recurring templates.
-
-2. **Feedback**
-   - **Web:** Users can submit questions/suggestions/comments; admins see them in the Admin area.
-   - **API:** No feedback endpoints and **no** `IFeedbackService` registration in the API project.
-   - **For mobile:** Add `POST /api/feedback` (and optionally `GET /api/feedback` for “my feedback”) and register `IFeedbackService` in the API so the mobile app can submit feedback.
-
-3. **API project config**
-   - **Feedback:** In `FinanceApp.API/Program.cs`, add:
-     - `builder.Services.AddScoped<IFeedbackService, FeedbackService>();`
-   - Then add a `FeedbackController` (e.g. `POST` create, `GET` list for current user) if you want feedback from the mobile app.
+So for a **first mobile version**, you can already build: login/register, dashboard, expenses, income, categories, budgets, accounts, transactions, recurring, feedback, profile, notifications, and reports — with localized API behavior where implemented.
 
 ---
 
@@ -56,6 +40,5 @@ So for a **first mobile version**, you can already build: login/register, dashbo
 
 ## Summary
 
-- **Ready for mobile now:** Auth, dashboard, expenses, income, categories, budgets, accounts, transactions, profile, subscription, documents, notifications, reports. You can start building the mobile app against the existing API.
-- **Quick wins for parity:** Add Recurring and Feedback API endpoints (and register `IFeedbackService` in the API) so the mobile app can do everything the web app can.
+- **Ready for mobile now:** Auth, dashboard, expenses, income, categories, budgets, accounts, transactions, recurring, feedback, profile, subscription, documents, notifications, reports, and baseline **localization** (`Accept-Language` / preferred language). The in-repo **FinanceApp.Mobile** app targets this API (see **`FinanceApp.Mobile/README.md`**).
 - **Before production:** Harden secrets, CORS, and upload storage as in [DEPLOYMENT_READINESS.md](./DEPLOYMENT_READINESS.md).

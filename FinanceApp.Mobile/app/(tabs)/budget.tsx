@@ -259,8 +259,8 @@ export default function BudgetScreen() {
 
       {/* Category Budgets */}
       <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <Text style={[styles.sectionTitle, { color: colors.text.primary }]} numberOfLines={1}>
+        <View style={styles.sectionHeaderStacked}>
+          <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>
             Category Budgets
           </Text>
           <View style={styles.sectionHeaderBtns}>
@@ -479,8 +479,9 @@ const styles = StyleSheet.create({
   summaryDivider: { width: 1, height: 32 },
   section: { marginBottom: 24 },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
-  sectionTitle: { fontSize: 18, fontWeight: '700', flexShrink: 1 },
-  sectionHeaderBtns: { flexDirection: 'row', gap: 8, flexShrink: 0 },
+  sectionHeaderStacked: { marginBottom: 16 },
+  sectionTitle: { fontSize: 18, fontWeight: '700', marginBottom: 10 },
+  sectionHeaderBtns: { flexDirection: 'row', gap: 8 },
   setBudgetBtn: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10 },
   setBudgetBtnText: { color: '#fff', fontSize: 14, fontWeight: '600' },
   addCatBudgetBtn: { paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10 },

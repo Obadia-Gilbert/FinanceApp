@@ -4,24 +4,24 @@
     @Html.AntiForgeryToken()
 
     <div class="mb-3">
-        <label asp-for="Name" class="form-label">Account Name</label>
-        <input asp-for="Name" class="form-control" placeholder="e.g. CRDB Savings" />
+        <label asp-for="Name" class="form-label">@L["Acc_LblAccountName"]</label>
+        <input asp-for="Name" class="form-control" placeholder="@L["Acc_PlaceholderName"]" />
         <span asp-validation-for="Name" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
-        <label asp-for="Type" class="form-label">Account Type</label>
+        <label asp-for="Type" class="form-label">@L["Acc_LblAccountType"]</label>
         <select asp-for="Type" class="form-select">
-            @foreach (var type in Enum.GetValues(typeof(FinanceApp.Domain.Enums.AccountType)))
+            @foreach (FinanceApp.Domain.Enums.AccountType type in Enum.GetValues(typeof(FinanceApp.Domain.Enums.AccountType)))
             {
-                <option value="@type">@type</option>
+                <option value="@type">@AccountDisplayHelper.LocalizedAccountType(L, type)</option>
             }
         </select>
         <span asp-validation-for="Type" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
-        <label asp-for="Currency" class="form-label">Currency</label>
+        <label asp-for="Currency" class="form-label">@L["Lbl_Currency"]</label>
         <select asp-for="Currency" class="form-select">
             @foreach (var c in Enum.GetValues(typeof(FinanceApp.Domain.Enums.Currency)))
             {
@@ -32,21 +32,21 @@
     </div>
 
     <div class="mb-3">
-        <label asp-for="InitialBalance" class="form-label">Initial Balance</label>
-        <input asp-for="InitialBalance" class="form-control" type="number" step="0.01" min="0" placeholder="0.00" />
+        <label asp-for="InitialBalance" class="form-label">@L["Acc_LblInitialBalance"]</label>
+        <input asp-for="InitialBalance" class="form-control" type="number" step="0.01" min="0" placeholder="@L["Acc_PlaceholderInitialBalance"]" />
         <span asp-validation-for="InitialBalance" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
-        <label asp-for="Description" class="form-label">Description <span class="text-muted fw-normal">(optional)</span></label>
-        <textarea asp-for="Description" class="form-control" rows="2" placeholder="Short note about this account"></textarea>
+        <label asp-for="Description" class="form-label">@L["Lbl_Description"] <span class="text-muted fw-normal">@L["Exp_ReceiptOptional"]</span></label>
+        <textarea asp-for="Description" class="form-control" rows="2" placeholder="@L["Acc_DescPlaceholder"]"></textarea>
         <span asp-validation-for="Description" class="text-danger"></span>
     </div>
 
     <div class="d-flex justify-content-end gap-2">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">Cancel</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">@L["Common_Cancel"]</button>
         <button type="submit" class="btn btn-primary">
-            <i class="bi bi-check-lg me-1"></i>Create Account
+            <i class="bi bi-check-lg me-1"></i>@L["Acc_CreateAccount"]
         </button>
     </div>
 </form>

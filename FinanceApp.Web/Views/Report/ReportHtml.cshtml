@@ -1,14 +1,16 @@
 @model FinanceApp.Application.Common.MonthlyReportResult
 @{
     Layout = null;
-    var monthNames = new[] { "", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
+    var ci = CultureInfo.CurrentUICulture;
+    var displayMonth = new DateTime(Model.Year, Model.Month, 1).ToString("MMMM yyyy", ci);
+    var generatedAt = DateTime.Now.ToString("g", ci);
 }
 <!DOCTYPE html>
-<html lang="en">
+<html lang="@ci.TwoLetterISOLanguageName">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Monthly Report - @Model.MonthName - FinanceApp</title>
+    <title>@L["Rpt_DocTitle", displayMonth]</title>
     <style>
         body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; color: #333; }
         h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
@@ -29,31 +31,33 @@
     </style>
 </head>
 <body>
-    <h1>@Model.MonthName</h1>
-    <p class="muted">FinanceApp monthly report — generated @DateTime.Now.ToString("yyyy-MM-dd HH:mm")</p>
+    <h1>@displayMonth</h1>
+    <p class="muted">@L["Rpt_GeneratedLine", generatedAt]</p>
 
     <div class="summary">
         <div class="summary-box">
-            <div class="label">Total spent</div>
+            <div class="label">@L["Rpt_TotalSpent"]</div>
             <div class="value">@Model.TotalSpent.ToString("N0") @Model.Currency</div>
         </div>
         <div class="summary-box">
-            <div class="label">Total income</div>
+            <div class="label">@L["Rpt_TotalIncome"]</div>
             <div class="value" style="color: #0d6efd;">@Model.TotalIncome.ToString("N0") @Model.Currency</div>
         </div>
         <div class="summary-box">
-            <div class="label">Net cash flow</div>
+            <div class="label">@L["Rpt_NetCashFlow"]</div>
             <div class="value" style="color: @(Model.NetCashFlow >= 0 ? "#198754" : "#dc3545");">@Model.NetCashFlow.ToString("N0") @Model.Currency</div>
         </div>
         @if (Model.GlobalBudgetAmount.HasValue)
         {
             <div class="summary-box @(Model.IsOverGlobalBudget ? "over" : "")">
-                <div class="label">Monthly budget</div>
+                <div class="label">@L["Rpt_MonthlyBudget"]</div>
                 <div class="value">@Model.GlobalBudgetAmount.Value.ToString("N0") @Model.Currency</div>
                 @if (Model.GlobalBudgetRemaining.HasValue)
                 {
                     <div class="muted" style="margin-top: 0.25rem;">
-                        @(Model.IsOverGlobalBudget ? "Exceeded by " + (-Model.GlobalBudgetRemaining.Value).ToString("N0") : "Left: " + Model.GlobalBudgetRemaining.Value.ToString("N0")) @Model.Currency
+                        @(Model.IsOverGlobalBudget
+                            ? L["Rpt_BudgetExceededBy", (-Model.GlobalBudgetRemaining.Value).ToString("N0"), Model.Currency]
+                            : L["Rpt_BudgetLeftShort", Model.GlobalBudgetRemaining.Value.ToString("N0"), Model.Currency])
                     </div>
                 }
             </div>
@@ -62,14 +66,14 @@
 
     @if (Model.CategoryLines.Any())
     {
-        <h2 style="font-size: 1rem;">By category</h2>
+        <h2 style="font-size: 1rem;">@L["Rpt_ByCategory"]</h2>
         <table>
             <thead>
                 <tr>
-                    <th>Category</th>
-                    <th class="text-end">Spent</th>
-                    <th class="text-end">Budget</th>
-                    <th class="text-end">Left</th>
+                    <th>@L["Table_Category"]</th>
+                    <th class="text-end">@L["Rpt_ColSpent"]</th>
+                    <th class="text-end">@L["Rpt_ColBudget"]</th>
+                    <th class="text-end">@L["Rpt_ColLeft"]</th>
                 </tr>
             </thead>
             <tbody>
@@ -78,8 +82,8 @@
                     <tr class="@(line.IsOverBudget ? "over-row" : "")">
                         <td>@line.CategoryName</td>
                         <td class="text-end">@line.Spent.ToString("N0") @Model.Currency</td>
-                        <td class="text-end">@(line.BudgetAmount.HasValue ? line.BudgetAmount.Value.ToString("N0") : "—")</td>
-                        <td class="text-end">@(line.Remaining.HasValue ? (line.IsOverBudget ? "Over" : line.Remaining.Value.ToString("N0")) : "—")</td>
+                        <td class="text-end">@(line.BudgetAmount.HasValue ? line.BudgetAmount.Value.ToString("N0") : L["Rpt_Dash"])</td>
+                        <td class="text-end">@(line.Remaining.HasValue ? (line.IsOverBudget ? L["Rpt_Over"] : line.Remaining.Value.ToString("N0")) : L["Rpt_Dash"])</td>
                     </tr>
                 }
             </tbody>
@@ -88,18 +92,18 @@
 
     @if (Model.TopExpenses.Any())
     {
-        <h2 style="font-size: 1rem;">Top expenses</h2>
+        <h2 style="font-size: 1rem;">@L["Rpt_TopExpenses"]</h2>
         <ul>
             @foreach (var e in Model.TopExpenses.Take(15))
             {
                 <li>
-                    <span>@(string.IsNullOrEmpty(e.Description) ? "Expense" : e.Description) — @e.CategoryName · @e.Date.ToString("MMM d")</span>
+                    <span>@(string.IsNullOrEmpty(e.Description) ? L["Rpt_ExpenseFallback"] : e.Description) — @e.CategoryName · @e.Date.ToString("MMM d", ci)</span>
                     <span>@e.Amount.ToString("N0") @e.Currency</span>
                 </li>
             }
         </ul>
     }
 
-    <p class="footer">FinanceApp — monthly report. You can save this page (File → Save As) to keep a copy.</p>
+    <p class="footer">@L["Rpt_HtmlSaveHint"]</p>
 </body>
 </html>

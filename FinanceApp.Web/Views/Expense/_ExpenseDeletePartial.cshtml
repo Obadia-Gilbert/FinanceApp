@@ -1,13 +1,13 @@
 @model FinanceApp.Web.Models.ExpenseDeleteViewModel
 
 <div class="p-3">
-    <h5 class="mb-3">Confirm Delete</h5>
-    <p>Are you sure you want to delete the expense <strong>"@Model.Description"</strong> dated <strong>@Model.ExpenseDate.ToString("yyyy-MM-dd")</strong> with amount <strong>@Model.Amount</strong>?</p>
+    <h5 class="mb-3">@L["Exp_DeleteTitle"]</h5>
+    <p>@L["Exp_DeleteBody", Model.Description ?? "", Model.ExpenseDate.ToString("yyyy-MM-dd"), Model.Amount.ToString()]</p>
 
     <form asp-action="Delete" method="post" class="d-flex justify-content-end gap-2">
         <input type="hidden" name="id" value="@Model.Id" />
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">Cancel</button>
-        <button type="submit" class="btn btn-danger">Delete</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">@L["Common_Cancel"]</button>
+        <button type="submit" class="btn btn-danger">@L["Common_Delete"]</button>
     </form>
 </div>
 
