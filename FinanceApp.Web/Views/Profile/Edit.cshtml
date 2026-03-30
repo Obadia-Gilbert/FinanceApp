@@ -112,12 +112,9 @@
 
         function getCallingCode(country) {
             if (!country) return null;
-            if (typeof lib.getCountryCallingCode === 'function') {
-                try { return lib.getCountryCallingCode(country) || null; } catch (e) { return null; }
-            }
-
-            // Reliable fallback for our supported profile country list.
-            // (CDN globals can vary; this guarantees prefix insertion.)
+            // Fallback for our supported profile country list.
+            // This keeps prefix insertion working even if the CDN bundle
+            // doesn't expose libphonenumber-js in the browser runtime.
             var FALLBACK_CALLING_CODES = {
                 TZ: '255',
                 UG: '256',
@@ -150,6 +147,12 @@
                 BW: '267',
                 NA: '264',
             };
+
+            if (!lib) return FALLBACK_CALLING_CODES[country] || null;
+
+            if (typeof lib.getCountryCallingCode === 'function') {
+                try { return lib.getCountryCallingCode(country) || null; } catch (e) { return null; }
+            }
 
             // Fallback: derive calling code by parsing a dummy value in the selected region.
             // This keeps behavior working even if the CDN global doesn't expose getCountryCallingCode.
@@ -227,6 +230,11 @@
             }
 
             try {
+                if (!lib || typeof lib.AsYouType !== 'function') {
+                    phoneInput.value = prefix + nationalDigits;
+                    setCaretAfterCallingCode(country);
+                    return;
+                }
                 var formatter = new lib.AsYouType(country);
                 var formattedSoFar = formatter.input(nationalDigits);
                 var num = formatter.getNumber();
