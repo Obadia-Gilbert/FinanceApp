@@ -36,7 +36,8 @@ public class ProfileController : Controller
             CountryCode = user.CountryCode,
             CurrentProfileImagePath = user.ProfileImagePath,
             Email = user.Email,
-            PreferredLanguage = SupportedLanguages.Normalize(user.PreferredLanguage)
+            PreferredLanguage = SupportedLanguages.Normalize(user.PreferredLanguage),
+            DailyReminderEnabled = user.DailyReminderEnabled
         };
         ViewBag.Countries = new SelectList(
             CountryList.All.Select(c => new SelectListItem { Value = c.Code, Text = c.Name }),
@@ -61,6 +62,7 @@ public class ProfileController : Controller
             user.CountryCode = string.IsNullOrWhiteSpace(model.CountryCode) ? null : model.CountryCode?.Trim();
             user.Country = CountryList.GetNameByCode(user.CountryCode) ?? model.Country?.Trim();
             user.PreferredLanguage = SupportedLanguages.Normalize(model.PreferredLanguage);
+            user.DailyReminderEnabled = model.DailyReminderEnabled;
 
             if (model.ProfileImage != null && model.ProfileImage.Length > 0)
             {
@@ -94,6 +96,7 @@ public class ProfileController : Controller
         model.PhoneNumber = user.PhoneNumber;
         model.Country = user.Country;
         model.CountryCode = user.CountryCode;
+        model.DailyReminderEnabled = user.DailyReminderEnabled;
         ViewBag.Countries = new SelectList(
             CountryList.All.Select(c => new SelectListItem { Value = c.Code, Text = c.Name }),
             "Value",

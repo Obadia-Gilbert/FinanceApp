@@ -19,6 +19,7 @@ public static class CountryList
         ("AU", "Australia"),
         ("DE", "Germany"),
         ("FR", "France"),
+        ("ES", "Spain"),
         ("IN", "India"),
         ("ZA", "South Africa"),
         ("NG", "Nigeria"),

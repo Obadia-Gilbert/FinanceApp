@@ -44,6 +44,8 @@
     "phoneNumber": "Namba ya simu",
     "phonePlaceholder": "Mfano: +255 712 345 678",
     "phonePrefixHint": "Kiambishi hutokana na nchi. Andika tarakimu zilizobaki.",
+    "dailyReminderTitle": "Kikumbusho cha shughuli za kila siku",
+    "dailyReminderHint": "Nijulishe kila siku kama sijaweka matumizi au mapato.",
     "updateFailed": "Imeshindwa kusasisha wasifu"
   }
 }

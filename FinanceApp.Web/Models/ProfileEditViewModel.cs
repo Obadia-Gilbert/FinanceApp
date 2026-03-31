@@ -36,4 +36,7 @@ public class ProfileEditViewModel
     [RegularExpression("^(en|sw|es)$")]
     [Display(Name = "Language")]
     public string PreferredLanguage { get; set; } = "en";
+
+    [Display(Name = "Daily reminders")]
+    public bool DailyReminderEnabled { get; set; } = true;
 }

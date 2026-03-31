@@ -44,6 +44,8 @@
     "phoneNumber": "Phone Number",
     "phonePlaceholder": "e.g. +255 712 345 678",
     "phonePrefixHint": "Prefix is derived from country. You type the remaining digits.",
+    "dailyReminderTitle": "Daily activity reminder",
+    "dailyReminderHint": "Notify me daily if I have not logged expense or income.",
     "updateFailed": "Failed to update profile"
   }
 }

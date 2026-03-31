@@ -141,6 +141,7 @@ export interface ProfileDto {
   countryCode: string | null;
   profileImagePath: string | null;
   preferredLanguage: string;
+  dailyReminderEnabled: boolean;
 }
 
 export interface UpdateProfileRequest {
@@ -149,6 +150,7 @@ export interface UpdateProfileRequest {
   phoneNumber?: string | null;
   countryCode?: string | null;
   preferredLanguage?: string;
+  dailyReminderEnabled?: boolean;
 }
 
 /** Income */

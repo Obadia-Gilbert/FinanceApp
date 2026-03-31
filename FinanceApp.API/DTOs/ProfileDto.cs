@@ -8,4 +8,5 @@ public record ProfileDto(
     string? Country,
     string? CountryCode,
     string? ProfileImagePath,
-    string PreferredLanguage);
+    string PreferredLanguage,
+    bool DailyReminderEnabled);

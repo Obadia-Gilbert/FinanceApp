@@ -55,6 +55,7 @@ builder.Services.AddHostedService<FinanceApp.Infrastructure.Services.RecurringTr
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IBudgetNotificationService, BudgetNotificationService>();
+builder.Services.AddScoped<IDailyActivityReminderService, DailyActivityReminderService>();
 builder.Services.AddScoped<IExpenseQueryService, FinanceApp.Infrastructure.Services.ExpenseQueryService>();
 builder.Services.AddScoped<IMonthlyReportService, MonthlyReportService>();
 builder.Services.AddSingleton<SubscriptionProductMapper>();
@@ -68,6 +69,7 @@ builder.Services.AddScoped<ISupportingDocumentService>(sp =>
     var uploadRoot = Path.Combine(env.WebRootPath, "uploads", "documents");
     return new SupportingDocumentService(repo, uploadRoot);
 });
+builder.Services.AddHostedService<DailyActivityReminderJob>();
 
 // Identity (required for JWT login)
 builder.Services
