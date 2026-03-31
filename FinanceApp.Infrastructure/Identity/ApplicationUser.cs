@@ -40,4 +40,9 @@ public class ApplicationUser : IdentityUser
 
     /// <summary>BCP 47 language code for UI (e.g. en, sw). Synced with web cookie and mobile i18n.</summary>
     public string PreferredLanguage { get; set; } = "en";
+
+    /// <summary>
+    /// If true, user receives daily reminder notifications when no expense/income is logged that day.
+    /// </summary>
+    public bool DailyReminderEnabled { get; set; } = true;
 }

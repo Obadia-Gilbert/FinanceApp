@@ -44,6 +44,8 @@
     "phoneNumber": "Número de teléfono",
     "phonePlaceholder": "Ej. +255 712 345 678",
     "phonePrefixHint": "El prefijo se deriva del país. Escribe los dígitos restantes.",
+    "dailyReminderTitle": "Recordatorio diario de actividad",
+    "dailyReminderHint": "Notifícame cada día si no he registrado gastos o ingresos.",
     "updateFailed": "No se pudo actualizar el perfil"
   }
 }

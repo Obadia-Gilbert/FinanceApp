@@ -19,6 +19,7 @@ export const COUNTRY_OPTIONS: CountryOption[] = [
   { code: 'AU', name: 'Australia' },
   { code: 'DE', name: 'Germany' },
   { code: 'FR', name: 'France' },
+  { code: 'ES', name: 'Spain' },
   { code: 'IN', name: 'India' },
   { code: 'ZA', name: 'South Africa' },
   { code: 'NG', name: 'Nigeria' },

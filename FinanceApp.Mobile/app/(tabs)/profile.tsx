@@ -39,6 +39,8 @@ export default function ProfileScreen() {
   const [phoneNationalDigits, setPhoneNationalDigits] = useState<string>('');
   const [phoneSelection, setPhoneSelection] = useState<{ start: number; end: number }>({ start: 0, end: 0 });
   const [countryPickerOpen, setCountryPickerOpen] = useState(false);
+  const [dailyReminderEnabled, setDailyReminderEnabled] = useState(true);
+  const [updatingReminder, setUpdatingReminder] = useState(false);
   const [error, setError] = useState('');
 
   const { data: profile } = useQuery({
@@ -70,6 +72,7 @@ export default function ProfileScreen() {
     const formatted = formatPhonePretty(nextCountry, nationalDigits);
     setPhoneDisplay(formatted);
     setPhoneSelection({ start: formatted.length, end: formatted.length });
+    setDailyReminderEnabled(profile.dailyReminderEnabled ?? true);
   }, [profile, editing]);
 
   useEffect(() => {
@@ -199,6 +202,24 @@ export default function ProfileScreen() {
       ],
       { cancelable: true }
     );
+  };
+
+  const toggleDailyReminder = (enabled: boolean) => {
+    setDailyReminderEnabled(enabled);
+    setUpdatingReminder(true);
+    setError('');
+
+    void (async () => {
+      try {
+        await updateProfile({ dailyReminderEnabled: enabled });
+        await queryClient.invalidateQueries({ queryKey: ['profile'] });
+      } catch (e) {
+        setDailyReminderEnabled((prev) => !enabled);
+        setError(e instanceof ApiError ? e.message : t('profile.updateFailed'));
+      } finally {
+        setUpdatingReminder(false);
+      }
+    })();
   };
 
   const handleSignOut = () => {
@@ -392,6 +413,22 @@ export default function ProfileScreen() {
           <Switch
             value={isDark}
             onValueChange={(v) => setMode(v ? 'dark' : 'light')}
+            trackColor={{ false: colors.border, true: colors.brand }}
+            thumbColor={isDark ? colors.bg.default : '#fff'}
+          />
+        </View>
+        <View style={[styles.menuRow, { borderBottomColor: colors.border }]}>
+          <View style={[styles.menuIconWrap, { backgroundColor: `${colors.info}15` }]}>
+            <Text style={styles.menuEmoji}>⏰</Text>
+          </View>
+          <View style={styles.menuLabelWrap}>
+            <Text style={[styles.menuLabel, { color: colors.text.primary }]}>{t('profile.dailyReminderTitle')}</Text>
+            <Text style={[styles.menuSub, { color: colors.text.muted }]}>{t('profile.dailyReminderHint')}</Text>
+          </View>
+          <Switch
+            value={dailyReminderEnabled}
+            onValueChange={toggleDailyReminder}
+            disabled={updatingReminder}
             trackColor={{ false: colors.border, true: colors.brand }}
             thumbColor={isDark ? colors.bg.default : '#fff'}
           />

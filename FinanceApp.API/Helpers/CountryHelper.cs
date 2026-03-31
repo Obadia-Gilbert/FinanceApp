@@ -14,6 +14,7 @@ public static class CountryHelper
         ("AE", "United Arab Emirates"), ("SA", "Saudi Arabia"), ("EG", "Egypt"),
         ("ZW", "Zimbabwe"), ("ZM", "Zambia"), ("MW", "Malawi"), ("MZ", "Mozambique"),
         ("BW", "Botswana"), ("NA", "Namibia"),
+        ("ES", "Spain"),
     };
 
     public static string? GetNameByCode(string? code)

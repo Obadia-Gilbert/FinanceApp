@@ -100,6 +100,7 @@ public class FinanceDbContext
             entity.Property(u => u.AppleOriginalTransactionId).HasMaxLength(128);
             entity.Property(u => u.GooglePurchaseToken).HasMaxLength(2048);
             entity.Property(u => u.PreferredLanguage).HasMaxLength(10).HasDefaultValue("en");
+            entity.Property(u => u.DailyReminderEnabled).HasDefaultValue(true);
         });
 
         // ==============================

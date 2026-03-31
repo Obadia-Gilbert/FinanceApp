@@ -35,7 +35,8 @@ public class ProfileController : ControllerBase
         return Ok(new ProfileDto(
             user.FirstName, user.LastName, user.Email, user.PhoneNumber,
             user.Country, user.CountryCode, user.ProfileImagePath,
-            SupportedLanguages.Normalize(user.PreferredLanguage)));
+            SupportedLanguages.Normalize(user.PreferredLanguage),
+            user.DailyReminderEnabled));
     }
 
     [HttpPut]
@@ -55,12 +56,15 @@ public class ProfileController : ControllerBase
         user.Country = CountryHelper.GetNameByCode(user.CountryCode) ?? user.Country;
         if (request.PreferredLanguage != null)
             user.PreferredLanguage = SupportedLanguages.Normalize(request.PreferredLanguage);
+        if (request.DailyReminderEnabled.HasValue)
+            user.DailyReminderEnabled = request.DailyReminderEnabled.Value;
         var result = await _userManager.UpdateAsync(user);
         if (!result.Succeeded)
             return BadRequest(new { errors = result.Errors.Select(e => e.Description) });
         return Ok(new ProfileDto(
             user.FirstName, user.LastName, user.Email, user.PhoneNumber,
             user.Country, user.CountryCode, user.ProfileImagePath,
-            SupportedLanguages.Normalize(user.PreferredLanguage)));
+            SupportedLanguages.Normalize(user.PreferredLanguage),
+            user.DailyReminderEnabled));
     }
 }

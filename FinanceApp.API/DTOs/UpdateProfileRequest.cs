@@ -19,4 +19,6 @@ public class UpdateProfileRequest
 
     [RegularExpression("^(en|sw|es)$")]
     public string? PreferredLanguage { get; set; }
+
+    public bool? DailyReminderEnabled { get; set; }
 }

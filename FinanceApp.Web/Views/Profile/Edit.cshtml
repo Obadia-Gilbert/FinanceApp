@@ -53,6 +53,11 @@
                         </select>
                         <span asp-validation-for="PreferredLanguage" class="invalid-feedback d-block small"></span>
                     </div>
+                    <div class="form-check form-switch mb-3">
+                        <input asp-for="DailyReminderEnabled" class="form-check-input" type="checkbox" role="switch" />
+                        <label asp-for="DailyReminderEnabled" class="form-check-label fw-600">Daily reminder notifications</label>
+                        <div><small class="text-muted">Get a daily reminder if you have not logged expense or income entries.</small></div>
+                    </div>
                     <div class="mb-3">
                         <label asp-for="Email" class="form-label fw-600">Email</label>
                         <input asp-for="Email" class="form-control" readonly disabled />
@@ -126,6 +131,7 @@
                 AU: '61',
                 DE: '49',
                 FR: '33',
+                ES: '34',
                 IN: '91',
                 ZA: '27',
                 NG: '234',
