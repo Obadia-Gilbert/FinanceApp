@@ -1,9 +1,12 @@
 import * as SecureStore from 'expo-secure-store';
 import { getStoredLanguage } from '../i18n/i18n';
 
+/** Default matches FinanceApp.API `http` launch profile (port 5022). Use Mobile profile → 5279 in .env if needed. */
+const defaultApiBase = 'http://127.0.0.1:5022';
+
 /** Base URL only (scheme + host + port). No path; do not append `/api` (paths already include `/api/...`). */
 function normalizeApiBase(raw: string | undefined): string {
-  let base = (raw ?? 'http://localhost:5279').trim();
+  let base = (raw ?? defaultApiBase).trim();
   base = base.replace(/\/+$/, '');
   if (base.toLowerCase().endsWith('/api')) {
     base = base.slice(0, -4).replace(/\/+$/, '');
@@ -12,6 +15,11 @@ function normalizeApiBase(raw: string | undefined): string {
 }
 
 const API_BASE = normalizeApiBase(process.env.EXPO_PUBLIC_API_URL);
+
+/** Resolved API origin for fetches (same host/port as `apiFetch`). */
+export function getApiBase(): string {
+  return API_BASE;
+}
 
 const TOKEN_KEY = 'auth_token';
 const REFRESH_KEY = 'refresh_token';

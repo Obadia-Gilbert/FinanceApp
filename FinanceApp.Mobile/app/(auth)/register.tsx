@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -14,8 +14,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../src/context/ThemeContext';
 import { Input } from '../../src/components/Input';
 import { Button } from '../../src/components/Button';
-import { register } from '../../src/api/auth';
+import { register, loginWithExternal } from '../../src/api/auth';
 import { ApiError } from '../../src/api/client';
+import { GoogleSignInButton } from '../../src/components/GoogleSignInButton';
+import { FacebookSignInButton } from '../../src/components/FacebookSignInButton';
+import { SocialLoginStub } from '../../src/components/SocialLoginStub';
+import { isGoogleAuthConfigured, isFacebookAuthConfigured, facebookAppId } from '../../src/auth/socialEnv';
 
 function getPasswordStrength(pwd: string): { level: number; label: string; color: string } {
   if (!pwd.length) return { level: 0, label: '', color: '' };
@@ -40,8 +44,34 @@ export default function RegisterScreen() {
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const googleOn = isGoogleAuthConfigured();
+  const facebookOn = isFacebookAuthConfigured();
 
   const strength = getPasswordStrength(password);
+
+  const completeSocialLogin = useCallback(
+    async (fn: () => Promise<unknown>) => {
+      setError('');
+      setLoading(true);
+      try {
+        await fn();
+        router.replace('/(tabs)');
+      } catch (e) {
+        if (e instanceof ApiError) setError(e.message);
+        else {
+          const msg = e instanceof Error ? e.message : 'Something went wrong. Please try again.';
+          setError(
+            msg.includes('fetch') || msg.includes('Network')
+              ? 'Cannot reach the server. Check Wi‑Fi and API URL in .env.'
+              : msg
+          );
+        }
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
 
   const handleRegister = async () => {
     setError('');
@@ -189,20 +219,29 @@ export default function RegisterScreen() {
           <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
         </View>
         <View style={styles.socialRow}>
-          <TouchableOpacity
-            style={[styles.socialBtn, { backgroundColor: colors.bg.default, borderColor: colors.border }]}
-            onPress={() => {}}
-          >
-            <Text style={[styles.socialIcon, { color: colors.text.primary }]}>G</Text>
-            <Text style={[styles.socialLabel, { color: colors.text.primary }]}>Google</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.socialBtn, { backgroundColor: colors.bg.default, borderColor: colors.border }]}
-            onPress={() => {}}
-          >
-            <Text style={styles.socialIcon}>🍎</Text>
-            <Text style={[styles.socialLabel, { color: colors.text.primary }]}>Apple</Text>
-          </TouchableOpacity>
+          {googleOn ? (
+            <GoogleSignInButton
+              colors={colors}
+              onIdToken={(idToken) =>
+                void completeSocialLogin(() => loginWithExternal({ provider: 'google', idToken }))
+              }
+              onError={(m) => setError(m)}
+            />
+          ) : (
+            <SocialLoginStub provider="google" colors={colors} />
+          )}
+          {facebookOn ? (
+            <FacebookSignInButton
+              clientId={facebookAppId()}
+              colors={colors}
+              onAccessToken={(accessToken) =>
+                void completeSocialLogin(() => loginWithExternal({ provider: 'facebook', accessToken }))
+              }
+              onError={(m) => setError(m)}
+            />
+          ) : (
+            <SocialLoginStub provider="facebook" colors={colors} />
+          )}
         </View>
 
         <View style={styles.footer}>
@@ -279,18 +318,6 @@ const styles = StyleSheet.create({
   dividerLine: { flex: 1, height: 1 },
   dividerText: { fontSize: 12, marginHorizontal: 12 },
   socialRow: { flexDirection: 'row', gap: 12 },
-  socialBtn: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 14,
-    borderRadius: 12,
-    borderWidth: 1,
-  },
-  socialIcon: { fontSize: 18 },
-  socialLabel: { fontSize: 15, fontWeight: '500' },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',

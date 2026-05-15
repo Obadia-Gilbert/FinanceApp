@@ -56,7 +56,7 @@ builder.Services.AddScoped<ISupportingDocumentService>(sp =>
     var uploadRoot = Path.Combine(env.WebRootPath, "uploads", "documents");
     return new SupportingDocumentService(repo, uploadRoot);
 });
-builder.Services.AddTransient<IEmailService, EmailService>();
+// IEmailService wired below after EmailSettings/Brevo are configured.
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IBudgetNotificationService, BudgetNotificationService>();
@@ -152,8 +152,18 @@ if (!string.IsNullOrWhiteSpace(twitterConsumerKey) && !string.IsNullOrWhiteSpace
 
 builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
     options.TokenLifespan = TimeSpan.FromHours(2));
-builder.Services.Configure<EmailSettings>(
-    builder.Configuration.GetSection("EmailSettings"));
+
+// Email — priority: Brevo HTTP API > SMTP (Brevo relay or other) > NoOp.
+builder.Services.Configure<BrevoSettings>(builder.Configuration.GetSection("Brevo"));
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddHttpClient(BrevoEmailService.HttpClientName);
+
+if (!string.IsNullOrWhiteSpace(builder.Configuration["Brevo:ApiKey"]))
+    builder.Services.AddTransient<IEmailService, BrevoEmailService>();
+else if (!string.IsNullOrWhiteSpace(builder.Configuration["EmailSettings:SmtpServer"]))
+    builder.Services.AddTransient<IEmailService, EmailService>();
+else
+    builder.Services.AddSingleton<IEmailService, NoOpEmailService>();
 
 builder.Services.AddTransient<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender, IdentityEmailSender>();
 builder.Services.AddRazorPages(); // For Identity UI

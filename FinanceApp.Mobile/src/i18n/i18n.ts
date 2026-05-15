@@ -12,7 +12,7 @@ export type AppLanguage = 'en' | 'sw' | 'es';
 /** Maps API / i18n language tags to a supported app language. */
 export function normalizeAppLanguage(code: string | undefined | null): AppLanguage {
   if (!code) return 'en';
-  const c = code.trim().toLowerInvariant();
+  const c = code.trim().toLocaleLowerCase('en');
   if (c.startsWith('sw')) return 'sw';
   if (c.startsWith('es')) return 'es';
   return 'en';

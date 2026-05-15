@@ -46,6 +46,13 @@
   <data name="Api_EmailRegistered" xml:space="preserve"><value>El correo electrónico ya está registrado.</value></data>
   <data name="Api_InvalidRefresh" xml:space="preserve"><value>Token de actualización no válido o caducado.</value></data>
   <data name="Api_UserNotFound" xml:space="preserve"><value>Usuario no encontrado.</value></data>
+  <data name="Api_OAuthNotConfigured" xml:space="preserve"><value>El inicio de sesión social no está configurado en el servidor.</value></data>
+  <data name="Api_OAuthInvalidToken" xml:space="preserve"><value>Token de inicio de sesión social no válido o caducado.</value></data>
+  <data name="Api_OAuthEmailRequired" xml:space="preserve"><value>Tu cuenta social no proporcionó un correo. Concede el permiso de correo u otro método de acceso.</value></data>
+  <data name="Api_OAuthUnsupportedProvider" xml:space="preserve"><value>Proveedor de inicio de sesión no admitido.</value></data>
+  <data name="Api_ResetPasswordInvalidToken" xml:space="preserve"><value>Este enlace para restablecer la contraseña no es válido o ha caducado. Solicita uno nuevo.</value></data>
+  <data name="Email_ResetPasswordSubject" xml:space="preserve"><value>Restablece tu contraseña de FinanceApp</value></data>
+  <data name="Email_ResetPasswordBody" xml:space="preserve"><value>&lt;p&gt;Hola,&lt;/p&gt;&lt;p&gt;Hemos recibido una solicitud para restablecer la contraseña de tu cuenta de FinanceApp. Haz clic en el enlace a continuación para elegir una nueva contraseña:&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;{0}&quot;&gt;Restablecer mi contraseña&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Si no solicitaste este cambio, puedes ignorar este correo de forma segura.&lt;/p&gt;&lt;p&gt;El enlace caducará en 2 horas.&lt;/p&gt;&lt;p&gt;— El equipo de FinanceApp&lt;/p&gt;</value></data>
   <data name="Dash_WelcomeBack" xml:space="preserve"><value>Bienvenido de nuevo, {0}. Así van tus finanzas.</value></data>
   <data name="Dash_ThisMonth" xml:space="preserve"><value>Este mes</value></data>
   <data name="Dash_NoExpensesStrong" xml:space="preserve"><value>Aún no hay gastos.</value></data>
@@ -319,6 +326,7 @@
   <data name="Priv_Title" xml:space="preserve"><value>Política de privacidad</value></data>
   <data name="Priv_BadgeUpdated" xml:space="preserve"><value>Última actualización: 1 de marzo de 2026</value></data>
   <data name="Priv_HeroLead" xml:space="preserve"><value>Creemos que sus datos financieros son suyos. Esta política explica qué recopilamos, cómo lo usamos y los controles que tiene.</value></data>
+  <data name="Priv_BackHome" xml:space="preserve"><value>Volver al inicio</value></data>
   <data name="Priv_TocContents" xml:space="preserve"><value>Contenido</value></data>
   <data name="Priv_TocNavAria" xml:space="preserve"><value>Secciones de la política</value></data>
   <data name="Priv_Toc01" xml:space="preserve"><value>Resumen</value></data>
@@ -437,4 +445,38 @@
   <data name="Rpt_DocTitle" xml:space="preserve"><value>Informe mensual - {0} - FinanceApp</value></data>
   <data name="Rpt_GeneratedLine" xml:space="preserve"><value>Informe mensual FinanceApp — generado {0}</value></data>
   <data name="Rpt_HtmlSaveHint" xml:space="preserve"><value>FinanceApp — informe mensual. Puedes guardar esta página (Archivo → Guardar como) para conservar una copia.</value></data>
+  <data name="Land_PageTitle" xml:space="preserve"><value>FinanceApp – Finanzas personales y presupuesto</value></data>
+  <data name="Land_MetaDescription" xml:space="preserve"><value>Controla gastos y presupuestos y obtén información con FinanceApp. Gestor gratuito de finanzas personales con categorías, paneles y multimoneda.</value></data>
+  <data name="Land_MetaKeywords" xml:space="preserve"><value>finanzas personales, presupuesto, control de gastos, gastos, categorías, multimoneda</value></data>
+  <data name="Land_JsonLdDescription" xml:space="preserve"><value>Controla gastos y presupuestos y obtén información. Gestor gratuito de finanzas personales.</value></data>
+  <data name="Land_BrandName" xml:space="preserve"><value>FinanceApp</value></data>
+  <data name="Land_NavFeatures" xml:space="preserve"><value>Funciones</value></data>
+  <data name="Land_NavHowItWorks" xml:space="preserve"><value>Cómo funciona</value></data>
+  <data name="Land_SignIn" xml:space="preserve"><value>Iniciar sesión</value></data>
+  <data name="Land_GetStartedFree" xml:space="preserve"><value>Empezar gratis</value></data>
+  <data name="Land_AriaToggleNav" xml:space="preserve"><value>Alternar navegación</value></data>
+  <data name="Land_FooterCopyright" xml:space="preserve"><value>© {0} FinanceApp</value></data>
+  <data name="Land_HeroH1" xml:space="preserve"><value>Toma el control de tu dinero</value></data>
+  <data name="Land_HeroLead" xml:space="preserve"><value>Registra gastos, define presupuestos y descubre a dónde va tu dinero. Una app sencilla para tus finanzas personales, gratis para empezar.</value></data>
+  <data name="Land_HeroSubtle" xml:space="preserve"><value>Sin tarjeta de crédito · Uso gratuito</value></data>
+  <data name="Land_FeaturesTitle" xml:space="preserve"><value>Todo lo que necesitas para tus finanzas</value></data>
+  <data name="Land_Feat1Title" xml:space="preserve"><value>Registrar gastos</value></data>
+  <data name="Land_Feat1Body" xml:space="preserve"><value>Anota gastos por categoría y fecha. Ve totales y tendencias de un vistazo.</value></data>
+  <data name="Land_Feat2Title" xml:space="preserve"><value>Categorías e información</value></data>
+  <data name="Land_Feat2Body" xml:space="preserve"><value>Organiza con categorías personalizadas. Desglosa el gasto por tipo y periodo.</value></data>
+  <data name="Land_Feat3Title" xml:space="preserve"><value>Presupuestos que funcionan</value></data>
+  <data name="Land_Feat3Body" xml:space="preserve"><value>Establece límites mensuales por categoría y recibe avisos antes de pasarte.</value></data>
+  <data name="Land_Feat4Title" xml:space="preserve"><value>Multimoneda</value></data>
+  <data name="Land_Feat4Body" xml:space="preserve"><value>Registra en tu moneda. Consulta equivalentes y totales en un solo lugar.</value></data>
+  <data name="Land_HowTitle" xml:space="preserve"><value>Cómo funciona</value></data>
+  <data name="Land_Step1Title" xml:space="preserve"><value>Crea tu cuenta</value></data>
+  <data name="Land_Step1Body" xml:space="preserve"><value>Regístrate en segundos con correo o usa Google, Facebook o X (Twitter).</value></data>
+  <data name="Land_Step2Title" xml:space="preserve"><value>Añade gastos y categorías</value></data>
+  <data name="Land_Step2Body" xml:space="preserve"><value>Empieza a registrar lo que gastas. Usa categorías por defecto o crea las tuyas (gasto, ingreso o ambas).</value></data>
+  <data name="Land_Step3Title" xml:space="preserve"><value>Define presupuestos y revisa el panel</value></data>
+  <data name="Land_Step3Body" xml:space="preserve"><value>Marca límites mensuales y compara gasto vs presupuesto, tendencias y actividad reciente en un solo panel.</value></data>
+  <data name="Land_Step4Title" xml:space="preserve"><value>Mantén el control</value></data>
+  <data name="Land_Step4Body" xml:space="preserve"><value>Exporta a Excel, adjunta documentos a operaciones y guarda todo en un lugar seguro.</value></data>
+  <data name="Land_CtaH2" xml:space="preserve"><value>¿Listo para empezar?</value></data>
+  <data name="Land_CtaLead" xml:space="preserve"><value>Únete a FinanceApp y gestiona tu dinero con claridad.</value></data>
 </root>

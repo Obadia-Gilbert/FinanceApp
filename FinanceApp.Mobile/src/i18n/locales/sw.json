@@ -1,4 +1,40 @@
 {
+  "tabs": {
+    "dashboard": "Dashibodi",
+    "expenses": "Matumizi",
+    "budget": "Bajeti",
+    "more": "Zaidi"
+  },
+  "dashboard": {
+    "title": "Dashibodi",
+    "loadFailed": "Imeshindwa kupakia dashibodi",
+    "pullToRetry": "Buruta chini kujaribu tena",
+    "thisMonthSpending": "Matumizi ya mwezi huu",
+    "monthlyExpenses": "Matumizi ya mwezi",
+    "totalSpendAllTime": "Jumla ya matumizi (siku zote)",
+    "budgetExceeded": "Bajeti imezidi",
+    "budgetExceededBody": "Mwezi huu umelipia {{spent}} {{currency}} ukilinganisha na bajeti ya {{budget}}.",
+    "spendingTrend": "Mwenendo wa matumizi",
+    "last7Days": "Siku 7 zilizopita",
+    "activeBudgets": "Bajeti zinazotumika",
+    "viewAll": "Ona zote",
+    "total": "Jumla",
+    "quickActions": "Vitendo vya haraka",
+    "addExpense": "Ongeza matumizi",
+    "addIncome": "Ongeza mapato",
+    "reports": "Ripoti",
+    "budget": "Bajeti",
+    "loading": "Inapakia dashibodi yako...",
+    "weekdays": {
+      "mon": "J2",
+      "tue": "J3",
+      "wed": "J4",
+      "thu": "J5",
+      "fri": "I1",
+      "sat": "I2",
+      "sun": "J1"
+    }
+  },
   "more": {
     "features": "VIFAA",
     "general": "JUMLA",
@@ -17,6 +53,55 @@
     "profile": "Wasifu",
     "feedback": "Maoni",
     "privacyPolicy": "Sera ya faragha"
+  },
+  "auth": {
+    "forgotPassword": {
+      "title": "Weka upya nenosiri",
+      "instruction": "Andika anwani yako ya barua pepe na tutakutumia kiungo cha kuweka upya nenosiri lako.",
+      "emailLabel": "Anwani ya barua pepe",
+      "emailPlaceholder": "jina@mfano.com",
+      "submit": "Tuma kiungo cha kuweka upya",
+      "backToLogin": "Rudi kwa kuingia",
+      "haveCode": "Tayari nina msimbo wa kuweka upya",
+      "sentTitle": "Angalia barua pepe yako",
+      "sentBody": "Kama akaunti ipo kwa {{email}}, tumetuma kiungo cha kuweka upya nenosiri. Kiungo ni halali kwa saa 2.",
+      "tip": "Fungua barua pepe kwenye kifaa hiki au kompyuta yako kisha fuata kiungo kuchagua nenosiri jipya. Hakikisha umeangalia folda ya spam ikiwa hujapata ndani ya dakika moja.",
+      "resend": "Hujapata barua pepe? Jaribu anwani nyingine",
+      "errors": {
+        "emailRequired": "Tafadhali andika anwani yako ya barua pepe.",
+        "emailInvalid": "Tafadhali andika anwani halali ya barua pepe.",
+        "generic": "Kuna tatizo limetokea. Tafadhali jaribu tena.",
+        "network": "Imeshindwa kufikia seva. Hakikisha mtandao wako na ujaribu tena."
+      }
+    },
+    "resetPassword": {
+      "title": "Chagua nenosiri jipya",
+      "instruction": "Bandika msimbo wa kuweka upya kutoka barua pepe yako, kisha andika nenosiri jipya kwa {{email}}.",
+      "instructionNoEmail": "Bandika msimbo wa kuweka upya kutoka barua pepe yako pamoja na barua pepe iliyotumiwa, kisha andika nenosiri jipya.",
+      "emailLabel": "Anwani ya barua pepe",
+      "emailPlaceholder": "jina@mfano.com",
+      "codeLabel": "Msimbo wa kuweka upya",
+      "codePlaceholder": "Bandika msimbo kutoka barua pepe",
+      "codeHelp": "Kidokezo: msimbo ni mfululizo mrefu wa herufi unaofuata \"code=\" katika kiungo cha barua pepe.",
+      "passwordLabel": "Nenosiri jipya",
+      "passwordPlaceholder": "Andika nenosiri jipya",
+      "confirmLabel": "Thibitisha nenosiri jipya",
+      "confirmPlaceholder": "Rudia nenosiri jipya",
+      "submit": "Weka upya nenosiri",
+      "successTitle": "Nenosiri limesasishwa",
+      "successBody": "Nenosiri lako limebadilishwa. Ingia na nenosiri lako jipya kuendelea.",
+      "signIn": "Rudi kwa kuingia",
+      "errors": {
+        "emailRequired": "Tafadhali andika anwani yako ya barua pepe.",
+        "emailInvalid": "Tafadhali andika anwani halali ya barua pepe.",
+        "codeRequired": "Tafadhali bandika msimbo wa kuweka upya kutoka barua pepe.",
+        "passwordRequired": "Tafadhali andika nenosiri jipya.",
+        "passwordShort": "Nenosiri lazima liwe angalau herufi 6.",
+        "passwordMismatch": "Manenosiri hayalingani.",
+        "generic": "Kuna tatizo limetokea. Tafadhali jaribu tena.",
+        "network": "Imeshindwa kufikia seva. Hakikisha mtandao wako na ujaribu tena."
+      }
+    }
   },
   "profile": {
     "accountManagement": "USIMAMIZI WA AKAUNTI",

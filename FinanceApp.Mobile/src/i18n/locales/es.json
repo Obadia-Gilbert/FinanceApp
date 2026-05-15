@@ -1,4 +1,40 @@
 {
+  "tabs": {
+    "dashboard": "Panel",
+    "expenses": "Gastos",
+    "budget": "Presupuesto",
+    "more": "Más"
+  },
+  "dashboard": {
+    "title": "Panel",
+    "loadFailed": "No se pudo cargar el panel",
+    "pullToRetry": "Desliza hacia abajo para reintentar",
+    "thisMonthSpending": "Gastos de este mes",
+    "monthlyExpenses": "Gastos del mes",
+    "totalSpendAllTime": "Gasto total (todo el tiempo)",
+    "budgetExceeded": "Presupuesto superado",
+    "budgetExceededBody": "Este mes has gastado {{spent}} {{currency}} frente a un presupuesto de {{budget}}.",
+    "spendingTrend": "Tendencia de gasto",
+    "last7Days": "Últimos 7 días",
+    "activeBudgets": "Presupuestos activos",
+    "viewAll": "Ver todo",
+    "total": "Total",
+    "quickActions": "Acciones rápidas",
+    "addExpense": "Añadir gasto",
+    "addIncome": "Añadir ingreso",
+    "reports": "Informes",
+    "budget": "Presupuesto",
+    "loading": "Cargando tu panel...",
+    "weekdays": {
+      "mon": "LUN",
+      "tue": "MAR",
+      "wed": "MIÉ",
+      "thu": "JUE",
+      "fri": "VIE",
+      "sat": "SÁB",
+      "sun": "DOM"
+    }
+  },
   "more": {
     "features": "FUNCIONES",
     "general": "GENERAL",
@@ -17,6 +53,55 @@
     "profile": "Perfil",
     "feedback": "Comentarios",
     "privacyPolicy": "Política de privacidad"
+  },
+  "auth": {
+    "forgotPassword": {
+      "title": "Restablecer contraseña",
+      "instruction": "Introduce tu correo electrónico y te enviaremos un enlace para restablecer la contraseña.",
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "nombre@ejemplo.com",
+      "submit": "Enviar enlace",
+      "backToLogin": "Volver a iniciar sesión",
+      "haveCode": "Ya tengo un código de restablecimiento",
+      "sentTitle": "Revisa tu correo",
+      "sentBody": "Si existe una cuenta para {{email}}, te hemos enviado un enlace para restablecer la contraseña. El enlace es válido por 2 horas.",
+      "tip": "Abre el correo en este dispositivo o en tu computadora y sigue el enlace para elegir una nueva contraseña. Revisa también la carpeta de spam si no lo ves en un minuto.",
+      "resend": "¿No recibiste el correo? Prueba con otra dirección",
+      "errors": {
+        "emailRequired": "Por favor introduce tu correo electrónico.",
+        "emailInvalid": "Por favor introduce un correo electrónico válido.",
+        "generic": "Algo salió mal. Inténtalo de nuevo.",
+        "network": "No se puede conectar al servidor. Verifica tu conexión e inténtalo de nuevo."
+      }
+    },
+    "resetPassword": {
+      "title": "Elige una nueva contraseña",
+      "instruction": "Pega el código de restablecimiento de tu correo y luego ingresa una nueva contraseña para {{email}}.",
+      "instructionNoEmail": "Pega el código de restablecimiento de tu correo junto con el correo al que se envió, luego ingresa una nueva contraseña.",
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "nombre@ejemplo.com",
+      "codeLabel": "Código de restablecimiento",
+      "codePlaceholder": "Pega el código del correo",
+      "codeHelp": "Sugerencia: el código es la cadena larga después de \"code=\" en el enlace del correo.",
+      "passwordLabel": "Nueva contraseña",
+      "passwordPlaceholder": "Introduce una nueva contraseña",
+      "confirmLabel": "Confirmar nueva contraseña",
+      "confirmPlaceholder": "Vuelve a introducir la nueva contraseña",
+      "submit": "Restablecer contraseña",
+      "successTitle": "Contraseña actualizada",
+      "successBody": "Tu contraseña ha sido cambiada. Inicia sesión con la nueva contraseña para continuar.",
+      "signIn": "Volver a iniciar sesión",
+      "errors": {
+        "emailRequired": "Por favor introduce tu correo electrónico.",
+        "emailInvalid": "Por favor introduce un correo electrónico válido.",
+        "codeRequired": "Por favor pega el código de restablecimiento del correo.",
+        "passwordRequired": "Por favor introduce una nueva contraseña.",
+        "passwordShort": "La contraseña debe tener al menos 6 caracteres.",
+        "passwordMismatch": "Las contraseñas no coinciden.",
+        "generic": "Algo salió mal. Inténtalo de nuevo.",
+        "network": "No se puede conectar al servidor. Verifica tu conexión e inténtalo de nuevo."
+      }
+    }
   },
   "profile": {
     "accountManagement": "GESTIÓN DE LA CUENTA",

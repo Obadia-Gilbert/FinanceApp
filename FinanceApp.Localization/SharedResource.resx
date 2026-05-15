@@ -46,6 +46,13 @@
   <data name="Api_EmailRegistered" xml:space="preserve"><value>Email is already registered.</value></data>
   <data name="Api_InvalidRefresh" xml:space="preserve"><value>Invalid or expired refresh token.</value></data>
   <data name="Api_UserNotFound" xml:space="preserve"><value>User not found.</value></data>
+  <data name="Api_OAuthNotConfigured" xml:space="preserve"><value>Social sign-in is not configured on the server.</value></data>
+  <data name="Api_OAuthInvalidToken" xml:space="preserve"><value>Invalid or expired social sign-in token.</value></data>
+  <data name="Api_OAuthEmailRequired" xml:space="preserve"><value>Your social account did not provide an email. Grant email permission or use another sign-in method.</value></data>
+  <data name="Api_OAuthUnsupportedProvider" xml:space="preserve"><value>Unsupported sign-in provider.</value></data>
+  <data name="Api_ResetPasswordInvalidToken" xml:space="preserve"><value>This password reset link is invalid or has expired. Please request a new one.</value></data>
+  <data name="Email_ResetPasswordSubject" xml:space="preserve"><value>Reset your FinanceApp password</value></data>
+  <data name="Email_ResetPasswordBody" xml:space="preserve"><value>&lt;p&gt;Hello,&lt;/p&gt;&lt;p&gt;We received a request to reset the password for your FinanceApp account. Click the link below to choose a new password:&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;{0}&quot;&gt;Reset my password&lt;/a&gt;&lt;/p&gt;&lt;p&gt;If you didn't request this, you can safely ignore this email.&lt;/p&gt;&lt;p&gt;The link will expire in 2 hours.&lt;/p&gt;&lt;p&gt;— The FinanceApp team&lt;/p&gt;</value></data>
   <data name="Dash_WelcomeBack" xml:space="preserve"><value>Welcome back, {0}. Here's what's happening with your finances.</value></data>
   <data name="Dash_ThisMonth" xml:space="preserve"><value>This Month</value></data>
   <data name="Dash_NoExpensesStrong" xml:space="preserve"><value>No expenses yet.</value></data>
@@ -319,6 +326,7 @@
   <data name="Priv_Title" xml:space="preserve"><value>Privacy Policy</value></data>
   <data name="Priv_BadgeUpdated" xml:space="preserve"><value>Last updated: March 1, 2026</value></data>
   <data name="Priv_HeroLead" xml:space="preserve"><value>We believe your financial data belongs to you. This policy explains clearly what we collect, how we use it, and the controls you have over it.</value></data>
+  <data name="Priv_BackHome" xml:space="preserve"><value>Back to home</value></data>
   <data name="Priv_TocContents" xml:space="preserve"><value>Contents</value></data>
   <data name="Priv_TocNavAria" xml:space="preserve"><value>Policy sections</value></data>
   <data name="Priv_Toc01" xml:space="preserve"><value>Overview</value></data>
@@ -437,4 +445,38 @@
   <data name="Rpt_DocTitle" xml:space="preserve"><value>Monthly Report - {0} - FinanceApp</value></data>
   <data name="Rpt_GeneratedLine" xml:space="preserve"><value>FinanceApp monthly report — generated {0}</value></data>
   <data name="Rpt_HtmlSaveHint" xml:space="preserve"><value>FinanceApp — monthly report. You can save this page (File → Save As) to keep a copy.</value></data>
+  <data name="Land_PageTitle" xml:space="preserve"><value>FinanceApp – Personal Finance &amp; Budget Tracker</value></data>
+  <data name="Land_MetaDescription" xml:space="preserve"><value>Track expenses, manage budgets, and get insights with FinanceApp. Free personal finance and budget tracker with categories, dashboards, and multi-currency support.</value></data>
+  <data name="Land_MetaKeywords" xml:space="preserve"><value>personal finance, budget tracker, expense tracker, manage money, spending, categories, multi-currency</value></data>
+  <data name="Land_JsonLdDescription" xml:space="preserve"><value>Track expenses, manage budgets, and get insights. Free personal finance and budget tracker.</value></data>
+  <data name="Land_BrandName" xml:space="preserve"><value>FinanceApp</value></data>
+  <data name="Land_NavFeatures" xml:space="preserve"><value>Features</value></data>
+  <data name="Land_NavHowItWorks" xml:space="preserve"><value>How it works</value></data>
+  <data name="Land_SignIn" xml:space="preserve"><value>Sign in</value></data>
+  <data name="Land_GetStartedFree" xml:space="preserve"><value>Get started free</value></data>
+  <data name="Land_AriaToggleNav" xml:space="preserve"><value>Toggle navigation</value></data>
+  <data name="Land_FooterCopyright" xml:space="preserve"><value>© {0} FinanceApp</value></data>
+  <data name="Land_HeroH1" xml:space="preserve"><value>Take control of your money</value></data>
+  <data name="Land_HeroLead" xml:space="preserve"><value>Track expenses, set budgets, and see where your money goes. One simple app for your personal finance free to start.</value></data>
+  <data name="Land_HeroSubtle" xml:space="preserve"><value>No credit card required · Free to use</value></data>
+  <data name="Land_FeaturesTitle" xml:space="preserve"><value>Everything you need to manage your finances</value></data>
+  <data name="Land_Feat1Title" xml:space="preserve"><value>Track expenses</value></data>
+  <data name="Land_Feat1Body" xml:space="preserve"><value>Log spending by category and date. See totals and trends at a glance.</value></data>
+  <data name="Land_Feat2Title" xml:space="preserve"><value>Categories &amp; insights</value></data>
+  <data name="Land_Feat2Body" xml:space="preserve"><value>Organize with custom categories. Break down spending by type and time.</value></data>
+  <data name="Land_Feat3Title" xml:space="preserve"><value>Budgets that work</value></data>
+  <data name="Land_Feat3Body" xml:space="preserve"><value>Set monthly budgets per category and get alerts before you overspend.</value></data>
+  <data name="Land_Feat4Title" xml:space="preserve"><value>Multi-currency</value></data>
+  <data name="Land_Feat4Body" xml:space="preserve"><value>Record transactions in your currency. View equivalents and totals in one place.</value></data>
+  <data name="Land_HowTitle" xml:space="preserve"><value>How it works</value></data>
+  <data name="Land_Step1Title" xml:space="preserve"><value>Create your account</value></data>
+  <data name="Land_Step1Body" xml:space="preserve"><value>Sign up in seconds with email or use Google, Facebook, or Twitter.</value></data>
+  <data name="Land_Step2Title" xml:space="preserve"><value>Add expenses and categories</value></data>
+  <data name="Land_Step2Body" xml:space="preserve"><value>Start logging what you spend. Use default categories or create your own (expense, income, or both).</value></data>
+  <data name="Land_Step3Title" xml:space="preserve"><value>Set budgets and check the dashboard</value></data>
+  <data name="Land_Step3Body" xml:space="preserve"><value>Define monthly limits and see spending vs budget, trends, and recent activity in one dashboard.</value></data>
+  <data name="Land_Step4Title" xml:space="preserve"><value>Stay in control</value></data>
+  <data name="Land_Step4Body" xml:space="preserve"><value>Export to Excel, attach documents to transactions, and keep everything in one secure place.</value></data>
+  <data name="Land_CtaH2" xml:space="preserve"><value>Ready to get started?</value></data>
+  <data name="Land_CtaLead" xml:space="preserve"><value>Join FinanceApp and start managing your money with clarity.</value></data>
 </root>
