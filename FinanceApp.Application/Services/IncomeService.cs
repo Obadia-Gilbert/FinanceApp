@@ -40,7 +40,7 @@ public class IncomeService : IIncomeService
             pageSize,
             userFilter,
             q => q.OrderByDescending(i => i.IncomeDate),
-            i => i.Account,
+            i => i.Account!,
             i => i.Category);
     }
 
