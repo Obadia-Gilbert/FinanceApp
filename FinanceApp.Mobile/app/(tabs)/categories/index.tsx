@@ -8,6 +8,7 @@ import {
   RefreshControl,
   TextInput,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { useTheme } from '../../../src/context/ThemeContext';
@@ -87,7 +88,7 @@ export default function ManageCategoriesScreen() {
       </View>
 
       <View style={[styles.searchWrap, { backgroundColor: colors.bg.default, borderColor: colors.border }]}>
-        <Text style={styles.searchIcon}>🔍</Text>
+        <Ionicons name="search-outline" size={20} color={colors.text.muted} style={styles.searchIcon} />
         <TextInput
           style={[styles.searchInput, { color: colors.text.primary }]}
           placeholder="Search categories..."
@@ -169,7 +170,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
   },
-  searchIcon: { fontSize: 16, marginRight: 8 },
+  searchIcon: { marginRight: 8 },
   searchInput: { flex: 1, fontSize: 15, paddingVertical: 0 },
   list: { paddingHorizontal: 16, paddingBottom: 40 },
   row: {

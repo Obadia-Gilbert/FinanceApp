@@ -1,7 +1,4 @@
-import { getStoredToken } from './client';
-import { ApiError } from './client';
-
-const API_BASE = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:5279';
+import { getStoredToken, getApiBase, ApiError } from './client';
 
 export type DocumentEntityType = 'Expense' | 'Income' | 'Transaction';
 
@@ -18,7 +15,7 @@ export interface SupportingDocumentDto {
 
 async function authenticatedFetch(path: string, options: RequestInit): Promise<Response> {
   const token = await getStoredToken();
-  const url = path.startsWith('http') ? path : `${API_BASE}${path}`;
+  const url = path.startsWith('http') ? path : `${getApiBase()}${path}`;
   const headers: Record<string, string> = { ...(options.headers as Record<string, string>) };
   if (token) headers['Authorization'] = `Bearer ${token}`;
   return fetch(url, { ...options, headers });

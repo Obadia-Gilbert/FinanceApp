@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,8 @@ import {
   ScrollView,
   RefreshControl,
   TouchableOpacity,
+  Pressable,
+  Platform,
   Alert,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -86,6 +88,14 @@ export default function BudgetScreen() {
   const [categoryBudgetCategoryId, setCategoryBudgetCategoryId] = useState('');
   const [categoryBudgetAmount, setCategoryBudgetAmount] = useState('');
   const [categoryBudgetCurrency, setCategoryBudgetCurrency] = useState('USD');
+
+  useEffect(() => {
+    setEditing(false);
+    setShowCategoryForm(false);
+    setAmountStr('');
+    setCategoryBudgetCategoryId('');
+    setCategoryBudgetAmount('');
+  }, [month, year]);
 
   const { data: dashboard } = useQuery({
     queryKey: ['dashboard'],
@@ -186,6 +196,24 @@ export default function BudgetScreen() {
     );
   };
 
+  const goPrevMonth = () => {
+    if (month <= 1) {
+      setMonth(12);
+      setYear((y) => y - 1);
+    } else {
+      setMonth((m) => m - 1);
+    }
+  };
+
+  const goNextMonth = () => {
+    if (month >= 12) {
+      setMonth(1);
+      setYear((y) => y + 1);
+    } else {
+      setMonth((m) => m + 1);
+    }
+  };
+
   const thisMonthSpend = dashboard?.thisMonthSpend ?? 0;
   const budgetAmount = budget?.amount ?? dashboard?.budgetAmount ?? 0;
   const progress = budgetAmount > 0 ? Math.min(1, thisMonthSpend / budgetAmount) : 0;
@@ -206,20 +234,39 @@ export default function BudgetScreen() {
         />
       }
     >
-      <View style={styles.header}>
+      <View style={styles.headerBlock}>
         <Text style={[styles.screenTitle, { color: colors.text.primary }]}>Monthly Budget</Text>
-        <View style={styles.headerRight}>
-          <TouchableOpacity style={[styles.iconBtn, { backgroundColor: colors.bg.default }]}>
-            <Text style={styles.iconText}>📅</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.iconBtn, { backgroundColor: colors.bg.default }]}>
-            <Text style={styles.iconText}>⋯</Text>
-          </TouchableOpacity>
+        <View
+          style={[styles.monthNav, { backgroundColor: colors.bg.default, borderColor: colors.border }]}
+          accessibilityLabel={`Budget month ${MONTHS[month - 1]} ${year}`}
+        >
+          <Pressable
+            onPress={goPrevMonth}
+            style={({ pressed }) => [styles.monthNavHit, pressed && styles.monthNavHitPressed]}
+            hitSlop={12}
+            accessibilityRole="button"
+            accessibilityLabel="Previous month"
+            android_ripple={{ color: Platform.OS === 'android' ? `${colors.brand}33` : undefined, borderless: true }}
+          >
+            <Text style={[styles.monthNavChevron, { color: colors.brand }]}>‹</Text>
+          </Pressable>
+          <View style={styles.monthNavLabelCenter}>
+            <Text style={[styles.monthNavLabel, { color: colors.text.primary }]}>
+              {MONTHS[month - 1]} {year}
+            </Text>
+          </View>
+          <Pressable
+            onPress={goNextMonth}
+            style={({ pressed }) => [styles.monthNavHit, pressed && styles.monthNavHitPressed]}
+            hitSlop={12}
+            accessibilityRole="button"
+            accessibilityLabel="Next month"
+            android_ripple={{ color: Platform.OS === 'android' ? `${colors.brand}33` : undefined, borderless: true }}
+          >
+            <Text style={[styles.monthNavChevron, { color: colors.brand }]}>›</Text>
+          </Pressable>
         </View>
       </View>
-      <Text style={[styles.monthLabel, { color: colors.text.muted }]}>
-        {MONTHS[month - 1]} {year}
-      </Text>
 
       {/* Total Monthly Budget card with circular progress */}
       <Card style={styles.summaryCard}>
@@ -259,28 +306,65 @@ export default function BudgetScreen() {
 
       {/* Category Budgets */}
       <View style={styles.section}>
-        <View style={styles.sectionHeaderStacked}>
-          <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>
-            Category Budgets
-          </Text>
-          <View style={styles.sectionHeaderBtns}>
-            <TouchableOpacity
-              style={[styles.addCatBudgetBtn, { backgroundColor: colors.brand }]}
-              onPress={() => setShowCategoryForm(true)}
-              activeOpacity={0.8}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            >
-              <Text style={styles.addCatBudgetBtnText}>+ By category</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.setBudgetBtn, { backgroundColor: colors.brand }]}
-              onPress={() => setEditing(true)}
-              activeOpacity={0.8}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            >
-              <Text style={styles.setBudgetBtnText}>+ Total</Text>
-            </TouchableOpacity>
-          </View>
+        <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>Category budgets</Text>
+        <Text style={[styles.sectionSubtitle, { color: colors.text.muted }]}>
+          Choose how you want to cap spending for this month.
+        </Text>
+        <View style={styles.actionTileRow}>
+          <Pressable
+            onPress={() => {
+              setEditing(false);
+              setShowCategoryForm(true);
+            }}
+            style={({ pressed }) => [
+              styles.actionTile,
+              {
+                backgroundColor: colors.bg.default,
+                borderColor: showCategoryForm ? colors.brand : colors.border,
+                borderWidth: showCategoryForm ? 2 : 1,
+                opacity: pressed ? 0.92 : 1,
+              },
+            ]}
+            accessibilityRole="button"
+            accessibilityLabel="Add budget by category"
+            accessibilityState={{ selected: showCategoryForm }}
+            android_ripple={{ color: `${colors.brand}22` }}
+          >
+            <View style={[styles.actionTileIconWrap, { backgroundColor: colors.brandLight }]}>
+              <Text style={[styles.actionTileIcon, { color: colors.brand }]}>⊞</Text>
+            </View>
+            <Text style={[styles.actionTileTitle, { color: colors.text.primary }]}>By category</Text>
+            <Text style={[styles.actionTileHint, { color: colors.text.muted }]}>
+              Limit groceries, transport, etc.
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              setShowCategoryForm(false);
+              setEditing(true);
+            }}
+            style={({ pressed }) => [
+              styles.actionTile,
+              {
+                backgroundColor: colors.bg.default,
+                borderColor: editing ? colors.brand : colors.border,
+                borderWidth: editing ? 2 : 1,
+                opacity: pressed ? 0.92 : 1,
+              },
+            ]}
+            accessibilityRole="button"
+            accessibilityLabel="Set total monthly budget"
+            accessibilityState={{ selected: editing }}
+            android_ripple={{ color: `${colors.brand}22` }}
+          >
+            <View style={[styles.actionTileIconWrap, { backgroundColor: colors.brandLight }]}>
+              <Text style={[styles.actionTileIcon, { color: colors.brand }]}>∑</Text>
+            </View>
+            <Text style={[styles.actionTileTitle, { color: colors.text.primary }]}>Total budget</Text>
+            <Text style={[styles.actionTileHint, { color: colors.text.muted }]}>
+              One cap for the whole month
+            </Text>
+          </Pressable>
         </View>
 
         {/* Add category budget form */}
@@ -438,7 +522,7 @@ export default function BudgetScreen() {
         ) : (
           <Card style={styles.emptyCat}>
             <Text style={[styles.emptyCatText, { color: colors.text.muted }]}>
-              No category budgets set. Tap "+ By category" to set a limit per category, or "+ Total" for total monthly budget.
+              No per-category limits yet. Use the tiles above to add a category budget or set your overall monthly cap.
             </Text>
           </Card>
         )}
@@ -458,12 +542,27 @@ export default function BudgetScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   content: { padding: 16, paddingBottom: 40 },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 },
-  headerRight: { flexDirection: 'row', gap: 10 },
-  iconBtn: { width: 40, height: 40, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
-  iconText: { fontSize: 18 },
-  screenTitle: { fontSize: 22, fontWeight: '700' },
-  monthLabel: { fontSize: 15, marginBottom: 20 },
+  headerBlock: { marginBottom: 20 },
+  screenTitle: { fontSize: 22, fontWeight: '700', marginBottom: 12 },
+  monthNav: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 14,
+    borderWidth: 1,
+    paddingVertical: 4,
+    paddingHorizontal: 4,
+  },
+  monthNavHit: {
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 12,
+  },
+  monthNavHitPressed: { opacity: 0.75 },
+  monthNavChevron: { fontSize: 28, fontWeight: '300', marginTop: -2 },
+  monthNavLabelCenter: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 8 },
+  monthNavLabel: { fontSize: 16, fontWeight: '600', letterSpacing: 0.2 },
   summaryCard: { alignItems: 'center', paddingVertical: 24, marginBottom: 24 },
   circleWrap: { position: 'relative', marginBottom: 20 },
   svg: { alignSelf: 'center' },
@@ -478,14 +577,28 @@ const styles = StyleSheet.create({
   summaryColValue: { fontSize: 16, fontWeight: '700' },
   summaryDivider: { width: 1, height: 32 },
   section: { marginBottom: 24 },
-  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
-  sectionHeaderStacked: { marginBottom: 16 },
-  sectionTitle: { fontSize: 18, fontWeight: '700', marginBottom: 10 },
-  sectionHeaderBtns: { flexDirection: 'row', gap: 8 },
-  setBudgetBtn: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10 },
-  setBudgetBtnText: { color: '#fff', fontSize: 14, fontWeight: '600' },
-  addCatBudgetBtn: { paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10 },
-  addCatBudgetBtnText: { color: '#fff', fontSize: 13, fontWeight: '600' },
+  sectionTitle: { fontSize: 18, fontWeight: '700', marginBottom: 6 },
+  sectionSubtitle: { fontSize: 14, lineHeight: 20, marginBottom: 14 },
+  actionTileRow: { flexDirection: 'row', gap: 12 },
+  actionTile: {
+    flex: 1,
+    minHeight: 116,
+    borderRadius: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    justifyContent: 'flex-start',
+  },
+  actionTileIconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  actionTileIcon: { fontSize: 18, fontWeight: '700' },
+  actionTileTitle: { fontSize: 16, fontWeight: '700', marginBottom: 4 },
+  actionTileHint: { fontSize: 12, lineHeight: 16 },
   catPickerScroll: { marginBottom: 12, maxHeight: 44 },
   helperText: { fontSize: 12, marginBottom: 8 },
   catCard: { marginBottom: 12 },
