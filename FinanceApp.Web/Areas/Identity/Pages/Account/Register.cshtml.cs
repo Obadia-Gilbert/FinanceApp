@@ -7,19 +7,19 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
-using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
+using FinanceApp.Infrastructure.Email;
 using FinanceApp.Infrastructure.Identity;
 using FinanceApp.Domain.Enums;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using FinanceApp.Application.Interfaces.Services;
 
 namespace FinanceApp.Web.Areas.Identity.Pages.Account
@@ -31,7 +31,9 @@ namespace FinanceApp.Web.Areas.Identity.Pages.Account
         private readonly IUserStore<ApplicationUser> _userStore;
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
-        private readonly IEmailSender _emailSender;
+        private readonly IBrandedEmailSender _brandedEmailSender;
+        private readonly LocalizedEmailTemplates _emailTemplates;
+        private readonly EmailBrandingOptions _emailBranding;
 
         private readonly ICategoryService _categoryService;
 
@@ -40,7 +42,9 @@ namespace FinanceApp.Web.Areas.Identity.Pages.Account
             IUserStore<ApplicationUser> userStore,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender,
+            IBrandedEmailSender brandedEmailSender,
+            LocalizedEmailTemplates emailTemplates,
+            IOptions<EmailBrandingOptions> emailBrandingOptions,
             ICategoryService categoryService) 
         {
             _userManager = userManager;
@@ -48,7 +52,9 @@ namespace FinanceApp.Web.Areas.Identity.Pages.Account
             _emailStore = GetEmailStore();
             _signInManager = signInManager;
             _logger = logger;
-            _emailSender = emailSender;
+            _brandedEmailSender = brandedEmailSender;
+            _emailTemplates = emailTemplates;
+            _emailBranding = emailBrandingOptions.Value;
             _categoryService = categoryService;
         }
 
@@ -166,13 +172,25 @@ namespace FinanceApp.Web.Areas.Identity.Pages.Account
 
                     try
                     {
-                        await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl ?? "")}'>clicking here</a>.");
+                        if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                        {
+                            var confirmTemplate = _emailTemplates.BuildEmailConfirmation(
+                                user.FirstName ?? Input.Email,
+                                callbackUrl ?? string.Empty);
+                            await _brandedEmailSender.SendAsync(Input.Email, confirmTemplate);
+                        }
+                        else if (_emailBranding.SendWelcomeEmail)
+                        {
+                            var welcomeTemplate = _emailTemplates.BuildWelcome(
+                                user.FirstName ?? Input.Email,
+                                _emailBranding.WebAppBaseUrl);
+                            await _brandedEmailSender.SendAsync(Input.Email, welcomeTemplate);
+                        }
                     }
                     catch (Exception ex)
                     {
-                        // Registration should not fail because SMTP is temporarily unavailable.
-                        _logger.LogWarning(ex, "Account created but confirmation email could not be sent for {Email}.", Input.Email);
+                        // Registration must not fail because the email transport hiccupped.
+                        _logger.LogWarning(ex, "Account created but post-registration email could not be sent for {Email}.", Input.Email);
                     }
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)

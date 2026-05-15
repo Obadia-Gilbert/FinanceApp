@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.Twitter;
 using FinanceApp.Application.Interfaces.Services; // application service interfaces
 using FinanceApp.Application.Services;
+using FinanceApp.Infrastructure.Email;
 using FinanceApp.Infrastructure.Services; // EmailService, UserService, SubscriptionEntitlementService
 using FinanceApp.Infrastructure.Subscription;
 using FinanceApp.Localization;
@@ -68,6 +69,7 @@ builder.Services.AddSingleton<SubscriptionProductMapper>();
 builder.Services.AddScoped<IAppleStoreTransactionVerifier, AppleStoreTransactionVerifier>();
 builder.Services.AddScoped<IGooglePlaySubscriptionVerifier, GooglePlaySubscriptionVerifier>();
 builder.Services.AddScoped<ISubscriptionEntitlementService, SubscriptionEntitlementService>();
+builder.Services.AddScoped<IStripeBillingService, StripeBillingService>();
 builder.Services.AddScoped<ISharedReportService, SharedReportService>();
 builder.Services.AddSingleton<ICurrencyConversionService, CurrencyConversionService>();
 builder.Services.AddHostedService<DailyActivityReminderJob>();
@@ -166,6 +168,14 @@ else
     builder.Services.AddSingleton<IEmailService, NoOpEmailService>();
 
 builder.Services.AddTransient<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender, IdentityEmailSender>();
+
+// Branded email rendering — single source of truth for layout / brand tokens /
+// localized copy across every email call site in the Web app.
+builder.Services.Configure<EmailBrandingOptions>(builder.Configuration.GetSection(EmailBrandingOptions.SectionName));
+builder.Services.AddSingleton<IEmailTemplateRenderer, EmailTemplateRenderer>();
+builder.Services.AddScoped<LocalizedEmailTemplates>();
+builder.Services.AddScoped<IBrandedEmailSender, BrandedEmailSender>();
+
 builder.Services.AddRazorPages(); // For Identity UI
 
 builder.Services.AddLocalization();
@@ -229,4 +239,87 @@ app.MapControllerRoute(
 
 app.MapRazorPages(); // For Identity UI 
 
+// Local dev preview harness for branded emails. Open
+// /dev/email-preview/{key}?culture=es to eyeball each template before shipping.
+// See FinanceApp.Documentations/EMAIL_BREVO.md for the available keys.
+if (app.Environment.IsDevelopment())
+{
+    app.MapGet("/dev/email-preview/{key}", (
+        string key,
+        string? culture,
+        LocalizedEmailTemplates templates,
+        IEmailTemplateRenderer renderer) =>
+    {
+        var requestedCulture = SupportedLanguages.Normalize(culture);
+        var cultureInfo = new System.Globalization.CultureInfo(requestedCulture);
+        var previousCulture = System.Globalization.CultureInfo.CurrentCulture;
+        var previousUiCulture = System.Globalization.CultureInfo.CurrentUICulture;
+        System.Globalization.CultureInfo.CurrentCulture = cultureInfo;
+        System.Globalization.CultureInfo.CurrentUICulture = cultureInfo;
+        try
+        {
+            var template = EmailPreviewSamples.Build(key, templates);
+            if (template is null)
+                return Results.NotFound(new { error = $"Unknown email preview key '{key}'.", available = EmailPreviewSamples.AvailableKeys });
+            var html = renderer.RenderHtml(template);
+            return Results.Content(html, "text/html; charset=utf-8");
+        }
+        finally
+        {
+            System.Globalization.CultureInfo.CurrentCulture = previousCulture;
+            System.Globalization.CultureInfo.CurrentUICulture = previousUiCulture;
+        }
+    });
+
+    app.MapGet("/dev/email-preview", () => Results.Content(
+        "<html><body style='font-family:-apple-system,sans-serif;padding:24px'>" +
+        "<h1>FinanceApp email previews</h1><p>Append a template key to the URL. Add <code>?culture=en|es|sw</code> to switch language.</p>" +
+        "<ul>" + string.Join("", EmailPreviewSamples.AvailableKeys.Select(k =>
+            $"<li><a href='/dev/email-preview/{k}?culture=en'>{k}</a> " +
+            $"(<a href='/dev/email-preview/{k}?culture=es'>es</a>, " +
+            $"<a href='/dev/email-preview/{k}?culture=sw'>sw</a>)</li>")) +
+        "</ul></body></html>", "text/html; charset=utf-8"));
+}
+
 app.Run();
+
+/// <summary>Sample inputs for the <c>/dev/email-preview/{key}</c> endpoint.</summary>
+internal static class EmailPreviewSamples
+{
+    public static readonly string[] AvailableKeys =
+    {
+        "reset-password",
+        "welcome",
+        "confirm-email",
+        "budget-alert",
+        "daily-reminder",
+        "feedback-ack",
+        "generic"
+    };
+
+    public static EmailTemplate? Build(string key, LocalizedEmailTemplates templates) =>
+        key switch
+        {
+            "reset-password" => templates.BuildResetPassword(
+                "Alex",
+                "https://app.financeapp.io/Identity/Account/ResetPassword?area=Identity&code=SAMPLE_TOKEN&email=alex%40example.com"),
+            "welcome" => templates.BuildWelcome("Alex", "https://app.financeapp.io"),
+            "confirm-email" => templates.BuildEmailConfirmation(
+                "Alex",
+                "https://app.financeapp.io/Identity/Account/ConfirmEmail?userId=abc123&code=SAMPLE"),
+            "budget-alert" => templates.BuildBudgetAlert(
+                "Alex",
+                "Groceries",
+                spent: 520_000m,
+                limit: 500_000m,
+                currency: "TZS"),
+            "daily-reminder" => templates.BuildDailyReminder("Alex", "https://app.financeapp.io"),
+            "feedback-ack" => templates.BuildFeedbackAcknowledgement("Alex"),
+            "generic" => templates.BuildGeneric(
+                "FinanceApp announcement",
+                "Heads up about scheduled maintenance",
+                "We'll be performing a brief maintenance on Sunday from 02:00–02:30 UTC.",
+                "You may experience a few seconds of downtime during the switchover."),
+            _ => null
+        };
+}
