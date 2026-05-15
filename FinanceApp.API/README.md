@@ -6,7 +6,7 @@ REST API for FinanceApp. Uses the same Application and Infrastructure layers as 
 
 - **Connection string**: Override in `appsettings.Development.json` or environment variables. Default uses SQL Server LocalDB (Windows only). On macOS, use a SQL Server instance (e.g. Docker) or configure your own connection.
 - **JWT**: Set `Jwt:Key` (min 32 chars) in appsettings. Use a strong secret in production.
-- **Store billing**: Map App Store / Play product IDs to plans under `SubscriptionBilling` in `appsettings` (see root `appsettings.json`). Google verification requires a Play Console service account JSON path. Webhook endpoints are stubs until you add Apple ASN v2 / Google RTDN processing and optional `X-*-Webhook-Secret` headers.
+- **Store billing**: Map App Store / Play product IDs under `SubscriptionBilling` in `Shared/appsettings.shared.json`. Google verification needs a Play service account JSON path (user secrets). Apple/Google webhooks process renewals and revocations — see `FinanceApp.Documentations/SUBSCRIPTIONS_IAP.md`.
 
 ## Endpoints
 

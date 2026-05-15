@@ -1,13 +1,32 @@
 @model FinanceApp.Web.Models.SubscriptionViewModel
 @using FinanceApp.Domain.Enums
 @{
-    ViewData["Title"] = "Subscription";
+    ViewData["Title"] = L["Sub_PageTitle"];
 }
 
 <div class="mb-4">
-    <h1 class="visually-hidden">Subscription</h1>
-    <p class="page-subtitle mb-2">Your current plan is <strong>@Model.CurrentPlan</strong>.</p>
-    <p class="text-muted small mb-0">Assigned on @Model.SubscriptionAssignedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm"). Billing: <strong>@Model.BillingSource</strong>.@(Model.SubscriptionExpiresAtUtc != null ? $" Expires (UTC): {Model.SubscriptionExpiresAtUtc:yyyy-MM-dd HH:mm}." : "") Paid plans use the <strong>App Store</strong> or <strong>Google Play</strong> subscription in the mobile app.</p>
+    <h1 class="visually-hidden">@L["Sub_PageTitle"]</h1>
+    <p class="page-subtitle mb-2">@L["Sub_CurrentPlan"] <strong>@Model.CurrentPlan</strong>.</p>
+    <p class="text-muted small mb-0">
+        @L["Sub_AssignedOn"] @Model.SubscriptionAssignedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm").
+        @L["Sub_BillingSource"] <strong>@Model.BillingSource</strong>.
+        @if (Model.SubscriptionExpiresAtUtc != null)
+        {
+            <text> @L["Sub_ExpiresUtc"] @Model.SubscriptionExpiresAtUtc:yyyy-MM-dd HH:mm.</text>
+        }
+        @if (Model.BillingSource == SubscriptionBillingSource.Web)
+        {
+            <text> @L["Sub_WebBillingNote"]</text>
+        }
+        else if (Model.BillingSource is SubscriptionBillingSource.Apple or SubscriptionBillingSource.Google)
+        {
+            <text> @L["Sub_MobileBillingNote"]</text>
+        }
+        else if (Model.WebCheckoutEnabled)
+        {
+            <text> @L["Sub_WebUpgradeHint"]</text>
+        }
+    </p>
 </div>
 
 @if (TempData["SubscriptionSuccess"] is string success)
@@ -23,15 +42,25 @@
     <div class="alert alert-info" role="alert">@info</div>
 }
 
+@if (Model.CanManageWebBilling)
+{
+    <div class="mb-3">
+        <form asp-action="ManageBilling" method="post" class="d-inline">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-outline-primary btn-sm">@L["Sub_ManageBilling"]</button>
+        </form>
+    </div>
+}
+
 <div class="row g-3">
     <div class="col-md-4">
         <div class="card h-100 @(Model.CurrentPlan == SubscriptionPlan.Free ? "border-primary" : "")">
             <div class="card-body">
-                <h5 class="card-title mb-2">Free</h5>
-                <p class="text-muted small mb-3">Starter access for personal finance tracking.</p>
+                <h5 class="card-title mb-2">@L["Sub_PlanFree"]</h5>
+                <p class="text-muted small mb-3">@L["Sub_PlanFreeDesc"]</p>
                 @if (Model.CurrentPlan == SubscriptionPlan.Free)
                 {
-                    <span class="badge bg-primary">Current plan</span>
+                    <span class="badge bg-primary">@L["Sub_CurrentBadge"]</span>
                 }
             </div>
         </div>
@@ -40,23 +69,33 @@
     <div class="col-md-4">
         <div class="card h-100 @(Model.CurrentPlan == SubscriptionPlan.Pro ? "border-success" : "")">
             <div class="card-body d-flex flex-column">
-                <h5 class="card-title mb-2">Pro</h5>
-                <p class="text-muted small mb-3">More advanced insights and upcoming premium features.</p>
+                <h5 class="card-title mb-2">@L["Sub_PlanPro"]</h5>
+                <p class="text-muted small mb-3">@L["Sub_PlanProDesc"]</p>
                 <div class="mt-auto">
                     @if (Model.CurrentPlan == SubscriptionPlan.Pro)
                     {
-                        <span class="badge bg-success">Current plan</span>
+                        <span class="badge bg-success">@L["Sub_CurrentBadge"]</span>
                     }
                     else if (User.IsInRole("Admin"))
                     {
                         <form asp-action="Upgrade" method="post">
+                            @Html.AntiForgeryToken()
                             <input type="hidden" name="plan" value="Pro" />
-                            <button type="submit" class="btn btn-success btn-sm">Admin: set Pro</button>
+                            <button type="submit" class="btn btn-success btn-sm">@L["Sub_AdminSetPro"]</button>
                         </form>
+                    }
+                    else if (Model.WebCheckoutEnabled && Model.BillingSource != SubscriptionBillingSource.Apple && Model.BillingSource != SubscriptionBillingSource.Google)
+                    {
+                        <form asp-action="Checkout" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="plan" value="Pro" />
+                            <button type="submit" class="btn btn-success btn-sm">@L["Sub_UpgradeWeb"]</button>
+                        </form>
+                        <p class="text-muted small mt-2 mb-0">@L["Sub_MobileAlso"]</p>
                     }
                     else
                     {
-                        <p class="text-muted small mb-0">Subscribe in the iOS or Android app (App Store / Google Play).</p>
+                        <p class="text-muted small mb-0">@L["Sub_MobileOnlyUpgrade"]</p>
                     }
                 </div>
             </div>
@@ -66,23 +105,33 @@
     <div class="col-md-4">
         <div class="card h-100 @(Model.CurrentPlan == SubscriptionPlan.Premium ? "border-warning" : "")">
             <div class="card-body d-flex flex-column">
-                <h5 class="card-title mb-2">Premium</h5>
-                <p class="text-muted small mb-3">Top-tier experience with future advanced automation features.</p>
+                <h5 class="card-title mb-2">@L["Sub_PlanPremium"]</h5>
+                <p class="text-muted small mb-3">@L["Sub_PlanPremiumDesc"]</p>
                 <div class="mt-auto">
                     @if (Model.CurrentPlan == SubscriptionPlan.Premium)
                     {
-                        <span class="badge bg-warning text-dark">Current plan</span>
+                        <span class="badge bg-warning text-dark">@L["Sub_CurrentBadge"]</span>
                     }
                     else if (User.IsInRole("Admin"))
                     {
                         <form asp-action="Upgrade" method="post">
+                            @Html.AntiForgeryToken()
                             <input type="hidden" name="plan" value="Premium" />
-                            <button type="submit" class="btn btn-warning btn-sm text-dark">Admin: set Premium</button>
+                            <button type="submit" class="btn btn-warning btn-sm text-dark">@L["Sub_AdminSetPremium"]</button>
                         </form>
+                    }
+                    else if (Model.WebCheckoutEnabled && Model.BillingSource != SubscriptionBillingSource.Apple && Model.BillingSource != SubscriptionBillingSource.Google)
+                    {
+                        <form asp-action="Checkout" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="plan" value="Premium" />
+                            <button type="submit" class="btn btn-warning btn-sm text-dark">@L["Sub_UpgradeWeb"]</button>
+                        </form>
+                        <p class="text-muted small mt-2 mb-0">@L["Sub_MobileAlso"]</p>
                     }
                     else
                     {
-                        <p class="text-muted small mb-0">Subscribe in the iOS or Android app (App Store / Google Play).</p>
+                        <p class="text-muted small mb-0">@L["Sub_MobileOnlyUpgrade"]</p>
                     }
                 </div>
             </div>

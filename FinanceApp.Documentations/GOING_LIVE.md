@@ -47,6 +47,7 @@ Distribution and build pipeline are separate from Web/API hosting:
 | Accounts | **Apple Developer Program**, **Google Play** developer account. |
 | Production wiring | Stable **API base URL** (HTTPS), valid **TLS** certificates, and correct **OAuth redirect URIs** / app links for Google, Facebook, and any other identity providers. |
 | Hosting | End users install from the stores; you are not “hosting” the mobile app on a VM like the API. |
+| Subscriptions (IAP) | See **[SUBSCRIPTIONS_IAP.md](./SUBSCRIPTIONS_IAP.md)** for App Store / Play product IDs, API secrets, webhooks, and sandbox testing. |
 
 ---
 

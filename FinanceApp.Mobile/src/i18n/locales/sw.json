@@ -132,5 +132,54 @@
     "dailyReminderTitle": "Kikumbusho cha shughuli za kila siku",
     "dailyReminderHint": "Nijulishe kila siku kama sijaweka matumizi au mapato.",
     "updateFailed": "Imeshindwa kusasisha wasifu"
+  },
+  "subscription": {
+    "currentPlan": "Mpango wa sasa",
+    "billing": "Malipo: {{source}}",
+    "renewsEnds": "Husasisha/kwisha: {{date}}",
+    "restorePurchases": "Rejesha ununuzi",
+    "choosePlan": "Chagua mpango wako",
+    "plans": { "free": "Bure", "pro": "Pro", "premium": "Premium" },
+    "forever": "/ milele",
+    "perMonth": "/ mwezi",
+    "freeDesc": "Anza na ufuatiliaji wa kimsingi wa fedha.",
+    "proDesc": "Maarifa ya AI na ufuatiliaji wa hali ya juu.",
+    "premiumDesc": "Kiwango cha juu na uendeshaji wa hali ya juu (ununuzi sawa na Pro kwenye duka).",
+    "mostPopular": "MAARUFU ZAIDI",
+    "activePlan": "Mpango unaotumika",
+    "subscribeAppStore": "Jiandikishe kupitia App Store",
+    "subscribeGooglePlay": "Jiandikishe kupitia Google Play",
+    "contactSales": "Wasiliana na mauzo",
+    "processing": "Inachakata…",
+    "faqTitle": "Maswali yanayoulizwa mara kwa mara",
+    "footerIos": "MALIPO SALAMA KUPITIA APP STORE",
+    "footerAndroid": "MALIPO SALAMA KUPITIA GOOGLE PLAY",
+    "restoreSuccessTitle": "Imerejeshwa",
+    "restoreSuccessBody": "Usajili wako umesawazishwa na seva.",
+    "features": {
+      "free": ["Ufuatiliaji wa msingi wa matumizi", "Usimamizi wa bajeti", "Ripoti za kila mwezi", "Hadi akaunti 3"],
+      "pro": ["Bajeti zisizo na kikomo", "Maarifa ya AI", "Skani ya risiti (OCR)", "Hamisha CSV na PDF", "Jamii maalum", "Msaada wa kipaumbele"],
+      "premium": ["Vipengele vyote vya Pro", "Watumiaji wengi", "Muunganisho wa API", "Msaada maalum", "Chapa maalum"]
+    },
+    "faq": {
+      "cancel": {
+        "q": "Nini hutokea kwa data yangu nikighairi?",
+        "a": "Data yako inabaki. Usajili unalipishwa na Apple au Google; kughairi kufuata sheria zao."
+      },
+      "how": {
+        "q": "Ninawezaje kujiandikisha?",
+        "a": "Tumia ununuzi ndani ya programu. Tunathibitisha ununuzi kwenye seva kabla ya kufungua Pro au Premium."
+      },
+      "web": {
+        "q": "Naweza kulipa kwenye tovuti?",
+        "a": "Usajili wa kidijitali wa kulipia hutumia maduka ya simu. Tovuti inaweza kutoa zana za msimamizi tu."
+      }
+    },
+    "errors": {
+      "title": "Usajili",
+      "storeUnavailable": "Ununuzi ndani ya programu unahitaji dev build (expo run:ios au run:android), si Expo Go.",
+      "purchaseFailed": "Ununuzi haukuwezekana.",
+      "restoreFailed": "Hakuna usajili unaotumika wa kurejesha."
+    }
   }
 }

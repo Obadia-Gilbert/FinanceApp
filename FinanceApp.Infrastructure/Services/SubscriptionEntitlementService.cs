@@ -5,6 +5,7 @@ using FinanceApp.Domain.Enums;
 using FinanceApp.Infrastructure.Identity;
 using FinanceApp.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace FinanceApp.Infrastructure.Services;
 
@@ -44,8 +45,13 @@ public sealed class SubscriptionEntitlementService : ISubscriptionEntitlementSer
         if (source == SubscriptionBillingSource.Apple)
             user.AppleOriginalTransactionId = externalTransactionId;
         if (source == SubscriptionBillingSource.Google)
-        {
             user.GooglePurchaseToken = googlePurchaseToken ?? externalTransactionId;
+
+        if (source == SubscriptionBillingSource.Web)
+        {
+            user.StripeSubscriptionId = externalTransactionId;
+            if (!string.IsNullOrWhiteSpace(googlePurchaseToken))
+                user.StripeCustomerId = googlePurchaseToken;
         }
 
         var update = await _userManager.UpdateAsync(user);
@@ -83,8 +89,92 @@ public sealed class SubscriptionEntitlementService : ISubscriptionEntitlementSer
         user.SubscriptionExpiresAtUtc = null;
         user.AppleOriginalTransactionId = null;
         user.GooglePurchaseToken = null;
+        user.StripeCustomerId = null;
+        user.StripeSubscriptionId = null;
         user.SubscriptionAssignedAt = DateTimeOffset.UtcNow;
 
         await _userManager.UpdateAsync(user);
+    }
+
+    public async Task<string?> FindUserIdByStripeCustomerIdAsync(
+        string stripeCustomerId,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(stripeCustomerId))
+            return null;
+
+        return await _userManager.Users
+            .AsNoTracking()
+            .Where(u => u.StripeCustomerId == stripeCustomerId)
+            .Select(u => u.Id)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<string?> FindUserIdByAppleOriginalTransactionIdAsync(
+        string originalTransactionId,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(originalTransactionId))
+            return null;
+
+        return await _userManager.Users
+            .AsNoTracking()
+            .Where(u => u.AppleOriginalTransactionId == originalTransactionId)
+            .Select(u => u.Id)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<string?> FindUserIdByGooglePurchaseTokenAsync(
+        string purchaseToken,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(purchaseToken))
+            return null;
+
+        return await _userManager.Users
+            .AsNoTracking()
+            .Where(u => u.GooglePurchaseToken == purchaseToken)
+            .Select(u => u.Id)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task RevokeStoreSubscriptionAsync(
+        string userId,
+        string? notes,
+        CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+            return;
+
+        if (user.SubscriptionPlan == SubscriptionPlan.Free &&
+            user.SubscriptionBillingSource == SubscriptionBillingSource.None)
+            return;
+
+        var previousPlan = user.SubscriptionPlan;
+        var previousSource = user.SubscriptionBillingSource;
+
+        user.SubscriptionPlan = SubscriptionPlan.Free;
+        user.SubscriptionBillingSource = SubscriptionBillingSource.None;
+        user.SubscriptionExpiresAtUtc = null;
+        user.AppleOriginalTransactionId = null;
+        user.GooglePurchaseToken = null;
+        user.StripeCustomerId = null;
+        user.StripeSubscriptionId = null;
+        user.SubscriptionAssignedAt = DateTimeOffset.UtcNow;
+
+        await _userManager.UpdateAsync(user);
+
+        await _purchaseRecords.AddAsync(new SubscriptionPurchaseRecord
+        {
+            UserId = userId,
+            BillingSource = previousSource,
+            ProductId = "revoked",
+            ExternalTransactionId = $"revoke-{DateTimeOffset.UtcNow:yyyyMMddHHmmss}",
+            Plan = previousPlan,
+            ExpiresAtUtc = null,
+            Notes = notes
+        });
+        await _purchaseRecords.SaveChangesAsync();
     }
 }

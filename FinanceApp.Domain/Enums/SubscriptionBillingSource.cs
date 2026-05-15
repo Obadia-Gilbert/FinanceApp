@@ -9,5 +9,7 @@ public enum SubscriptionBillingSource
     /// <summary>Assigned by an administrator (support / testing).</summary>
     AdminManual = 1,
     Apple = 2,
-    Google = 3
+    Google = 3,
+    /// <summary>Stripe Checkout / Customer Portal on the web app.</summary>
+    Web = 4
 }

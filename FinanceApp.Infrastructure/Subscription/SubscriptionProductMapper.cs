@@ -10,11 +10,13 @@ public sealed class SubscriptionProductMapper
 {
     private readonly IReadOnlyDictionary<string, SubscriptionPlan> _apple;
     private readonly IReadOnlyDictionary<string, SubscriptionPlan> _google;
+    private readonly IReadOnlyDictionary<string, SubscriptionPlan> _stripe;
 
     public SubscriptionProductMapper(IConfiguration config)
     {
         _apple = LoadSection(config, "SubscriptionBilling:AppleProductIdToPlan");
         _google = LoadSection(config, "SubscriptionBilling:GoogleProductIdToPlan");
+        _stripe = LoadSection(config, "SubscriptionBilling:Stripe:PriceIdToPlan");
     }
 
     private static Dictionary<string, SubscriptionPlan> LoadSection(IConfiguration config, string path)
@@ -37,4 +39,18 @@ public sealed class SubscriptionProductMapper
 
     public bool TryMapGoogle(string productId, out SubscriptionPlan plan) =>
         _google.TryGetValue(productId, out plan);
+
+    public bool TryMapStripe(string priceId, out SubscriptionPlan plan) =>
+        _stripe.TryGetValue(priceId, out plan);
+
+    public string? GetStripePriceId(SubscriptionPlan plan)
+    {
+        foreach (var (priceId, mapped) in _stripe)
+        {
+            if (mapped == plan)
+                return priceId;
+        }
+
+        return null;
+    }
 }

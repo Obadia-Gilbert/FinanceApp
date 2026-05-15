@@ -1,11 +1,8 @@
-using System.Collections;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using FinanceApp.Application.Interfaces.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 
 namespace FinanceApp.Infrastructure.Subscription;
 
@@ -31,50 +28,10 @@ public sealed class AppleStoreTransactionVerifier : IAppleStoreTransactionVerifi
         if (string.IsNullOrWhiteSpace(signedTransactionJws))
             return Task.FromResult<AppleVerifiedTransaction?>(null);
 
-        var allowUnsafe = _config.GetValue("SubscriptionBilling:Apple:AllowUnsignedPayloadInDevelopment", false);
-
         try
         {
-            var handler = new JwtSecurityTokenHandler { MapInboundClaims = false };
-            JwtSecurityToken jwt;
-            if (allowUnsafe)
-            {
-                jwt = handler.ReadJwtToken(signedTransactionJws);
-                _logger.LogWarning("Apple transaction JWS accepted without signature verification (AllowUnsignedPayloadInDevelopment).");
-            }
-            else
-            {
-                var token = handler.ReadJwtToken(signedTransactionJws);
-                if (!TryGetX5cLeaf(token, out var leafPem))
-                {
-                    _logger.LogWarning("Apple JWS missing x5c header.");
-                    return Task.FromResult<AppleVerifiedTransaction?>(null);
-                }
-
-                var certBytes = Convert.FromBase64String(leafPem);
-                using var leaf = X509CertificateLoader.LoadCertificate(certBytes);
-                using var ecdsa = leaf.GetECDsaPublicKey();
-                if (ecdsa == null)
-                {
-                    _logger.LogWarning("Apple leaf certificate has no ECDsa public key.");
-                    return Task.FromResult<AppleVerifiedTransaction?>(null);
-                }
-
-                var key = new ECDsaSecurityKey(ecdsa);
-                var validation = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = key,
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ValidateLifetime = true,
-                    RequireExpirationTime = true,
-                    ClockSkew = TimeSpan.FromMinutes(10)
-                };
-
-                handler.ValidateToken(signedTransactionJws, validation, out _);
-                jwt = token;
-            }
+            if (!AppleJwsVerifier.TryReadVerifiedToken(signedTransactionJws, _config, _logger, out var jwt))
+                return Task.FromResult<AppleVerifiedTransaction?>(null);
 
             var payloadJson = jwt.Payload.SerializeToJson();
             using var doc = JsonDocument.Parse(payloadJson);
@@ -112,26 +69,5 @@ public sealed class AppleStoreTransactionVerifier : IAppleStoreTransactionVerifi
             _logger.LogWarning(ex, "Failed to verify Apple StoreKit JWS.");
             return Task.FromResult<AppleVerifiedTransaction?>(null);
         }
-    }
-
-    private static bool TryGetX5cLeaf(JwtSecurityToken token, out string leaf)
-    {
-        leaf = null!;
-        if (!token.Header.TryGetValue("x5c", out var x5cObj) || x5cObj == null)
-            return false;
-
-        if (x5cObj is IList list && list.Count > 0 && list[0] is string s)
-        {
-            leaf = s;
-            return true;
-        }
-
-        if (x5cObj is string[] arr && arr.Length > 0)
-        {
-            leaf = arr[0];
-            return true;
-        }
-
-        return false;
     }
 }
