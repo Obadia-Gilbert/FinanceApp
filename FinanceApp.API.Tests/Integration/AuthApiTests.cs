@@ -115,6 +115,10 @@ public class AuthApiTests : IClassFixture<ApiWebApplicationFactory>
         await client.PostAsJsonAsync("/api/auth/register",
             new RegisterRequest("Forgot", "Mock", email, "P@ssw0rd123!"));
 
+        // Registration also fires a branded welcome email; clear the recorder
+        // so this assertion only sees the password-reset send we're testing.
+        recorder.Sent.Clear();
+
         var response = await client.PostAsJsonAsync(
             "/api/auth/forgot-password",
             new ForgotPasswordRequest(email));
@@ -128,6 +132,27 @@ public class AuthApiTests : IClassFixture<ApiWebApplicationFactory>
         // Body should include the reset URL with the email + base64url code.
         Assert.Contains("code=", sent.Body, StringComparison.Ordinal);
         Assert.Contains(Uri.EscapeDataString(email), sent.Body, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task Register_SendsBrandedWelcomeEmail()
+    {
+        var recorder = new RecordingEmailService();
+        using var factory = new ApiWebApplicationFactory()
+            .WithEmailService(recorder);
+        var client = factory.CreateClient();
+
+        var email = $"welcome-{Guid.NewGuid():N}@example.com";
+        var response = await client.PostAsJsonAsync("/api/auth/register",
+            new RegisterRequest("Welcome", "User", email, "P@ssw0rd123!"));
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+        var welcome = Assert.Single(recorder.Sent);
+        Assert.Equal(email, welcome.To);
+        Assert.Contains("FinanceApp", welcome.Subject, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("Welcome", welcome.Body, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("branding/email-logo.png", welcome.Body, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]

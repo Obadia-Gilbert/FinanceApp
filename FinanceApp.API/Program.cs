@@ -2,6 +2,7 @@ using System.Text;
 using FinanceApp.Application.Interfaces;
 using FinanceApp.Application.Interfaces.Services;
 using FinanceApp.Application.Services;
+using FinanceApp.Infrastructure.Email;
 using FinanceApp.Infrastructure.Identity;
 using FinanceApp.Infrastructure.Persistence;
 using FinanceApp.Infrastructure.Repositories;
@@ -103,6 +104,13 @@ else if (!string.IsNullOrWhiteSpace(builder.Configuration["EmailSettings:SmtpSer
 else
     builder.Services.AddSingleton<IEmailService, NoOpEmailService>();
 builder.Services.AddTransient<IEmailSender, IdentityEmailSender>();
+
+// Branded email rendering — single source of truth for layout / brand tokens /
+// localized copy across every email call site in the API.
+builder.Services.Configure<EmailBrandingOptions>(builder.Configuration.GetSection(EmailBrandingOptions.SectionName));
+builder.Services.AddSingleton<IEmailTemplateRenderer, EmailTemplateRenderer>();
+builder.Services.AddScoped<LocalizedEmailTemplates>();
+builder.Services.AddScoped<IBrandedEmailSender, BrandedEmailSender>();
 
 // JWT
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key is required.");

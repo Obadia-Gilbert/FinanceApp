@@ -479,4 +479,48 @@
   <data name="Land_Step4Body" xml:space="preserve"><value>Exporta a Excel, adjunta documentos a operaciones y guarda todo en un lugar seguro.</value></data>
   <data name="Land_CtaH2" xml:space="preserve"><value>¿Listo para empezar?</value></data>
   <data name="Land_CtaLead" xml:space="preserve"><value>Únete a FinanceApp y gestiona tu dinero con claridad.</value></data>
+  <!-- ===== Branded transactional email copy ===== -->
+  <data name="Email_Common_Footer" xml:space="preserve"><value>Recibes este correo porque tienes una cuenta en FinanceApp.</value></data>
+  <data name="Email_Common_DefaultName" xml:space="preserve"><value>amig@</value></data>
+  <data name="Email_Common_UnsubscribeNote" xml:space="preserve"><value>Gestiona tus preferencias de correo cuando quieras desde tu perfil.</value></data>
+  <data name="Email_ResetPassword_Subject" xml:space="preserve"><value>Restablece tu contraseña de FinanceApp</value></data>
+  <data name="Email_ResetPassword_Preheader" xml:space="preserve"><value>Usa el enlace de abajo para crear una nueva contraseña — caduca en 2 horas.</value></data>
+  <data name="Email_ResetPassword_Heading" xml:space="preserve"><value>Hola {0}, restablezcamos tu contraseña</value></data>
+  <data name="Email_ResetPassword_BodyIntro" xml:space="preserve"><value>Recibimos una solicitud para restablecer la contraseña de tu cuenta de FinanceApp. Toca el botón para elegir una nueva.</value></data>
+  <data name="Email_ResetPassword_BodyExpiry" xml:space="preserve"><value>Este enlace caduca en 2 horas. Si ya no funciona, solicita uno nuevo.</value></data>
+  <data name="Email_ResetPassword_BodyIgnore" xml:space="preserve"><value>Si no hiciste esta solicitud, ignora el correo: tu contraseña no cambia.</value></data>
+  <data name="Email_ResetPassword_CtaLabel" xml:space="preserve"><value>Restablecer contraseña</value></data>
+  <data name="Email_Welcome_Subject" xml:space="preserve"><value>Te damos la bienvenida a {0}</value></data>
+  <data name="Email_Welcome_Preheader" xml:space="preserve"><value>Tu cuenta de FinanceApp ya está lista — esto te ayudará a empezar.</value></data>
+  <data name="Email_Welcome_Heading" xml:space="preserve"><value>Bienvenid@, {0}</value></data>
+  <data name="Email_Welcome_BodyIntro" xml:space="preserve"><value>Gracias por unirte a FinanceApp. Ya puedes registrar gastos, fijar presupuestos y entender mejor en qué se va tu dinero.</value></data>
+  <data name="Email_Welcome_BodyTips" xml:space="preserve"><value>Un buen primer paso: añade una categoría, registra tu primer gasto y define un presupuesto mensual para recibir alertas antes de pasarte.</value></data>
+  <data name="Email_Welcome_CtaLabel" xml:space="preserve"><value>Abrir FinanceApp</value></data>
+  <data name="Email_Confirm_Subject" xml:space="preserve"><value>Confirma tu correo de FinanceApp</value></data>
+  <data name="Email_Confirm_Preheader" xml:space="preserve"><value>Un paso rápido para activar tu cuenta de FinanceApp.</value></data>
+  <data name="Email_Confirm_Heading" xml:space="preserve"><value>Hola {0}, confirma tu correo</value></data>
+  <data name="Email_Confirm_BodyIntro" xml:space="preserve"><value>Confirma tu dirección de correo para asegurar tu cuenta y poder enviarte avisos importantes.</value></data>
+  <data name="Email_Confirm_BodyIgnore" xml:space="preserve"><value>Si no creaste una cuenta en FinanceApp, puedes ignorar este correo.</value></data>
+  <data name="Email_Confirm_CtaLabel" xml:space="preserve"><value>Confirmar correo</value></data>
+  <data name="Email_BudgetAlert_Subject" xml:space="preserve"><value>Alerta de presupuesto: {0}</value></data>
+  <data name="Email_BudgetAlert_Preheader" xml:space="preserve"><value>{0} se acerca o supera su límite mensual.</value></data>
+  <data name="Email_BudgetAlert_Heading" xml:space="preserve"><value>Hola {0}, revisa tu presupuesto</value></data>
+  <data name="Email_BudgetAlert_BodyOver" xml:space="preserve"><value>Has gastado {1} en {0} este mes — eso es el {3}% de tu presupuesto de {2}. Ya pasaste el límite.</value></data>
+  <data name="Email_BudgetAlert_BodyNear" xml:space="preserve"><value>Has gastado {1} en {0} este mes — eso es el {3}% de tu presupuesto de {2}. Estás cerca del límite.</value></data>
+  <data name="Email_BudgetAlert_BodyAdvice" xml:space="preserve"><value>Abre FinanceApp para revisar la categoría, ajustar el presupuesto o pausar el gasto hasta el próximo mes.</value></data>
+  <data name="Email_BudgetAlert_LabelCategory" xml:space="preserve"><value>Categoría</value></data>
+  <data name="Email_BudgetAlert_LabelSpent" xml:space="preserve"><value>Gastado este mes</value></data>
+  <data name="Email_BudgetAlert_LabelLimit" xml:space="preserve"><value>Límite mensual</value></data>
+  <data name="Email_BudgetAlert_LabelPercent" xml:space="preserve"><value>Del presupuesto usado</value></data>
+  <data name="Email_DailyReminder_Subject" xml:space="preserve"><value>No olvides registrar la actividad de hoy</value></data>
+  <data name="Email_DailyReminder_Preheader" xml:space="preserve"><value>Un breve recordatorio para añadir los gastos o ingresos de hoy.</value></data>
+  <data name="Email_DailyReminder_Heading" xml:space="preserve"><value>Hola {0}, un recordatorio rápido</value></data>
+  <data name="Email_DailyReminder_BodyIntro" xml:space="preserve"><value>Hoy aún no has registrado nada. Llevar tus entradas al día mantiene tus informes y presupuestos precisos.</value></data>
+  <data name="Email_DailyReminder_BodyOptOut" xml:space="preserve"><value>Puedes desactivar los recordatorios diarios cuando quieras desde la configuración de tu perfil.</value></data>
+  <data name="Email_DailyReminder_CtaLabel" xml:space="preserve"><value>Registrar la actividad de hoy</value></data>
+  <data name="Email_FeedbackAck_Subject" xml:space="preserve"><value>Hemos recibido tus comentarios</value></data>
+  <data name="Email_FeedbackAck_Preheader" xml:space="preserve"><value>Gracias — los estamos revisando.</value></data>
+  <data name="Email_FeedbackAck_Heading" xml:space="preserve"><value>Gracias por escribirnos, {0}</value></data>
+  <data name="Email_FeedbackAck_BodyIntro" xml:space="preserve"><value>Tu mensaje llegó al equipo de FinanceApp. Leemos cada comentario y los usamos para mejorar el producto.</value></data>
+  <data name="Email_FeedbackAck_BodyClose" xml:space="preserve"><value>Si tu mensaje incluye una pregunta o un problema, te responderemos directamente. Si no, considéralo nuestro agradecimiento silencioso.</value></data>
 </root>
