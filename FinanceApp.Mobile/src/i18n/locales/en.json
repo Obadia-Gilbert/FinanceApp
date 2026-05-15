@@ -1,4 +1,40 @@
 {
+  "tabs": {
+    "dashboard": "Dashboard",
+    "expenses": "Expenses",
+    "budget": "Budget",
+    "more": "More"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "loadFailed": "Failed to load dashboard",
+    "pullToRetry": "Pull down to retry",
+    "thisMonthSpending": "This month's spending",
+    "monthlyExpenses": "Monthly expenses",
+    "totalSpendAllTime": "Total spend (all time)",
+    "budgetExceeded": "Budget exceeded",
+    "budgetExceededBody": "This month you've spent {{spent}} {{currency}} against a budget of {{budget}}.",
+    "spendingTrend": "Spending trend",
+    "last7Days": "Last 7 days",
+    "activeBudgets": "Active budgets",
+    "viewAll": "View all",
+    "total": "Total",
+    "quickActions": "Quick actions",
+    "addExpense": "Add expense",
+    "addIncome": "Add income",
+    "reports": "Reports",
+    "budget": "Budget",
+    "loading": "Loading your dashboard...",
+    "weekdays": {
+      "mon": "MON",
+      "tue": "TUE",
+      "wed": "WED",
+      "thu": "THU",
+      "fri": "FRI",
+      "sat": "SAT",
+      "sun": "SUN"
+    }
+  },
   "more": {
     "features": "FEATURES",
     "general": "GENERAL",
@@ -17,6 +53,55 @@
     "profile": "Profile",
     "feedback": "Feedback",
     "privacyPolicy": "Privacy Policy"
+  },
+  "auth": {
+    "forgotPassword": {
+      "title": "Reset Password",
+      "instruction": "Enter your email address and we'll send you a link to reset your password.",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "name@example.com",
+      "submit": "Send Reset Link",
+      "backToLogin": "Back to Login",
+      "haveCode": "I already have a reset code",
+      "sentTitle": "Check your email",
+      "sentBody": "If an account exists for {{email}}, we've sent a link to reset your password. The link is valid for 2 hours.",
+      "tip": "Open the email on this device or your computer and follow the link to choose a new password. Be sure to check your spam folder if you don't see it within a minute.",
+      "resend": "Didn't get the email? Try a different address",
+      "errors": {
+        "emailRequired": "Please enter your email address.",
+        "emailInvalid": "Please enter a valid email address.",
+        "generic": "Something went wrong. Please try again.",
+        "network": "Cannot reach the server. Check your connection and try again."
+      }
+    },
+    "resetPassword": {
+      "title": "Choose a new password",
+      "instruction": "Paste the reset code from your email, then enter a new password for {{email}}.",
+      "instructionNoEmail": "Paste the reset code from your email along with the email it was sent to, then enter a new password.",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "name@example.com",
+      "codeLabel": "Reset Code",
+      "codePlaceholder": "Paste the code from your email",
+      "codeHelp": "Tip: the code is the long string after \"code=\" in the link the email sent you.",
+      "passwordLabel": "New Password",
+      "passwordPlaceholder": "Enter a new password",
+      "confirmLabel": "Confirm New Password",
+      "confirmPlaceholder": "Re-enter your new password",
+      "submit": "Reset Password",
+      "successTitle": "Password updated",
+      "successBody": "Your password has been changed. Sign in with your new password to continue.",
+      "signIn": "Back to Sign In",
+      "errors": {
+        "emailRequired": "Please enter your email address.",
+        "emailInvalid": "Please enter a valid email address.",
+        "codeRequired": "Please paste the reset code from your email.",
+        "passwordRequired": "Please enter a new password.",
+        "passwordShort": "Password must be at least 6 characters.",
+        "passwordMismatch": "Passwords do not match.",
+        "generic": "Something went wrong. Please try again.",
+        "network": "Cannot reach the server. Check your connection and try again."
+      }
+    }
   },
   "profile": {
     "accountManagement": "ACCOUNT MANAGEMENT",

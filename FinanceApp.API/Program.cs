@@ -8,6 +8,7 @@ using FinanceApp.Infrastructure.Repositories;
 using FinanceApp.Infrastructure.Services;
 using FinanceApp.Infrastructure.Subscription;
 using FinanceApp.Localization;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Identity;
@@ -71,7 +72,8 @@ builder.Services.AddScoped<ISupportingDocumentService>(sp =>
 });
 builder.Services.AddHostedService<DailyActivityReminderJob>();
 
-// Identity (required for JWT login)
+// Identity (required for JWT login). AddDefaultTokenProviders is required so
+// password-reset tokens can be generated for the forgot/reset password flow.
 builder.Services
     .AddIdentityCore<ApplicationUser>(options =>
     {
@@ -79,7 +81,28 @@ builder.Services
         options.User.RequireUniqueEmail = true;
     })
     .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<FinanceDbContext>();
+    .AddEntityFrameworkStores<FinanceDbContext>()
+    .AddDefaultTokenProviders();
+
+// Reset-link tokens stay valid for 2h (matches FinanceApp.Web).
+builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
+    options.TokenLifespan = TimeSpan.FromHours(2));
+
+// Email — used by the forgot-password flow. Priority:
+//   1. Brevo HTTP API (preferred for production deliverability)
+//   2. SMTP (works with Brevo's SMTP relay or any other provider)
+//   3. NoOp (e.g. Testing) so requests don't blow up.
+builder.Services.Configure<BrevoSettings>(builder.Configuration.GetSection("Brevo"));
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddHttpClient(BrevoEmailService.HttpClientName);
+
+if (!string.IsNullOrWhiteSpace(builder.Configuration["Brevo:ApiKey"]))
+    builder.Services.AddTransient<IEmailService, BrevoEmailService>();
+else if (!string.IsNullOrWhiteSpace(builder.Configuration["EmailSettings:SmtpServer"]))
+    builder.Services.AddTransient<IEmailService, EmailService>();
+else
+    builder.Services.AddSingleton<IEmailService, NoOpEmailService>();
+builder.Services.AddTransient<IEmailSender, IdentityEmailSender>();
 
 // JWT
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key is required.");
@@ -105,6 +128,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 builder.Services.AddControllers();
+builder.Services.AddHttpClient();
 
 builder.Services.AddLocalization();
 builder.Services.Configure<RequestLocalizationOptions>(options =>

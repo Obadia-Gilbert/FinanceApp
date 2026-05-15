@@ -10,7 +10,7 @@ Use this prompt with a UI/UX–focused AI agent to design a top-notch, productio
 
 **Target users:** Individuals who want to track spending, set budgets, and see where their money goes. They may use multiple currencies (e.g. TZS, USD). They value clarity, control, and minimal friction—not gamification or social features.
 
-**Value proposition (from existing landing):** “Take control of your money — Track expenses, set budgets, and see where your money goes. One simple app for your personal finance—free to start.”
+**Value proposition (from existing landing):** “Take control of your money — Track expenses, set budgets, and see where your money goes. One simple app for your personal finance free to start.”
 
 **Tone:** Professional, calm, trustworthy. Avoid playful or casual finance UX. Prioritize clarity and scannability over decoration.
 
