@@ -45,6 +45,8 @@ public sealed class AdminSubscriptionController : ControllerBase
             user.SubscriptionBillingSource = SubscriptionBillingSource.AdminManual;
             user.AppleOriginalTransactionId = null;
             user.GooglePurchaseToken = null;
+            user.StripeCustomerId = null;
+            user.StripeSubscriptionId = null;
             user.SubscriptionAssignedAt = DateTimeOffset.UtcNow;
             await _userManager.UpdateAsync(user);
             var free = await _userManager.FindByIdAsync(user.Id);

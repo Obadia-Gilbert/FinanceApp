@@ -8,4 +8,8 @@ public class SubscriptionViewModel
     public DateTimeOffset SubscriptionAssignedAt { get; set; }
     public DateTimeOffset? SubscriptionExpiresAtUtc { get; set; }
     public SubscriptionBillingSource BillingSource { get; set; }
+
+    public bool WebCheckoutEnabled { get; set; }
+
+    public bool CanManageWebBilling { get; set; }
 }

@@ -30,6 +30,27 @@
   <data name="Nav_Budget" xml:space="preserve"><value>Presupuesto</value></data>
   <data name="Nav_MonthlyReport" xml:space="preserve"><value>Informe mensual</value></data>
   <data name="Nav_Subscription" xml:space="preserve"><value>Suscripción</value></data>
+  <data name="Sub_PageTitle" xml:space="preserve"><value>Suscripción</value></data>
+  <data name="Sub_CurrentPlan" xml:space="preserve"><value>Su plan actual es</value></data>
+  <data name="Sub_AssignedOn" xml:space="preserve"><value>Asignado el</value></data>
+  <data name="Sub_BillingSource" xml:space="preserve"><value>Facturación:</value></data>
+  <data name="Sub_ExpiresUtc" xml:space="preserve"><value>Caduca (UTC):</value></data>
+  <data name="Sub_WebBillingNote" xml:space="preserve"><value>Gestione la facturación abajo (Stripe). El plan se sincroniza con la app móvil al iniciar sesión.</value></data>
+  <data name="Sub_MobileBillingNote" xml:space="preserve"><value>Gestione esta suscripción en App Store o Google Play en su teléfono.</value></data>
+  <data name="Sub_WebUpgradeHint" xml:space="preserve"><value>Mejore en la web con Stripe o use compras dentro de la app en iOS/Android — misma cuenta, mismo plan.</value></data>
+  <data name="Sub_ManageBilling" xml:space="preserve"><value>Gestionar facturación</value></data>
+  <data name="Sub_PlanFree" xml:space="preserve"><value>Gratis</value></data>
+  <data name="Sub_PlanFreeDesc" xml:space="preserve"><value>Acceso inicial para finanzas personales.</value></data>
+  <data name="Sub_PlanPro" xml:space="preserve"><value>Pro</value></data>
+  <data name="Sub_PlanProDesc" xml:space="preserve"><value>Información avanzada y funciones premium próximas.</value></data>
+  <data name="Sub_PlanPremium" xml:space="preserve"><value>Premium</value></data>
+  <data name="Sub_PlanPremiumDesc" xml:space="preserve"><value>Experiencia superior con automatización avanzada.</value></data>
+  <data name="Sub_CurrentBadge" xml:space="preserve"><value>Plan actual</value></data>
+  <data name="Sub_AdminSetPro" xml:space="preserve"><value>Admin: Pro</value></data>
+  <data name="Sub_AdminSetPremium" xml:space="preserve"><value>Admin: Premium</value></data>
+  <data name="Sub_UpgradeWeb" xml:space="preserve"><value>Mejorar en la web</value></data>
+  <data name="Sub_MobileAlso" xml:space="preserve"><value>O suscríbase en la app iOS/Android — el acceso es compartido.</value></data>
+  <data name="Sub_MobileOnlyUpgrade" xml:space="preserve"><value>Suscríbase en la app iOS o Android, o pida habilitar facturación web.</value></data>
   <data name="Nav_Profile" xml:space="preserve"><value>Perfil</value></data>
   <data name="Nav_Privacy" xml:space="preserve"><value>Privacidad</value></data>
   <data name="Nav_ManageUsers" xml:space="preserve"><value>Gestionar usuarios</value></data>
@@ -46,6 +67,13 @@
   <data name="Api_EmailRegistered" xml:space="preserve"><value>El correo electrónico ya está registrado.</value></data>
   <data name="Api_InvalidRefresh" xml:space="preserve"><value>Token de actualización no válido o caducado.</value></data>
   <data name="Api_UserNotFound" xml:space="preserve"><value>Usuario no encontrado.</value></data>
+  <data name="Api_OAuthNotConfigured" xml:space="preserve"><value>El inicio de sesión social no está configurado en el servidor.</value></data>
+  <data name="Api_OAuthInvalidToken" xml:space="preserve"><value>Token de inicio de sesión social no válido o caducado.</value></data>
+  <data name="Api_OAuthEmailRequired" xml:space="preserve"><value>Tu cuenta social no proporcionó un correo. Concede el permiso de correo u otro método de acceso.</value></data>
+  <data name="Api_OAuthUnsupportedProvider" xml:space="preserve"><value>Proveedor de inicio de sesión no admitido.</value></data>
+  <data name="Api_ResetPasswordInvalidToken" xml:space="preserve"><value>Este enlace para restablecer la contraseña no es válido o ha caducado. Solicita uno nuevo.</value></data>
+  <data name="Email_ResetPasswordSubject" xml:space="preserve"><value>Restablece tu contraseña de FinanceApp</value></data>
+  <data name="Email_ResetPasswordBody" xml:space="preserve"><value>&lt;p&gt;Hola,&lt;/p&gt;&lt;p&gt;Hemos recibido una solicitud para restablecer la contraseña de tu cuenta de FinanceApp. Haz clic en el enlace a continuación para elegir una nueva contraseña:&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;{0}&quot;&gt;Restablecer mi contraseña&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Si no solicitaste este cambio, puedes ignorar este correo de forma segura.&lt;/p&gt;&lt;p&gt;El enlace caducará en 2 horas.&lt;/p&gt;&lt;p&gt;— El equipo de FinanceApp&lt;/p&gt;</value></data>
   <data name="Dash_WelcomeBack" xml:space="preserve"><value>Bienvenido de nuevo, {0}. Así van tus finanzas.</value></data>
   <data name="Dash_ThisMonth" xml:space="preserve"><value>Este mes</value></data>
   <data name="Dash_NoExpensesStrong" xml:space="preserve"><value>Aún no hay gastos.</value></data>
@@ -319,6 +347,7 @@
   <data name="Priv_Title" xml:space="preserve"><value>Política de privacidad</value></data>
   <data name="Priv_BadgeUpdated" xml:space="preserve"><value>Última actualización: 1 de marzo de 2026</value></data>
   <data name="Priv_HeroLead" xml:space="preserve"><value>Creemos que sus datos financieros son suyos. Esta política explica qué recopilamos, cómo lo usamos y los controles que tiene.</value></data>
+  <data name="Priv_BackHome" xml:space="preserve"><value>Volver al inicio</value></data>
   <data name="Priv_TocContents" xml:space="preserve"><value>Contenido</value></data>
   <data name="Priv_TocNavAria" xml:space="preserve"><value>Secciones de la política</value></data>
   <data name="Priv_Toc01" xml:space="preserve"><value>Resumen</value></data>
@@ -437,4 +466,82 @@
   <data name="Rpt_DocTitle" xml:space="preserve"><value>Informe mensual - {0} - FinanceApp</value></data>
   <data name="Rpt_GeneratedLine" xml:space="preserve"><value>Informe mensual FinanceApp — generado {0}</value></data>
   <data name="Rpt_HtmlSaveHint" xml:space="preserve"><value>FinanceApp — informe mensual. Puedes guardar esta página (Archivo → Guardar como) para conservar una copia.</value></data>
+  <data name="Land_PageTitle" xml:space="preserve"><value>FinanceApp – Finanzas personales y presupuesto</value></data>
+  <data name="Land_MetaDescription" xml:space="preserve"><value>Controla gastos y presupuestos y obtén información con FinanceApp. Gestor gratuito de finanzas personales con categorías, paneles y multimoneda.</value></data>
+  <data name="Land_MetaKeywords" xml:space="preserve"><value>finanzas personales, presupuesto, control de gastos, gastos, categorías, multimoneda</value></data>
+  <data name="Land_JsonLdDescription" xml:space="preserve"><value>Controla gastos y presupuestos y obtén información. Gestor gratuito de finanzas personales.</value></data>
+  <data name="Land_BrandName" xml:space="preserve"><value>FinanceApp</value></data>
+  <data name="Land_NavFeatures" xml:space="preserve"><value>Funciones</value></data>
+  <data name="Land_NavHowItWorks" xml:space="preserve"><value>Cómo funciona</value></data>
+  <data name="Land_SignIn" xml:space="preserve"><value>Iniciar sesión</value></data>
+  <data name="Land_GetStartedFree" xml:space="preserve"><value>Empezar gratis</value></data>
+  <data name="Land_AriaToggleNav" xml:space="preserve"><value>Alternar navegación</value></data>
+  <data name="Land_FooterCopyright" xml:space="preserve"><value>© {0} FinanceApp</value></data>
+  <data name="Land_HeroH1" xml:space="preserve"><value>Toma el control de tu dinero</value></data>
+  <data name="Land_HeroLead" xml:space="preserve"><value>Registra gastos, define presupuestos y descubre a dónde va tu dinero. Una app sencilla para tus finanzas personales, gratis para empezar.</value></data>
+  <data name="Land_HeroSubtle" xml:space="preserve"><value>Sin tarjeta de crédito · Uso gratuito</value></data>
+  <data name="Land_FeaturesTitle" xml:space="preserve"><value>Todo lo que necesitas para tus finanzas</value></data>
+  <data name="Land_Feat1Title" xml:space="preserve"><value>Registrar gastos</value></data>
+  <data name="Land_Feat1Body" xml:space="preserve"><value>Anota gastos por categoría y fecha. Ve totales y tendencias de un vistazo.</value></data>
+  <data name="Land_Feat2Title" xml:space="preserve"><value>Categorías e información</value></data>
+  <data name="Land_Feat2Body" xml:space="preserve"><value>Organiza con categorías personalizadas. Desglosa el gasto por tipo y periodo.</value></data>
+  <data name="Land_Feat3Title" xml:space="preserve"><value>Presupuestos que funcionan</value></data>
+  <data name="Land_Feat3Body" xml:space="preserve"><value>Establece límites mensuales por categoría y recibe avisos antes de pasarte.</value></data>
+  <data name="Land_Feat4Title" xml:space="preserve"><value>Multimoneda</value></data>
+  <data name="Land_Feat4Body" xml:space="preserve"><value>Registra en tu moneda. Consulta equivalentes y totales en un solo lugar.</value></data>
+  <data name="Land_HowTitle" xml:space="preserve"><value>Cómo funciona</value></data>
+  <data name="Land_Step1Title" xml:space="preserve"><value>Crea tu cuenta</value></data>
+  <data name="Land_Step1Body" xml:space="preserve"><value>Regístrate en segundos con correo o usa Google, Facebook o X (Twitter).</value></data>
+  <data name="Land_Step2Title" xml:space="preserve"><value>Añade gastos y categorías</value></data>
+  <data name="Land_Step2Body" xml:space="preserve"><value>Empieza a registrar lo que gastas. Usa categorías por defecto o crea las tuyas (gasto, ingreso o ambas).</value></data>
+  <data name="Land_Step3Title" xml:space="preserve"><value>Define presupuestos y revisa el panel</value></data>
+  <data name="Land_Step3Body" xml:space="preserve"><value>Marca límites mensuales y compara gasto vs presupuesto, tendencias y actividad reciente en un solo panel.</value></data>
+  <data name="Land_Step4Title" xml:space="preserve"><value>Mantén el control</value></data>
+  <data name="Land_Step4Body" xml:space="preserve"><value>Exporta a Excel, adjunta documentos a operaciones y guarda todo en un lugar seguro.</value></data>
+  <data name="Land_CtaH2" xml:space="preserve"><value>¿Listo para empezar?</value></data>
+  <data name="Land_CtaLead" xml:space="preserve"><value>Únete a FinanceApp y gestiona tu dinero con claridad.</value></data>
+  <!-- ===== Branded transactional email copy ===== -->
+  <data name="Email_Common_Footer" xml:space="preserve"><value>Recibes este correo porque tienes una cuenta en FinanceApp.</value></data>
+  <data name="Email_Common_DefaultName" xml:space="preserve"><value>amig@</value></data>
+  <data name="Email_Common_UnsubscribeNote" xml:space="preserve"><value>Gestiona tus preferencias de correo cuando quieras desde tu perfil.</value></data>
+  <data name="Email_ResetPassword_Subject" xml:space="preserve"><value>Restablece tu contraseña de FinanceApp</value></data>
+  <data name="Email_ResetPassword_Preheader" xml:space="preserve"><value>Usa el enlace de abajo para crear una nueva contraseña — caduca en 2 horas.</value></data>
+  <data name="Email_ResetPassword_Heading" xml:space="preserve"><value>Hola {0}, restablezcamos tu contraseña</value></data>
+  <data name="Email_ResetPassword_BodyIntro" xml:space="preserve"><value>Recibimos una solicitud para restablecer la contraseña de tu cuenta de FinanceApp. Toca el botón para elegir una nueva.</value></data>
+  <data name="Email_ResetPassword_BodyExpiry" xml:space="preserve"><value>Este enlace caduca en 2 horas. Si ya no funciona, solicita uno nuevo.</value></data>
+  <data name="Email_ResetPassword_BodyIgnore" xml:space="preserve"><value>Si no hiciste esta solicitud, ignora el correo: tu contraseña no cambia.</value></data>
+  <data name="Email_ResetPassword_CtaLabel" xml:space="preserve"><value>Restablecer contraseña</value></data>
+  <data name="Email_Welcome_Subject" xml:space="preserve"><value>Te damos la bienvenida a {0}</value></data>
+  <data name="Email_Welcome_Preheader" xml:space="preserve"><value>Tu cuenta de FinanceApp ya está lista — esto te ayudará a empezar.</value></data>
+  <data name="Email_Welcome_Heading" xml:space="preserve"><value>Bienvenid@, {0}</value></data>
+  <data name="Email_Welcome_BodyIntro" xml:space="preserve"><value>Gracias por unirte a FinanceApp. Ya puedes registrar gastos, fijar presupuestos y entender mejor en qué se va tu dinero.</value></data>
+  <data name="Email_Welcome_BodyTips" xml:space="preserve"><value>Un buen primer paso: añade una categoría, registra tu primer gasto y define un presupuesto mensual para recibir alertas antes de pasarte.</value></data>
+  <data name="Email_Welcome_CtaLabel" xml:space="preserve"><value>Abrir FinanceApp</value></data>
+  <data name="Email_Confirm_Subject" xml:space="preserve"><value>Confirma tu correo de FinanceApp</value></data>
+  <data name="Email_Confirm_Preheader" xml:space="preserve"><value>Un paso rápido para activar tu cuenta de FinanceApp.</value></data>
+  <data name="Email_Confirm_Heading" xml:space="preserve"><value>Hola {0}, confirma tu correo</value></data>
+  <data name="Email_Confirm_BodyIntro" xml:space="preserve"><value>Confirma tu dirección de correo para asegurar tu cuenta y poder enviarte avisos importantes.</value></data>
+  <data name="Email_Confirm_BodyIgnore" xml:space="preserve"><value>Si no creaste una cuenta en FinanceApp, puedes ignorar este correo.</value></data>
+  <data name="Email_Confirm_CtaLabel" xml:space="preserve"><value>Confirmar correo</value></data>
+  <data name="Email_BudgetAlert_Subject" xml:space="preserve"><value>Alerta de presupuesto: {0}</value></data>
+  <data name="Email_BudgetAlert_Preheader" xml:space="preserve"><value>{0} se acerca o supera su límite mensual.</value></data>
+  <data name="Email_BudgetAlert_Heading" xml:space="preserve"><value>Hola {0}, revisa tu presupuesto</value></data>
+  <data name="Email_BudgetAlert_BodyOver" xml:space="preserve"><value>Has gastado {1} en {0} este mes — eso es el {3}% de tu presupuesto de {2}. Ya pasaste el límite.</value></data>
+  <data name="Email_BudgetAlert_BodyNear" xml:space="preserve"><value>Has gastado {1} en {0} este mes — eso es el {3}% de tu presupuesto de {2}. Estás cerca del límite.</value></data>
+  <data name="Email_BudgetAlert_BodyAdvice" xml:space="preserve"><value>Abre FinanceApp para revisar la categoría, ajustar el presupuesto o pausar el gasto hasta el próximo mes.</value></data>
+  <data name="Email_BudgetAlert_LabelCategory" xml:space="preserve"><value>Categoría</value></data>
+  <data name="Email_BudgetAlert_LabelSpent" xml:space="preserve"><value>Gastado este mes</value></data>
+  <data name="Email_BudgetAlert_LabelLimit" xml:space="preserve"><value>Límite mensual</value></data>
+  <data name="Email_BudgetAlert_LabelPercent" xml:space="preserve"><value>Del presupuesto usado</value></data>
+  <data name="Email_DailyReminder_Subject" xml:space="preserve"><value>No olvides registrar la actividad de hoy</value></data>
+  <data name="Email_DailyReminder_Preheader" xml:space="preserve"><value>Un breve recordatorio para añadir los gastos o ingresos de hoy.</value></data>
+  <data name="Email_DailyReminder_Heading" xml:space="preserve"><value>Hola {0}, un recordatorio rápido</value></data>
+  <data name="Email_DailyReminder_BodyIntro" xml:space="preserve"><value>Hoy aún no has registrado nada. Llevar tus entradas al día mantiene tus informes y presupuestos precisos.</value></data>
+  <data name="Email_DailyReminder_BodyOptOut" xml:space="preserve"><value>Puedes desactivar los recordatorios diarios cuando quieras desde la configuración de tu perfil.</value></data>
+  <data name="Email_DailyReminder_CtaLabel" xml:space="preserve"><value>Registrar la actividad de hoy</value></data>
+  <data name="Email_FeedbackAck_Subject" xml:space="preserve"><value>Hemos recibido tus comentarios</value></data>
+  <data name="Email_FeedbackAck_Preheader" xml:space="preserve"><value>Gracias — los estamos revisando.</value></data>
+  <data name="Email_FeedbackAck_Heading" xml:space="preserve"><value>Gracias por escribirnos, {0}</value></data>
+  <data name="Email_FeedbackAck_BodyIntro" xml:space="preserve"><value>Tu mensaje llegó al equipo de FinanceApp. Leemos cada comentario y los usamos para mejorar el producto.</value></data>
+  <data name="Email_FeedbackAck_BodyClose" xml:space="preserve"><value>Si tu mensaje incluye una pregunta o un problema, te responderemos directamente. Si no, considéralo nuestro agradecimiento silencioso.</value></data>
 </root>

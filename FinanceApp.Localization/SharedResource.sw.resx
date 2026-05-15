@@ -30,6 +30,27 @@
   <data name="Nav_Budget" xml:space="preserve"><value>Bajeti</value></data>
   <data name="Nav_MonthlyReport" xml:space="preserve"><value>Ripoti ya mwezi</value></data>
   <data name="Nav_Subscription" xml:space="preserve"><value>Michango</value></data>
+  <data name="Sub_PageTitle" xml:space="preserve"><value>Michango</value></data>
+  <data name="Sub_CurrentPlan" xml:space="preserve"><value>Mpango wako wa sasa ni</value></data>
+  <data name="Sub_AssignedOn" xml:space="preserve"><value>Imekabidhiwa</value></data>
+  <data name="Sub_BillingSource" xml:space="preserve"><value>Malipo:</value></data>
+  <data name="Sub_ExpiresUtc" xml:space="preserve"><value>Inaisha (UTC):</value></data>
+  <data name="Sub_WebBillingNote" xml:space="preserve"><value>Simamia malipo hapa chini (Stripe). Mpango unaunganishwa na programu ya simu baada ya kuingia.</value></data>
+  <data name="Sub_MobileBillingNote" xml:space="preserve"><value>Simamia michango hii kwenye App Store au Google Play kwenye simu yako.</value></data>
+  <data name="Sub_WebUpgradeHint" xml:space="preserve"><value>Boresha kwenye wavuti kwa Stripe, au tumia ununuzi ndani ya programu — akaunti moja, mpango mmoja.</value></data>
+  <data name="Sub_ManageBilling" xml:space="preserve"><value>Simamia malipo</value></data>
+  <data name="Sub_PlanFree" xml:space="preserve"><value>Bure</value></data>
+  <data name="Sub_PlanFreeDesc" xml:space="preserve"><value>Ufuatiliaji wa msingi wa fedha binafsi.</value></data>
+  <data name="Sub_PlanPro" xml:space="preserve"><value>Pro</value></data>
+  <data name="Sub_PlanProDesc" xml:space="preserve"><value>Uchambuzi wa hali ya juu na vipengele vya premium.</value></data>
+  <data name="Sub_PlanPremium" xml:space="preserve"><value>Premium</value></data>
+  <data name="Sub_PlanPremiumDesc" xml:space="preserve"><value>Uzoefu wa juu na uendeshaji wa kiotomatiki.</value></data>
+  <data name="Sub_CurrentBadge" xml:space="preserve"><value>Mpango wa sasa</value></data>
+  <data name="Sub_AdminSetPro" xml:space="preserve"><value>Msimamizi: Pro</value></data>
+  <data name="Sub_AdminSetPremium" xml:space="preserve"><value>Msimamizi: Premium</value></data>
+  <data name="Sub_UpgradeWeb" xml:space="preserve"><value>Boresha kwenye wavuti</value></data>
+  <data name="Sub_MobileAlso" xml:space="preserve"><value>Au jiandikishe kwenye programu ya iOS/Android — haki zinashirikiwa.</value></data>
+  <data name="Sub_MobileOnlyUpgrade" xml:space="preserve"><value>Jiandikishe kwenye programu ya iOS au Android, au omba kuwezesha malipo ya wavuti.</value></data>
   <data name="Nav_Profile" xml:space="preserve"><value>Wasifu</value></data>
   <data name="Nav_Privacy" xml:space="preserve"><value>Faragha</value></data>
   <data name="Nav_ManageUsers" xml:space="preserve"><value>Simamia watumiaji</value></data>
@@ -46,6 +67,13 @@
   <data name="Api_EmailRegistered" xml:space="preserve"><value>Barua pepe tayari imesajiliwa.</value></data>
   <data name="Api_InvalidRefresh" xml:space="preserve"><value>Ishara ya kufuta si sahihi au imekwisha muda.</value></data>
   <data name="Api_UserNotFound" xml:space="preserve"><value>Mtumiaji hajapatikana.</value></data>
+  <data name="Api_OAuthNotConfigured" xml:space="preserve"><value>Kuingia kwa mitandao ya kijamii haijasanidiwa kwenye seva.</value></data>
+  <data name="Api_OAuthInvalidToken" xml:space="preserve"><value>Ishara ya kuingia kwa mitandao ya kijamii si sahihi au imekwisha muda wake.</value></data>
+  <data name="Api_OAuthEmailRequired" xml:space="preserve"><value>Akaunti yako ya kijamii haikutoa barua pepe. Ruhusu barua pepe au tumia njia nyingine ya kuingia.</value></data>
+  <data name="Api_OAuthUnsupportedProvider" xml:space="preserve"><value>Mtoa huduma wa kuingia hauauniwi.</value></data>
+  <data name="Api_ResetPasswordInvalidToken" xml:space="preserve"><value>Kiungo cha kuweka upya nenosiri si sahihi au muda wake umekwisha. Tafadhali omba kingine.</value></data>
+  <data name="Email_ResetPasswordSubject" xml:space="preserve"><value>Weka upya nenosiri lako la FinanceApp</value></data>
+  <data name="Email_ResetPasswordBody" xml:space="preserve"><value>&lt;p&gt;Habari,&lt;/p&gt;&lt;p&gt;Tumepokea ombi la kuweka upya nenosiri la akaunti yako ya FinanceApp. Bonyeza kiungo hapa chini ili kuchagua nenosiri jipya:&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;{0}&quot;&gt;Weka upya nenosiri langu&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Ikiwa hukufanya ombi hili, unaweza kupuuza barua pepe hii.&lt;/p&gt;&lt;p&gt;Kiungo hiki kitaisha muda baada ya saa 2.&lt;/p&gt;&lt;p&gt;— Timu ya FinanceApp&lt;/p&gt;</value></data>
   <data name="Dash_WelcomeBack" xml:space="preserve"><value>Karibu tena, {0}. Hivi ndivyo hali ya fedha zako.</value></data>
   <data name="Dash_ThisMonth" xml:space="preserve"><value>Mwezi huu</value></data>
   <data name="Dash_NoExpensesStrong" xml:space="preserve"><value>Bado hakuna matumizi.</value></data>
@@ -319,6 +347,7 @@
   <data name="Priv_Title" xml:space="preserve"><value>Sera ya Faragha</value></data>
   <data name="Priv_BadgeUpdated" xml:space="preserve"><value>Ilisasishwa mwisho: Machi 1, 2026</value></data>
   <data name="Priv_HeroLead" xml:space="preserve"><value>Tunaamini data yako ya kifedha ni yako. Sera hii inaeleza wazi tunachokusanya, jinsi tunavyotumia, na udhibiti unaonacho.</value></data>
+  <data name="Priv_BackHome" xml:space="preserve"><value>Rudi nyumbani</value></data>
   <data name="Priv_TocContents" xml:space="preserve"><value>Yaliyomo</value></data>
   <data name="Priv_TocNavAria" xml:space="preserve"><value>Sehemu za sera</value></data>
   <data name="Priv_Toc01" xml:space="preserve"><value>Muhtasari</value></data>
@@ -437,4 +466,82 @@
   <data name="Rpt_DocTitle" xml:space="preserve"><value>Ripoti ya mwezi - {0} - FinanceApp</value></data>
   <data name="Rpt_GeneratedLine" xml:space="preserve"><value>Ripoti ya mwezi ya FinanceApp — iliyotengenezwa {0}</value></data>
   <data name="Rpt_HtmlSaveHint" xml:space="preserve"><value>FinanceApp — ripoti ya mwezi. Unaweza kuhifadhi ukurasa huu (Faili → Hifadhi kama) kuweka nakala.</value></data>
+  <data name="Land_PageTitle" xml:space="preserve"><value>FinanceApp – Fedha binafsi na ufuatiliaji wa bajeti</value></data>
+  <data name="Land_MetaDescription" xml:space="preserve"><value>Fuatilia matumizi, simamia bajeti, na upate muhtasari na FinanceApp. Kifuatiliaji bila malipo cha fedha za kibinafsi na makundi, dashibodi, na sarafu nyingi.</value></data>
+  <data name="Land_MetaKeywords" xml:space="preserve"><value>fedha binafsi, bajeti, ufuatiliaji wa matumizi, pesa, makundi, sarafu nyingi</value></data>
+  <data name="Land_JsonLdDescription" xml:space="preserve"><value>Fuatilia matumizi na bajeti na upate muhtasari. Kifuatiliaji bila malipo cha fedha za kibinafsi.</value></data>
+  <data name="Land_BrandName" xml:space="preserve"><value>FinanceApp</value></data>
+  <data name="Land_NavFeatures" xml:space="preserve"><value>Vipengele</value></data>
+  <data name="Land_NavHowItWorks" xml:space="preserve"><value>Jinsi inavyofanya kazi</value></data>
+  <data name="Land_SignIn" xml:space="preserve"><value>Ingia</value></data>
+  <data name="Land_GetStartedFree" xml:space="preserve"><value>Anza bila malipo</value></data>
+  <data name="Land_AriaToggleNav" xml:space="preserve"><value>Badili urambazaji</value></data>
+  <data name="Land_FooterCopyright" xml:space="preserve"><value>© {0} FinanceApp</value></data>
+  <data name="Land_HeroH1" xml:space="preserve"><value>Simamia pesa zako</value></data>
+  <data name="Land_HeroLead" xml:space="preserve"><value>Rekodi matumizi, weka bajeti, na uone pesa zinakokwenda. Programu moja rahisi kwa fedha zako binafsi—anza bila malipo.</value></data>
+  <data name="Land_HeroSubtle" xml:space="preserve"><value>Hakuna kadi ya mkopo · Bila malipo kutumia</value></data>
+  <data name="Land_FeaturesTitle" xml:space="preserve"><value>Kila kitu unachohitaji kwa fedha zako</value></data>
+  <data name="Land_Feat1Title" xml:space="preserve"><value>Fuatilia matumizi</value></data>
+  <data name="Land_Feat1Body" xml:space="preserve"><value>Andika matumizi kwa kategoria na tarehe. Ona jumla na mwelekeo kwa haraka.</value></data>
+  <data name="Land_Feat2Title" xml:space="preserve"><value>Makundi na muhtasari</value></data>
+  <data name="Land_Feat2Body" xml:space="preserve"><value>Panga kwa makundi maalum. Changanua matumizi kwa aina na muda.</value></data>
+  <data name="Land_Feat3Title" xml:space="preserve"><value>Bajeti zinazofanya kazi</value></data>
+  <data name="Land_Feat3Body" xml:space="preserve"><value>Weka mipaka ya kila mwezi kwa kategoria na upokee arifa kabla haujazidi.</value></data>
+  <data name="Land_Feat4Title" xml:space="preserve"><value>Sarafu nyingi</value></data>
+  <data name="Land_Feat4Body" xml:space="preserve"><value>Rekodi muamala kwa sarafu yako. Ona sawia na jumla mahali pamoja.</value></data>
+  <data name="Land_HowTitle" xml:space="preserve"><value>Jinsi inavyofanya kazi</value></data>
+  <data name="Land_Step1Title" xml:space="preserve"><value>Tengeneza akaunti yako</value></data>
+  <data name="Land_Step1Body" xml:space="preserve"><value>Jisajili kwa sekunde kwa barua pepe au tumia Google, Facebook au Twitter.</value></data>
+  <data name="Land_Step2Title" xml:space="preserve"><value>Ongeza matumizi na makundi</value></data>
+  <data name="Land_Step2Body" xml:space="preserve"><value>Anza kuandika unachotumia. Tumia makundi chaguo-msingi au tengeneza yako (matumizi, mapato, au yote mawili).</value></data>
+  <data name="Land_Step3Title" xml:space="preserve"><value>Weka bajeti na angalia dashibodi</value></data>
+  <data name="Land_Step3Body" xml:space="preserve"><value>Fafanua mipaka ya kila mwezi na ona matumizi dhidi ya bajeti, mwelekeo, na shughuli za karibuni dashibodi moja.</value></data>
+  <data name="Land_Step4Title" xml:space="preserve"><value>Baki msimamizi</value></data>
+  <data name="Land_Step4Body" xml:space="preserve"><value>Hamisha kwenda Excel, ambatisha nyaraka kwenye muamala, na hifadhi kila kitu mahali salama.</value></data>
+  <data name="Land_CtaH2" xml:space="preserve"><value>Je, uko tayari kuanza?</value></data>
+  <data name="Land_CtaLead" xml:space="preserve"><value>Jiunge na FinanceApp na usimamie pesa zako kwa uwazi.</value></data>
+  <!-- ===== Branded transactional email copy ===== -->
+  <data name="Email_Common_Footer" xml:space="preserve"><value>Unapokea barua pepe hii kwa sababu una akaunti ya FinanceApp.</value></data>
+  <data name="Email_Common_DefaultName" xml:space="preserve"><value>rafiki</value></data>
+  <data name="Email_Common_UnsubscribeNote" xml:space="preserve"><value>Unaweza kubadilisha mapendeleo yako ya barua pepe wakati wowote kwenye mipangilio ya wasifu.</value></data>
+  <data name="Email_ResetPassword_Subject" xml:space="preserve"><value>Weka upya nenosiri lako la FinanceApp</value></data>
+  <data name="Email_ResetPassword_Preheader" xml:space="preserve"><value>Tumia kiungo hapa chini kuweka nenosiri jipya — kitaisha baada ya saa 2.</value></data>
+  <data name="Email_ResetPassword_Heading" xml:space="preserve"><value>Habari {0}, hebu tuweke upya nenosiri</value></data>
+  <data name="Email_ResetPassword_BodyIntro" xml:space="preserve"><value>Tumepokea ombi la kuweka upya nenosiri la akaunti yako ya FinanceApp. Bofya kitufe hapa chini ili kuchagua nenosiri jipya.</value></data>
+  <data name="Email_ResetPassword_BodyExpiry" xml:space="preserve"><value>Kiungo hiki kinaisha baada ya saa 2. Ukikuta hakifanyi kazi, omba kingine.</value></data>
+  <data name="Email_ResetPassword_BodyIgnore" xml:space="preserve"><value>Ikiwa hukufanya ombi hili, puuza barua pepe hii — nenosiri lako halibadiliki.</value></data>
+  <data name="Email_ResetPassword_CtaLabel" xml:space="preserve"><value>Weka upya nenosiri langu</value></data>
+  <data name="Email_Welcome_Subject" xml:space="preserve"><value>Karibu {0}</value></data>
+  <data name="Email_Welcome_Preheader" xml:space="preserve"><value>Akaunti yako ya FinanceApp tayari — hivi ndivyo unavyoanza vizuri.</value></data>
+  <data name="Email_Welcome_Heading" xml:space="preserve"><value>Karibu sana, {0}</value></data>
+  <data name="Email_Welcome_BodyIntro" xml:space="preserve"><value>Asante kwa kujiunga na FinanceApp. Sasa unaweza kufuatilia matumizi, kuweka bajeti na kuelewa pesa zako zinakwenda wapi.</value></data>
+  <data name="Email_Welcome_BodyTips" xml:space="preserve"><value>Hatua nzuri ya kuanza: ongeza aina, andika matumizi yako ya kwanza na weka bajeti ya mwezi ili upate tahadhari kabla ya kuvuka kiwango.</value></data>
+  <data name="Email_Welcome_CtaLabel" xml:space="preserve"><value>Fungua FinanceApp</value></data>
+  <data name="Email_Confirm_Subject" xml:space="preserve"><value>Thibitisha barua pepe yako ya FinanceApp</value></data>
+  <data name="Email_Confirm_Preheader" xml:space="preserve"><value>Hatua moja ya haraka ili kuamilisha akaunti yako ya FinanceApp.</value></data>
+  <data name="Email_Confirm_Heading" xml:space="preserve"><value>Habari {0}, thibitisha barua pepe yako</value></data>
+  <data name="Email_Confirm_BodyIntro" xml:space="preserve"><value>Tafadhali thibitisha anwani yako ya barua pepe ili tuweze kulinda akaunti yako na kukutumia arifa muhimu.</value></data>
+  <data name="Email_Confirm_BodyIgnore" xml:space="preserve"><value>Ikiwa hukufungua akaunti ya FinanceApp, unaweza kupuuza barua pepe hii.</value></data>
+  <data name="Email_Confirm_CtaLabel" xml:space="preserve"><value>Thibitisha barua pepe</value></data>
+  <data name="Email_BudgetAlert_Subject" xml:space="preserve"><value>Tahadhari ya bajeti: {0}</value></data>
+  <data name="Email_BudgetAlert_Preheader" xml:space="preserve"><value>{0} inakaribia au kuvuka kikomo cha mwezi.</value></data>
+  <data name="Email_BudgetAlert_Heading" xml:space="preserve"><value>Habari {0}, angalia bajeti yako</value></data>
+  <data name="Email_BudgetAlert_BodyOver" xml:space="preserve"><value>Umetumia {1} kwa {0} mwezi huu — hiyo ni {3}% ya bajeti yako ya {2}. Umevuka kikomo.</value></data>
+  <data name="Email_BudgetAlert_BodyNear" xml:space="preserve"><value>Umetumia {1} kwa {0} mwezi huu — hiyo ni {3}% ya bajeti yako ya {2}. Unakaribia kikomo.</value></data>
+  <data name="Email_BudgetAlert_BodyAdvice" xml:space="preserve"><value>Fungua FinanceApp ili kuhakiki aina, kurekebisha bajeti au kusitisha matumizi hadi mwezi unaofuata.</value></data>
+  <data name="Email_BudgetAlert_LabelCategory" xml:space="preserve"><value>Aina</value></data>
+  <data name="Email_BudgetAlert_LabelSpent" xml:space="preserve"><value>Imetumika mwezi huu</value></data>
+  <data name="Email_BudgetAlert_LabelLimit" xml:space="preserve"><value>Kikomo cha mwezi</value></data>
+  <data name="Email_BudgetAlert_LabelPercent" xml:space="preserve"><value>Asilimia ya bajeti iliyotumika</value></data>
+  <data name="Email_DailyReminder_Subject" xml:space="preserve"><value>Usisahau kuandika shughuli za leo</value></data>
+  <data name="Email_DailyReminder_Preheader" xml:space="preserve"><value>Ukumbusho mfupi wa kuongeza matumizi au mapato ya leo.</value></data>
+  <data name="Email_DailyReminder_Heading" xml:space="preserve"><value>Habari {0}, ukumbusho mfupi</value></data>
+  <data name="Email_DailyReminder_BodyIntro" xml:space="preserve"><value>Hujaandika shughuli yoyote leo. Kuongeza taarifa kila siku kunaweka ripoti na bajeti zako sahihi.</value></data>
+  <data name="Email_DailyReminder_BodyOptOut" xml:space="preserve"><value>Unaweza kuzima vikumbusho vya kila siku wakati wowote kupitia mipangilio ya wasifu wako.</value></data>
+  <data name="Email_DailyReminder_CtaLabel" xml:space="preserve"><value>Andika shughuli za leo</value></data>
+  <data name="Email_FeedbackAck_Subject" xml:space="preserve"><value>Tumepokea maoni yako</value></data>
+  <data name="Email_FeedbackAck_Preheader" xml:space="preserve"><value>Asante — tunayapitia.</value></data>
+  <data name="Email_FeedbackAck_Heading" xml:space="preserve"><value>Asante kwa kuandika, {0}</value></data>
+  <data name="Email_FeedbackAck_BodyIntro" xml:space="preserve"><value>Maoni yako yamefika kwa timu ya FinanceApp. Tunasoma kila ujumbe na kuyatumia kuboresha bidhaa.</value></data>
+  <data name="Email_FeedbackAck_BodyClose" xml:space="preserve"><value>Iwapo ujumbe wako ulikuwa na swali au tatizo, tutakujibu moja kwa moja. La sivyo, hii ni shukrani yetu tulivu.</value></data>
 </root>

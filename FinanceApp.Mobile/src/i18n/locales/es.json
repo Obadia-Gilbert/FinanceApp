@@ -40,5 +40,54 @@
     "validationFirstName": "El nombre debe tener al menos 2 caracteres",
     "validationLastName": "Los apellidos deben tener al menos 2 caracteres",
     "updateFailed": "No se pudo actualizar el perfil"
+  },
+  "subscription": {
+    "currentPlan": "Plan actual",
+    "billing": "Facturación: {{source}}",
+    "renewsEnds": "Renueva/termina: {{date}}",
+    "restorePurchases": "Restaurar compras",
+    "choosePlan": "Elige tu plan",
+    "plans": { "free": "Gratis", "pro": "Pro", "premium": "Premium" },
+    "forever": "/ para siempre",
+    "perMonth": "/ mes",
+    "freeDesc": "Empieza con el seguimiento financiero esencial.",
+    "proDesc": "Información con IA y seguimiento avanzado.",
+    "premiumDesc": "Nivel superior con automatización avanzada (misma compra en la tienda que Pro).",
+    "mostPopular": "MÁS POPULAR",
+    "activePlan": "Plan activo",
+    "subscribeAppStore": "Suscribirse con App Store",
+    "subscribeGooglePlay": "Suscribirse con Google Play",
+    "contactSales": "Contactar ventas",
+    "processing": "Procesando…",
+    "faqTitle": "Preguntas frecuentes",
+    "footerIos": "PAGO SEGURO VÍA APP STORE",
+    "footerAndroid": "PAGO SEGURO VÍA GOOGLE PLAY",
+    "restoreSuccessTitle": "Restaurado",
+    "restoreSuccessBody": "Tu suscripción se sincronizó con el servidor.",
+    "features": {
+      "free": ["Seguimiento básico de gastos", "Gestión de presupuesto", "Informes mensuales", "Hasta 3 cuentas"],
+      "pro": ["Presupuestos ilimitados", "Información con IA", "Escaneo de recibos (OCR)", "Exportar CSV y PDF", "Categorías personalizadas", "Soporte prioritario"],
+      "premium": ["Todo Pro", "Acceso multiusuario", "Integración API", "Soporte dedicado", "Marca personalizada"]
+    },
+    "faq": {
+      "cancel": {
+        "q": "¿Qué pasa con mis datos si cancelo?",
+        "a": "Tus datos siguen disponibles. La suscripción la facturan Apple o Google; la cancelación sigue sus reglas."
+      },
+      "how": {
+        "q": "¿Cómo me suscribo?",
+        "a": "Usa la compra dentro de la app. Verificamos la compra en el servidor antes de desbloquear Pro o Premium."
+      },
+      "web": {
+        "q": "¿Puedo pagar en la web?",
+        "a": "Las suscripciones digitales de pago usan las tiendas móviles. La web puede ofrecer solo herramientas de administración."
+      }
+    },
+    "errors": {
+      "title": "Suscripción",
+      "storeUnavailable": "Las compras dentro de la app requieren una compilación de desarrollo (expo run:ios o run:android), no Expo Go.",
+      "purchaseFailed": "No se pudo completar la compra.",
+      "restoreFailed": "No se encontró una suscripción activa para restaurar."
+    }
   }
 }

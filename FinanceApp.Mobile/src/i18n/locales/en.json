@@ -40,5 +40,54 @@
     "validationFirstName": "First name must be at least 2 characters",
     "validationLastName": "Last name must be at least 2 characters",
     "updateFailed": "Failed to update profile"
+  },
+  "subscription": {
+    "currentPlan": "Current Plan",
+    "billing": "Billing: {{source}}",
+    "renewsEnds": "Renews/ends: {{date}}",
+    "restorePurchases": "Restore purchases",
+    "choosePlan": "Choose Your Plan",
+    "plans": { "free": "Free", "pro": "Pro", "premium": "Premium" },
+    "forever": "/ forever",
+    "perMonth": "/ month",
+    "freeDesc": "Get started with essential finance tracking.",
+    "proDesc": "AI insights and advanced tracking for power users.",
+    "premiumDesc": "Top tier with future advanced automation (same store checkout as Pro).",
+    "mostPopular": "MOST POPULAR",
+    "activePlan": "Active Plan",
+    "subscribeAppStore": "Subscribe with App Store",
+    "subscribeGooglePlay": "Subscribe with Google Play",
+    "contactSales": "Contact Sales",
+    "processing": "Processing…",
+    "faqTitle": "Frequently Asked Questions",
+    "footerIos": "SECURE CHECKOUT VIA APP STORE",
+    "footerAndroid": "SECURE CHECKOUT VIA GOOGLE PLAY",
+    "restoreSuccessTitle": "Restored",
+    "restoreSuccessBody": "Your subscription was synced with the server.",
+    "features": {
+      "free": ["Basic expense tracking", "Budget management", "Monthly reports", "Up to 3 accounts"],
+      "pro": ["Unlimited Budgets", "AI-Powered Insights", "Receipt Scanning (OCR)", "CSV & PDF Export", "Custom Categories", "Priority Support"],
+      "premium": ["All Pro Features", "Multi-user Access", "API Integration", "Dedicated Support", "Custom Branding"]
+    },
+    "faq": {
+      "cancel": {
+        "q": "What happens to my data if I cancel?",
+        "a": "Your data remains available. Subscription is billed by Apple or Google; cancellation follows their rules."
+      },
+      "how": {
+        "q": "How do I subscribe?",
+        "a": "Use In-App Purchase on this device. The app verifies your purchase with our server before unlocking Pro or Premium."
+      },
+      "web": {
+        "q": "Can I use the website to pay?",
+        "a": "Yes. Subscribe on the web (Stripe on the Subscription page) or in this app via App Store / Google Play. The same account gets Pro or Premium on web and mobile after sign-in."
+      }
+    },
+    "errors": {
+      "title": "Subscription",
+      "storeUnavailable": "In-app purchases need a dev build (expo run:ios or run:android), not Expo Go.",
+      "purchaseFailed": "Purchase could not be completed.",
+      "restoreFailed": "No active subscription found to restore."
+    }
   }
 }

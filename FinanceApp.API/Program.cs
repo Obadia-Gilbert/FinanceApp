@@ -61,6 +61,9 @@ builder.Services.AddSingleton<SubscriptionProductMapper>();
 builder.Services.AddScoped<IAppleStoreTransactionVerifier, AppleStoreTransactionVerifier>();
 builder.Services.AddScoped<IGooglePlaySubscriptionVerifier, GooglePlaySubscriptionVerifier>();
 builder.Services.AddScoped<ISubscriptionEntitlementService, SubscriptionEntitlementService>();
+builder.Services.AddScoped<ISubscriptionBillingWebhookService, SubscriptionBillingWebhookService>();
+builder.Services.AddScoped<IStripeBillingService, StripeBillingService>();
+builder.Services.AddScoped<IStripeBillingWebhookHandler, StripeBillingWebhookHandler>();
 builder.Services.AddScoped<ISupportingDocumentService>(sp =>
 {
     var repo = sp.GetRequiredService<IRepository<FinanceApp.Domain.Entities.SupportingDocument>>();

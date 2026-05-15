@@ -38,6 +38,12 @@ public class ApplicationUser : IdentityUser
     /// <summary>Latest Google Play purchase token for the active subscription (for revalidation).</summary>
     public string? GooglePurchaseToken { get; set; }
 
+    /// <summary>Stripe customer id for web billing (cus_…).</summary>
+    public string? StripeCustomerId { get; set; }
+
+    /// <summary>Active Stripe subscription id (sub_…) when billed via web.</summary>
+    public string? StripeSubscriptionId { get; set; }
+
     /// <summary>BCP 47 language code for UI (e.g. en, sw). Synced with web cookie and mobile i18n.</summary>
     public string PreferredLanguage { get; set; } = "en";
 }
