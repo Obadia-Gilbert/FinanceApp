@@ -2,12 +2,12 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text;
-using System.Text.Encodings.Web;
 using System.Text.Json.Serialization;
 using FinanceApp.API.DTOs;
 using FinanceApp.Application.Interfaces;
 using FinanceApp.Application.Interfaces.Services;
 using FinanceApp.Domain.Enums;
+using FinanceApp.Infrastructure.Email;
 using FinanceApp.Infrastructure.Identity;
 using FinanceApp.Localization;
 using Google.Apis.Auth;
@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace FinanceApp.API.Controllers;
@@ -33,7 +34,9 @@ public class AuthController : ControllerBase
     private readonly IConfiguration _config;
     private readonly IStringLocalizer<SharedResource> _localizer;
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly IEmailService _emailService;
+    private readonly IBrandedEmailSender _brandedEmailSender;
+    private readonly LocalizedEmailTemplates _emailTemplates;
+    private readonly EmailBrandingOptions _emailBranding;
     private readonly ILogger<AuthController> _logger;
 
     public AuthController(
@@ -43,7 +46,9 @@ public class AuthController : ControllerBase
         IConfiguration config,
         IStringLocalizer<SharedResource> localizer,
         IHttpClientFactory httpClientFactory,
-        IEmailService emailService,
+        IBrandedEmailSender brandedEmailSender,
+        LocalizedEmailTemplates emailTemplates,
+        IOptions<EmailBrandingOptions> emailBrandingOptions,
         ILogger<AuthController> logger)
     {
         _userManager = userManager;
@@ -52,7 +57,9 @@ public class AuthController : ControllerBase
         _config = config;
         _localizer = localizer;
         _httpClientFactory = httpClientFactory;
-        _emailService = emailService;
+        _brandedEmailSender = brandedEmailSender;
+        _emailTemplates = emailTemplates;
+        _emailBranding = emailBrandingOptions.Value;
         _logger = logger;
     }
 
@@ -84,8 +91,31 @@ public class AuthController : ControllerBase
         await _userManager.AddToRoleAsync(user, "User");
         await _categoryService.AssignDefaultCategoriesToUserAsync(user.Id);
 
+        await TrySendWelcomeEmailAsync(user);
+
         var response = await BuildLoginResponseAsync(user);
         return StatusCode(StatusCodes.Status201Created, response);
+    }
+
+    /// <summary>
+    /// Sends the branded welcome email when <c>EmailBranding:SendWelcomeEmail</c>
+    /// is enabled (default true). Swallows all errors — registration must never
+    /// fail because the email transport hiccupped.
+    /// </summary>
+    private async Task TrySendWelcomeEmailAsync(ApplicationUser user)
+    {
+        if (!_emailBranding.SendWelcomeEmail) return;
+        if (string.IsNullOrWhiteSpace(user.Email)) return;
+
+        try
+        {
+            var template = _emailTemplates.BuildWelcome(user.FirstName ?? user.Email!, _emailBranding.WebAppBaseUrl);
+            await _brandedEmailSender.SendAsync(user.Email!, template);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Account created but welcome email could not be sent for {Email}.", user.Email);
+        }
     }
 
     // POST /api/auth/login
@@ -160,12 +190,10 @@ public class AuthController : ControllerBase
                 var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
                 var resetUrl = BuildPasswordResetUrl(email, encodedToken);
 
-                var subject = _localizer["Email_ResetPasswordSubject"].Value;
-                var body = string.Format(
-                    _localizer["Email_ResetPasswordBody"].Value,
-                    HtmlEncoder.Default.Encode(resetUrl));
-
-                await _emailService.SendEmailAsync(email, subject, body);
+                var template = _emailTemplates.BuildResetPassword(
+                    user.FirstName ?? user.Email ?? email,
+                    resetUrl);
+                await _brandedEmailSender.SendAsync(email, template);
             }
             catch (Exception ex)
             {

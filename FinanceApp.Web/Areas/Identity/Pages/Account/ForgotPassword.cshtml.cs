@@ -5,34 +5,31 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
-using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using FinanceApp.Infrastructure.Email;
 using FinanceApp.Infrastructure.Identity;
-using FinanceApp.Localization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Localization;
 
 namespace FinanceApp.Web.Areas.Identity.Pages.Account
 {
     public class ForgotPasswordModel : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IEmailSender _emailSender;
-        private readonly IStringLocalizer<SharedResource> _localizer;
+        private readonly IBrandedEmailSender _brandedEmailSender;
+        private readonly LocalizedEmailTemplates _emailTemplates;
 
         public ForgotPasswordModel(
             UserManager<ApplicationUser> userManager,
-            IEmailSender emailSender,
-            IStringLocalizer<SharedResource> localizer)
+            IBrandedEmailSender brandedEmailSender,
+            LocalizedEmailTemplates emailTemplates)
         {
             _userManager = userManager;
-            _emailSender = emailSender;
-            _localizer = localizer;
+            _brandedEmailSender = brandedEmailSender;
+            _emailTemplates = emailTemplates;
         }
 
         /// <summary>
@@ -78,12 +75,10 @@ namespace FinanceApp.Web.Areas.Identity.Pages.Account
                     values: new { area = "Identity", code = encodedToken, email = Input.Email },
                     protocol: Request.Scheme);
 
-                var subject = _localizer["Email_ResetPasswordSubject"].Value;
-                var body = string.Format(
-                    _localizer["Email_ResetPasswordBody"].Value,
-                    HtmlEncoder.Default.Encode(callbackUrl));
-
-                await _emailSender.SendEmailAsync(Input.Email, subject, body);
+                var template = _emailTemplates.BuildResetPassword(
+                    user.FirstName ?? user.Email ?? Input.Email,
+                    callbackUrl);
+                await _brandedEmailSender.SendAsync(Input.Email, template);
 
                 return RedirectToPage("./ForgotPasswordConfirmation");
             }

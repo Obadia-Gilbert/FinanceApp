@@ -7,17 +7,16 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using FinanceApp.Infrastructure.Email;
 using FinanceApp.Infrastructure.Identity;
 using FinanceApp.Application.Interfaces.Services;
 using FinanceApp.Domain.Enums;
@@ -31,7 +30,8 @@ namespace FinanceApp.Web.Areas.Identity.Pages.Account
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IUserStore<ApplicationUser> _userStore;
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
-        private readonly IEmailSender _emailSender;
+        private readonly IBrandedEmailSender _brandedEmailSender;
+        private readonly LocalizedEmailTemplates _emailTemplates;
         private readonly ILogger<ExternalLoginModel> _logger;
         private readonly ICategoryService _categoryService;
 
@@ -40,7 +40,8 @@ namespace FinanceApp.Web.Areas.Identity.Pages.Account
             UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
             ILogger<ExternalLoginModel> logger,
-            IEmailSender emailSender,
+            IBrandedEmailSender brandedEmailSender,
+            LocalizedEmailTemplates emailTemplates,
             ICategoryService categoryService)
         {
             _signInManager = signInManager;
@@ -48,7 +49,8 @@ namespace FinanceApp.Web.Areas.Identity.Pages.Account
             _userStore = userStore;
             _emailStore = GetEmailStore();
             _logger = logger;
-            _emailSender = emailSender;
+            _brandedEmailSender = brandedEmailSender;
+            _emailTemplates = emailTemplates;
             _categoryService = categoryService;
         }
 
@@ -291,8 +293,17 @@ namespace FinanceApp.Web.Areas.Identity.Pages.Account
                             values: new { area = "Identity", userId = userId, code = code },
                             protocol: Request.Scheme);
 
-                        await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                        try
+                        {
+                            var confirmTemplate = _emailTemplates.BuildEmailConfirmation(
+                                user.FirstName ?? Input.Email,
+                                callbackUrl ?? string.Empty);
+                            await _brandedEmailSender.SendAsync(Input.Email, confirmTemplate);
+                        }
+                        catch (Exception emailEx)
+                        {
+                            _logger.LogWarning(emailEx, "External login account created but confirmation email could not be sent for {Email}.", Input.Email);
+                        }
 
                         // If account confirmation is required, we need to show the link if we don't have a real email sender
                         if (_userManager.Options.SignIn.RequireConfirmedAccount)

@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using FinanceApp.Infrastructure.Email;
 using FinanceApp.Infrastructure.Services;
 using Microsoft.Extensions.Options;
 using Xunit;
@@ -100,6 +101,54 @@ public class BrevoEmailServiceTests
 
         await Assert.ThrowsAsync<HttpRequestException>(
             () => service.SendEmailAsync("user@example.com", "s", "b"));
+    }
+
+    [Fact]
+    public async Task BrandedEmailSender_PostsRenderedHtmlBranding_ThroughBrevo()
+    {
+        // Wire the full Brevo pipeline so we know the rendered HTML actually
+        // reaches Brevo with the expected body shape (subject + branded
+        // markers: logo URL, brand color, bulletproof CTA).
+        var handler = new RecordingHandler(HttpStatusCode.Created, "{\"messageId\":\"<branded@brevo>\"}");
+        var factory = new SingleClientFactory(new HttpClient(handler));
+        var settings = Options.Create(new BrevoSettings
+        {
+            ApiKey = "xkeysib-branded-test",
+            SenderEmail = "noreply@financeapp.test",
+            SenderName = "FinanceApp"
+        });
+        var brevo = new BrevoEmailService(factory, settings);
+        var renderer = new EmailTemplateRenderer(Options.Create(new EmailBrandingOptions
+        {
+            WebAppBaseUrl = "https://app.financeapp.test",
+            BrandName = "FinanceApp",
+            PrimaryColor = "#0d6efd"
+        }));
+        var sender = new BrandedEmailSender(brevo, renderer);
+
+        var template = new EmailTemplate(
+            Subject: "Reset your FinanceApp password",
+            PreheaderText: "Use the link below to set a new password.",
+            Heading: "Hi Alex",
+            Body: new EmailBlock[]
+            {
+                new EmailBlock.Paragraph("We received a request to reset the password for your account."),
+                new EmailBlock.CallToAction("Reset my password", "https://example.com/reset?code=abc")
+            });
+
+        await sender.SendAsync("alex@example.com", template);
+
+        Assert.NotNull(handler.LastBody);
+        using var doc = JsonDocument.Parse(handler.LastBody!);
+        var root = doc.RootElement;
+        Assert.Equal("alex@example.com", root.GetProperty("to")[0].GetProperty("email").GetString());
+        Assert.Equal("Reset your FinanceApp password", root.GetProperty("subject").GetString());
+
+        var htmlContent = root.GetProperty("htmlContent").GetString()!;
+        Assert.Contains("https://app.financeapp.test/branding/email-logo.png", htmlContent);
+        Assert.Contains("#0d6efd", htmlContent, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("Reset my password", htmlContent);
+        Assert.Contains("https://example.com/reset?code=abc", htmlContent);
     }
 
     // -------- Helpers --------

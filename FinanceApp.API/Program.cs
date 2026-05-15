@@ -2,6 +2,7 @@ using System.Text;
 using FinanceApp.Application.Interfaces;
 using FinanceApp.Application.Interfaces.Services;
 using FinanceApp.Application.Services;
+using FinanceApp.Infrastructure.Email;
 using FinanceApp.Infrastructure.Identity;
 using FinanceApp.Infrastructure.Persistence;
 using FinanceApp.Infrastructure.Repositories;
@@ -63,6 +64,9 @@ builder.Services.AddSingleton<SubscriptionProductMapper>();
 builder.Services.AddScoped<IAppleStoreTransactionVerifier, AppleStoreTransactionVerifier>();
 builder.Services.AddScoped<IGooglePlaySubscriptionVerifier, GooglePlaySubscriptionVerifier>();
 builder.Services.AddScoped<ISubscriptionEntitlementService, SubscriptionEntitlementService>();
+builder.Services.AddScoped<ISubscriptionBillingWebhookService, SubscriptionBillingWebhookService>();
+builder.Services.AddScoped<IStripeBillingService, StripeBillingService>();
+builder.Services.AddScoped<IStripeBillingWebhookHandler, StripeBillingWebhookHandler>();
 builder.Services.AddScoped<ISupportingDocumentService>(sp =>
 {
     var repo = sp.GetRequiredService<IRepository<FinanceApp.Domain.Entities.SupportingDocument>>();
@@ -103,6 +107,13 @@ else if (!string.IsNullOrWhiteSpace(builder.Configuration["EmailSettings:SmtpSer
 else
     builder.Services.AddSingleton<IEmailService, NoOpEmailService>();
 builder.Services.AddTransient<IEmailSender, IdentityEmailSender>();
+
+// Branded email rendering — single source of truth for layout / brand tokens /
+// localized copy across every email call site in the API.
+builder.Services.Configure<EmailBrandingOptions>(builder.Configuration.GetSection(EmailBrandingOptions.SectionName));
+builder.Services.AddSingleton<IEmailTemplateRenderer, EmailTemplateRenderer>();
+builder.Services.AddScoped<LocalizedEmailTemplates>();
+builder.Services.AddScoped<IBrandedEmailSender, BrandedEmailSender>();
 
 // JWT
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key is required.");

@@ -30,6 +30,27 @@
   <data name="Nav_Budget" xml:space="preserve"><value>Budget</value></data>
   <data name="Nav_MonthlyReport" xml:space="preserve"><value>Monthly report</value></data>
   <data name="Nav_Subscription" xml:space="preserve"><value>Subscription</value></data>
+  <data name="Sub_PageTitle" xml:space="preserve"><value>Subscription</value></data>
+  <data name="Sub_CurrentPlan" xml:space="preserve"><value>Your current plan is</value></data>
+  <data name="Sub_AssignedOn" xml:space="preserve"><value>Assigned on</value></data>
+  <data name="Sub_BillingSource" xml:space="preserve"><value>Billing:</value></data>
+  <data name="Sub_ExpiresUtc" xml:space="preserve"><value>Expires (UTC):</value></data>
+  <data name="Sub_WebBillingNote" xml:space="preserve"><value>Manage billing below (Stripe). Your plan syncs to the mobile app after sign-in.</value></data>
+  <data name="Sub_MobileBillingNote" xml:space="preserve"><value>Manage this subscription in the App Store or Google Play on your phone.</value></data>
+  <data name="Sub_WebUpgradeHint" xml:space="preserve"><value>Upgrade on the web with Stripe, or use in-app purchase on iOS/Android — same account, same plan.</value></data>
+  <data name="Sub_ManageBilling" xml:space="preserve"><value>Manage billing</value></data>
+  <data name="Sub_PlanFree" xml:space="preserve"><value>Free</value></data>
+  <data name="Sub_PlanFreeDesc" xml:space="preserve"><value>Starter access for personal finance tracking.</value></data>
+  <data name="Sub_PlanPro" xml:space="preserve"><value>Pro</value></data>
+  <data name="Sub_PlanProDesc" xml:space="preserve"><value>More advanced insights and upcoming premium features.</value></data>
+  <data name="Sub_PlanPremium" xml:space="preserve"><value>Premium</value></data>
+  <data name="Sub_PlanPremiumDesc" xml:space="preserve"><value>Top-tier experience with future advanced automation features.</value></data>
+  <data name="Sub_CurrentBadge" xml:space="preserve"><value>Current plan</value></data>
+  <data name="Sub_AdminSetPro" xml:space="preserve"><value>Admin: set Pro</value></data>
+  <data name="Sub_AdminSetPremium" xml:space="preserve"><value>Admin: set Premium</value></data>
+  <data name="Sub_UpgradeWeb" xml:space="preserve"><value>Upgrade on web</value></data>
+  <data name="Sub_MobileAlso" xml:space="preserve"><value>Or subscribe in the iOS/Android app — entitlement is shared.</value></data>
+  <data name="Sub_MobileOnlyUpgrade" xml:space="preserve"><value>Subscribe in the iOS or Android app, or ask an admin to enable web billing.</value></data>
   <data name="Nav_Profile" xml:space="preserve"><value>Profile</value></data>
   <data name="Nav_Privacy" xml:space="preserve"><value>Privacy</value></data>
   <data name="Nav_ManageUsers" xml:space="preserve"><value>Manage Users</value></data>
@@ -479,4 +500,48 @@
   <data name="Land_Step4Body" xml:space="preserve"><value>Export to Excel, attach documents to transactions, and keep everything in one secure place.</value></data>
   <data name="Land_CtaH2" xml:space="preserve"><value>Ready to get started?</value></data>
   <data name="Land_CtaLead" xml:space="preserve"><value>Join FinanceApp and start managing your money with clarity.</value></data>
+  <!-- ===== Branded transactional email copy ===== -->
+  <data name="Email_Common_Footer" xml:space="preserve"><value>You're receiving this because you have a FinanceApp account.</value></data>
+  <data name="Email_Common_DefaultName" xml:space="preserve"><value>there</value></data>
+  <data name="Email_Common_UnsubscribeNote" xml:space="preserve"><value>Manage your email preferences any time from your profile settings.</value></data>
+  <data name="Email_ResetPassword_Subject" xml:space="preserve"><value>Reset your FinanceApp password</value></data>
+  <data name="Email_ResetPassword_Preheader" xml:space="preserve"><value>Use the link below to set a new password — expires in 2 hours.</value></data>
+  <data name="Email_ResetPassword_Heading" xml:space="preserve"><value>Hi {0}, let's reset your password</value></data>
+  <data name="Email_ResetPassword_BodyIntro" xml:space="preserve"><value>We received a request to reset the password for your FinanceApp account. Click the button below to choose a new one.</value></data>
+  <data name="Email_ResetPassword_BodyExpiry" xml:space="preserve"><value>This link expires in 2 hours. Request a new one if it's no longer working.</value></data>
+  <data name="Email_ResetPassword_BodyIgnore" xml:space="preserve"><value>If you didn't request this change, you can safely ignore this email — your password stays the same.</value></data>
+  <data name="Email_ResetPassword_CtaLabel" xml:space="preserve"><value>Reset my password</value></data>
+  <data name="Email_Welcome_Subject" xml:space="preserve"><value>Welcome to {0}</value></data>
+  <data name="Email_Welcome_Preheader" xml:space="preserve"><value>Your FinanceApp account is ready — here's how to get the most out of it.</value></data>
+  <data name="Email_Welcome_Heading" xml:space="preserve"><value>Welcome aboard, {0}</value></data>
+  <data name="Email_Welcome_BodyIntro" xml:space="preserve"><value>Thanks for joining FinanceApp. You're all set to start tracking expenses, setting budgets, and seeing where your money goes.</value></data>
+  <data name="Email_Welcome_BodyTips" xml:space="preserve"><value>A great first step: add a category, log your first expense, and set a monthly budget so you'll get an alert before you overspend.</value></data>
+  <data name="Email_Welcome_CtaLabel" xml:space="preserve"><value>Open FinanceApp</value></data>
+  <data name="Email_Confirm_Subject" xml:space="preserve"><value>Confirm your FinanceApp email</value></data>
+  <data name="Email_Confirm_Preheader" xml:space="preserve"><value>One quick step to activate your FinanceApp account.</value></data>
+  <data name="Email_Confirm_Heading" xml:space="preserve"><value>Hi {0}, confirm your email</value></data>
+  <data name="Email_Confirm_BodyIntro" xml:space="preserve"><value>Please confirm your email address so we can secure your account and send you important account notifications.</value></data>
+  <data name="Email_Confirm_BodyIgnore" xml:space="preserve"><value>If you didn't create a FinanceApp account, you can ignore this email.</value></data>
+  <data name="Email_Confirm_CtaLabel" xml:space="preserve"><value>Confirm email</value></data>
+  <data name="Email_BudgetAlert_Subject" xml:space="preserve"><value>Budget alert: {0}</value></data>
+  <data name="Email_BudgetAlert_Preheader" xml:space="preserve"><value>{0} is approaching or exceeding its monthly limit.</value></data>
+  <data name="Email_BudgetAlert_Heading" xml:space="preserve"><value>Hi {0}, your budget needs a look</value></data>
+  <data name="Email_BudgetAlert_BodyOver" xml:space="preserve"><value>You've spent {1} on {0} this month — that's {3}% of your {2} budget. You're over the limit.</value></data>
+  <data name="Email_BudgetAlert_BodyNear" xml:space="preserve"><value>You've spent {1} on {0} this month — that's {3}% of your {2} budget. You're getting close to the limit.</value></data>
+  <data name="Email_BudgetAlert_BodyAdvice" xml:space="preserve"><value>Open FinanceApp to review the category, adjust the budget, or pause spending until next month.</value></data>
+  <data name="Email_BudgetAlert_LabelCategory" xml:space="preserve"><value>Category</value></data>
+  <data name="Email_BudgetAlert_LabelSpent" xml:space="preserve"><value>Spent this month</value></data>
+  <data name="Email_BudgetAlert_LabelLimit" xml:space="preserve"><value>Monthly limit</value></data>
+  <data name="Email_BudgetAlert_LabelPercent" xml:space="preserve"><value>Of budget used</value></data>
+  <data name="Email_DailyReminder_Subject" xml:space="preserve"><value>Don't forget to log today's activity</value></data>
+  <data name="Email_DailyReminder_Preheader" xml:space="preserve"><value>A quick reminder to add today's expenses or income.</value></data>
+  <data name="Email_DailyReminder_Heading" xml:space="preserve"><value>Hi {0}, a quick nudge</value></data>
+  <data name="Email_DailyReminder_BodyIntro" xml:space="preserve"><value>You haven't logged any activity today. Adding entries regularly keeps your reports and budgets accurate.</value></data>
+  <data name="Email_DailyReminder_BodyOptOut" xml:space="preserve"><value>You can turn daily reminders off any time from your profile settings.</value></data>
+  <data name="Email_DailyReminder_CtaLabel" xml:space="preserve"><value>Log today's activity</value></data>
+  <data name="Email_FeedbackAck_Subject" xml:space="preserve"><value>We received your feedback</value></data>
+  <data name="Email_FeedbackAck_Preheader" xml:space="preserve"><value>Thank you — we're reviewing what you sent.</value></data>
+  <data name="Email_FeedbackAck_Heading" xml:space="preserve"><value>Thanks for writing in, {0}</value></data>
+  <data name="Email_FeedbackAck_BodyIntro" xml:space="preserve"><value>Your feedback has reached the FinanceApp team. We read every message and use it to make the product better.</value></data>
+  <data name="Email_FeedbackAck_BodyClose" xml:space="preserve"><value>If your message asks a question or reports an issue, we'll reply directly. Otherwise consider this our quiet thank-you.</value></data>
 </root>
