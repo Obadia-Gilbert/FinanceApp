@@ -10,6 +10,7 @@ import {
   Animated,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../src/context/ThemeContext';
@@ -20,9 +21,10 @@ import { getUnreadCount } from '../../src/api/notifications';
 import { LineChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
 
-const DAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+const WEEKDAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
 
 export default function DashboardScreen() {
+  const { t } = useTranslation();
   const { colors, isDark } = useTheme();
   const { user } = useAuth();
   const router = useRouter();
@@ -65,7 +67,7 @@ export default function DashboardScreen() {
   const screenWidth = Dimensions.get('window').width - 48;
   const last7 = data?.chartData?.slice(-7) ?? [];
   const chartLabels = last7.length >= 7
-    ? DAYS
+    ? WEEKDAY_KEYS.map((k) => t(`dashboard.weekdays.${k}`))
     : last7.map((d, i) => (i % 2 === 0 ? d.date : ''));
 
   if (isError) {
@@ -78,9 +80,9 @@ export default function DashboardScreen() {
         >
           <Text style={{ fontSize: 48, marginBottom: 16 }}>📊</Text>
           <Text style={[styles.errorText, { color: colors.danger }]}>
-            {(error as Error)?.message ?? 'Failed to load dashboard'}
+            {(error as Error)?.message ?? t('dashboard.loadFailed')}
           </Text>
-          <Text style={[styles.retryHint, { color: colors.text.muted }]}>Pull down to retry</Text>
+          <Text style={[styles.retryHint, { color: colors.text.muted }]}>{t('dashboard.pullToRetry')}</Text>
         </ScrollView>
       </View>
     );
@@ -106,7 +108,7 @@ export default function DashboardScreen() {
               {user?.firstName?.[0] ?? user?.email?.[0] ?? '?'}
             </Text>
           </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: colors.text.primary }]}>Dashboard</Text>
+          <Text style={[styles.headerTitle, { color: colors.text.primary }]}>{t('dashboard.title')}</Text>
           <TouchableOpacity
             onPress={() => router.push('/(tabs)/notifications')}
             style={styles.bellWrap}
@@ -127,18 +129,18 @@ export default function DashboardScreen() {
           <Animated.View style={{ opacity: fadeIn }}>
             {/* Spending card */}
             <View style={[styles.balanceCard, { backgroundColor: colors.brand }]}>
-              <Text style={styles.balanceLabel}>This month&apos;s spending</Text>
+              <Text style={styles.balanceLabel}>{t('dashboard.thisMonthSpending')}</Text>
               <Text style={styles.balanceAmount}>
                 {data.displayCurrency} {data.thisMonthSpend.toLocaleString()}
               </Text>
               <View style={styles.balanceRow}>
                 <View style={styles.balanceCol}>
-                  <Text style={styles.balanceSubLabel}>Monthly expenses</Text>
+                  <Text style={styles.balanceSubLabel}>{t('dashboard.monthlyExpenses')}</Text>
                   <Text style={styles.balanceSubValue}>−{data.thisMonthSpend.toLocaleString()}</Text>
                 </View>
                 <View style={styles.balanceDivider} />
                 <View style={styles.balanceCol}>
-                  <Text style={styles.balanceSubLabel}>Total spend (all time)</Text>
+                  <Text style={styles.balanceSubLabel}>{t('dashboard.totalSpendAllTime')}</Text>
                   <Text style={styles.balanceSubValue}>{data.totalSpend.toLocaleString()}</Text>
                 </View>
               </View>
@@ -147,9 +149,15 @@ export default function DashboardScreen() {
             {/* Budget alert */}
             {data.isOverBudget && data.budgetAmount != null && (
               <Card style={[styles.alert, { borderLeftWidth: 4, borderLeftColor: colors.danger }]}>
-                <Text style={[styles.alertTitle, { color: colors.danger }]}>⚠ Budget exceeded</Text>
+                <Text style={[styles.alertTitle, { color: colors.danger }]}>
+                  ⚠ {t('dashboard.budgetExceeded')}
+                </Text>
                 <Text style={[styles.alertBody, { color: colors.text.body }]}>
-                  This month you've spent {data.thisMonthSpend.toLocaleString()} {data.displayCurrency} against a budget of {data.budgetAmount.toLocaleString()}.
+                  {t('dashboard.budgetExceededBody', {
+                    spent: data.thisMonthSpend.toLocaleString(),
+                    currency: data.displayCurrency,
+                    budget: data.budgetAmount.toLocaleString(),
+                  })}
                 </Text>
               </Card>
             )}
@@ -159,13 +167,13 @@ export default function DashboardScreen() {
               <Card style={styles.trendCard}>
                 <View style={styles.trendHeader}>
                   <View>
-                    <Text style={[styles.trendTitle, { color: colors.text.primary }]}>Spending Trend</Text>
+                    <Text style={[styles.trendTitle, { color: colors.text.primary }]}>{t('dashboard.spendingTrend')}</Text>
                     <Text style={[styles.trendAmount, { color: colors.text.primary }]}>
                       {data.displayCurrency} {data.thisMonthSpend.toLocaleString()}
                     </Text>
                   </View>
                   <View style={[styles.trendPill, { backgroundColor: colors.brandLight ?? colors.bg.alt }]}>
-                    <Text style={[styles.trendPillText, { color: colors.brand }]}>Last 7 days</Text>
+                    <Text style={[styles.trendPillText, { color: colors.brand }]}>{t('dashboard.last7Days')}</Text>
                   </View>
                 </View>
                 <LineChart
@@ -190,9 +198,9 @@ export default function DashboardScreen() {
             {(data.categoryBudgetAlerts?.length > 0 || (data.budgetAmount != null && data.budgetAmount > 0)) && (
               <View style={styles.section}>
                 <View style={styles.sectionHeader}>
-                  <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>Active Budgets</Text>
+                  <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>{t('dashboard.activeBudgets')}</Text>
                   <TouchableOpacity onPress={() => router.push('/(tabs)/budget')}>
-                    <Text style={[styles.viewAll, { color: colors.brand }]}>View all</Text>
+                    <Text style={[styles.viewAll, { color: colors.brand }]}>{t('dashboard.viewAll')}</Text>
                   </TouchableOpacity>
                 </View>
                 {data.budgetAmount != null && data.budgetAmount > 0 && (
@@ -202,7 +210,7 @@ export default function DashboardScreen() {
                         <Text style={styles.budgetEmoji}>📊</Text>
                       </View>
                       <View style={{ flex: 1 }}>
-                        <Text style={[styles.budgetName, { color: colors.text.primary }]}>Total</Text>
+                        <Text style={[styles.budgetName, { color: colors.text.primary }]}>{t('dashboard.total')}</Text>
                         <Text style={[styles.budgetMeta, { color: colors.text.muted }]}>
                           {data.thisMonthSpend.toLocaleString()} / {data.budgetAmount.toLocaleString()} {data.displayCurrency}
                         </Text>
@@ -252,7 +260,7 @@ export default function DashboardScreen() {
 
             {/* Quick Actions */}
             <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: colors.text.primary, marginBottom: 12 }]}>Quick Actions</Text>
+              <Text style={[styles.sectionTitle, { color: colors.text.primary, marginBottom: 12 }]}>{t('dashboard.quickActions')}</Text>
               <View style={styles.quickActions}>
                 <TouchableOpacity
                   style={[styles.quickAction, { backgroundColor: colors.bg.default, borderColor: colors.border }]}
@@ -262,7 +270,7 @@ export default function DashboardScreen() {
                   <View style={[styles.quickActionIcon, { backgroundColor: `${colors.danger}15` }]}>
                     <Text style={{ fontSize: 20 }}>💸</Text>
                   </View>
-                  <Text style={[styles.quickActionLabel, { color: colors.text.primary }]}>Add Expense</Text>
+                  <Text style={[styles.quickActionLabel, { color: colors.text.primary }]}>{t('dashboard.addExpense')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.quickAction, { backgroundColor: colors.bg.default, borderColor: colors.border }]}
@@ -272,7 +280,7 @@ export default function DashboardScreen() {
                   <View style={[styles.quickActionIcon, { backgroundColor: `${colors.success}15` }]}>
                     <Text style={{ fontSize: 20 }}>💰</Text>
                   </View>
-                  <Text style={[styles.quickActionLabel, { color: colors.text.primary }]}>Add Income</Text>
+                  <Text style={[styles.quickActionLabel, { color: colors.text.primary }]}>{t('dashboard.addIncome')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.quickAction, { backgroundColor: colors.bg.default, borderColor: colors.border }]}
@@ -282,7 +290,7 @@ export default function DashboardScreen() {
                   <View style={[styles.quickActionIcon, { backgroundColor: `${colors.info}15` }]}>
                     <Text style={{ fontSize: 20 }}>📊</Text>
                   </View>
-                  <Text style={[styles.quickActionLabel, { color: colors.text.primary }]}>Reports</Text>
+                  <Text style={[styles.quickActionLabel, { color: colors.text.primary }]}>{t('dashboard.reports')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.quickAction, { backgroundColor: colors.bg.default, borderColor: colors.border }]}
@@ -292,7 +300,7 @@ export default function DashboardScreen() {
                   <View style={[styles.quickActionIcon, { backgroundColor: `${colors.brand}15` }]}>
                     <Text style={{ fontSize: 20 }}>🎯</Text>
                   </View>
-                  <Text style={[styles.quickActionLabel, { color: colors.text.primary }]}>Budget</Text>
+                  <Text style={[styles.quickActionLabel, { color: colors.text.primary }]}>{t('dashboard.budget')}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -300,7 +308,7 @@ export default function DashboardScreen() {
         ) : isLoading ? (
           <View style={styles.loadingWrap}>
             <ActivityIndicator size="large" color={colors.brand} />
-            <Text style={[styles.loadingText, { color: colors.text.muted }]}>Loading your dashboard...</Text>
+            <Text style={[styles.loadingText, { color: colors.text.muted }]}>{t('dashboard.loading')}</Text>
           </View>
         ) : null}
       </ScrollView>

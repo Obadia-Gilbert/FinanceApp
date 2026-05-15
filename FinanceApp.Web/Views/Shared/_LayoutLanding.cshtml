@@ -1,12 +1,20 @@
+@using System.Globalization
+@using System.Text.Json
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
 @{
-    var title = ViewData["Title"] as string ?? "FinanceApp – Personal Finance & Budget Tracker";
-    var metaDescription = ViewData["MetaDescription"] as string ?? "Track expenses, manage budgets, and get insights with FinanceApp. Free personal finance and budget tracker.";
+    var title = ViewData["Title"] as string ?? L["Land_PageTitle"].Value;
+    var metaDescription = ViewData["MetaDescription"] as string ?? L["Land_MetaDescription"].Value;
     var canonicalUrl = ViewData["CanonicalUrl"] as string;
     var ogImage = ViewData["OgImage"] as string;
+    var ogLocale = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName switch
+    {
+        "es" => "es_ES",
+        "sw" => "sw_KE",
+        _ => "en_US"
+    };
 }
 <!DOCTYPE html>
-<html lang="en">
+<html lang="@CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -25,7 +33,7 @@
     {
         <meta property="og:image" content="@ogImage" />
     }
-    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale" content="@ogLocale" />
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="@title" />
@@ -47,7 +55,7 @@
       "@@context": "https://schema.org",
       "@@type": "WebApplication",
       "name": "FinanceApp",
-      "description": "Track expenses, manage budgets, and get insights. Free personal finance and budget tracker.",
+      "description": @Html.Raw(JsonSerializer.Serialize(L["Land_JsonLdDescription"].Value)),
       "url": "@(canonicalUrl ?? "")",
       "applicationCategory": "FinanceApplication",
       "offers": { "@@type": "Offer", "price": "0", "priceCurrency": "USD" }
@@ -61,22 +69,25 @@
         <nav class="navbar navbar-expand-lg navbar-light">
             <div class="container">
                 <a class="navbar-brand fw-bold d-flex align-items-center gap-2" asp-controller="Landing" asp-action="Index">
-                    <img src="~/financeapp-logo.png" alt="FinanceApp" width="32" height="32" class="rounded" />
-                    <span>FinanceApp</span>
+                    <img src="~/financeapp-logo.png" alt="@L["Land_BrandName"]" width="32" height="32" class="rounded" />
+                    <span>@L["Land_BrandName"]</span>
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#landingNav" aria-controls="landingNav" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#landingNav" aria-controls="landingNav" aria-expanded="false" aria-label="@L["Land_AriaToggleNav"]">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="landingNav">
                     <ul class="navbar-nav ms-auto align-items-lg-center gap-2 gap-lg-3">
-                        <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#how-it-works">How it works</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Privacy">Privacy</a></li>
-                        <li class="nav-item">
-                            <a class="nav-link btn btn-outline-primary btn-sm px-3" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="/Home/Index">Sign in</a>
+                        <li class="nav-item"><a class="nav-link" href="#features">@L["Land_NavFeatures"]</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#how-it-works">@L["Land_NavHowItWorks"]</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Privacy">@L["Nav_Privacy"]</a></li>
+                        <li class="nav-item d-flex align-items-center py-2 py-lg-0">
+                            <partial name="_LanguageSwitcher" />
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link btn btn-primary btn-sm px-3" asp-area="Identity" asp-page="/Account/Register" asp-route-returnUrl="/Home/Index">Get started free</a>
+                            <a class="nav-link btn btn-outline-primary btn-sm px-3" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="/Home/Index">@L["Land_SignIn"]</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-primary btn-sm px-3" asp-area="Identity" asp-page="/Account/Register" asp-route-returnUrl="/Home/Index">@L["Land_GetStartedFree"]</a>
                         </li>
                     </ul>
                 </div>
@@ -92,13 +103,13 @@
         <div class="container">
             <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 py-4">
                 <div class="d-flex align-items-center gap-2">
-                    <img src="~/financeapp-logo.png" alt="FinanceApp" width="24" height="24" class="rounded" />
-                    <span class="fw-semibold">FinanceApp</span>
+                    <img src="~/financeapp-logo.png" alt="@L["Land_BrandName"]" width="24" height="24" class="rounded" />
+                    <span class="fw-semibold">@L["Land_BrandName"]</span>
                 </div>
                 <div class="d-flex flex-wrap align-items-center justify-content-center gap-3 small">
-                    <a asp-controller="Home" asp-action="Privacy" class="text-muted text-decoration-none">Privacy</a>
-                    <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="/Home/Index" class="text-muted text-decoration-none">Sign in</a>
-                    <span class="text-muted">&copy; @DateTime.Now.Year FinanceApp</span>
+                    <a asp-controller="Home" asp-action="Privacy" class="text-muted text-decoration-none">@L["Nav_Privacy"]</a>
+                    <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="/Home/Index" class="text-muted text-decoration-none">@L["Land_SignIn"]</a>
+                    <span class="text-muted">@L["Land_FooterCopyright", DateTime.Now.Year]</span>
                 </div>
             </div>
         </div>

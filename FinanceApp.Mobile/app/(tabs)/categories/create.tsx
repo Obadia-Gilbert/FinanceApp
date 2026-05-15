@@ -51,7 +51,11 @@ export default function CreateCategoryScreen() {
             {BADGE_COLORS.map((c) => (
               <TouchableOpacity
                 key={c}
-                style={[styles.colorDot, { backgroundColor: c }, badgeColor === c && styles.colorDotSelected]}
+                style={[
+                  styles.colorDot,
+                  { backgroundColor: c },
+                  badgeColor === c && { borderWidth: 3, borderColor: colors.text.primary },
+                ]}
                 onPress={() => setBadgeColor(c)}
               />
             ))}
@@ -72,7 +76,6 @@ const styles = StyleSheet.create({
   colorLabel: { fontSize: 14, fontWeight: '500', marginBottom: 8 },
   colorWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   colorDot: { width: 36, height: 36, borderRadius: 18 },
-  colorDotSelected: { borderWidth: 3, borderColor: '#111' },
   err: { fontSize: 14, marginBottom: 12 },
   btn: { marginTop: 8 },
 });

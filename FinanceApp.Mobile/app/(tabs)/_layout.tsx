@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { Tabs } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../src/context/ThemeContext';
 import { BackToMoreButton } from '../../src/components/BackToMoreButton';
@@ -14,6 +15,7 @@ const tabIcons: Record<string, string> = {
 };
 
 export default function TabsLayout() {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   return (
@@ -37,8 +39,8 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Dashboard',
-          tabBarLabel: 'Dashboard',
+          title: t('tabs.dashboard'),
+          tabBarLabel: t('tabs.dashboard'),
           headerShown: false,
           tabBarIcon: ({ color, size }) => <TabIcon char={tabIcons.index} color={color} size={size} />,
         }}
@@ -46,8 +48,8 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="expenses"
         options={{
-          title: 'Expenses',
-          tabBarLabel: 'Expenses',
+          title: t('tabs.expenses'),
+          tabBarLabel: t('tabs.expenses'),
           headerShown: false,
           tabBarIcon: ({ color, size }) => <TabIcon char={tabIcons.expenses} color={color} size={size} />,
         }}
@@ -55,8 +57,8 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="budget"
         options={{
-          title: 'Budget',
-          tabBarLabel: 'Budget',
+          title: t('tabs.budget'),
+          tabBarLabel: t('tabs.budget'),
           headerShown: true,
           headerLeft: () => <HeaderScreenIcon char="◉" />,
           headerRight: () => <HeaderNotificationIcon />,
@@ -66,8 +68,8 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="more"
         options={{
-          title: 'More',
-          tabBarLabel: 'More',
+          title: t('tabs.more'),
+          tabBarLabel: t('tabs.more'),
           headerShown: true,
           headerLeft: () => (
             <View style={styles.headerLeftIcon}>
@@ -80,32 +82,32 @@ export default function TabsLayout() {
       />
       <Tabs.Screen
         name="profile"
-        options={{ href: null, title: 'Profile', headerLeft: () => <BackToMoreButton /> }}
+        options={{ href: null, title: t('more.profile'), headerLeft: () => <BackToMoreButton /> }}
       />
       <Tabs.Screen name="categories" options={{ href: null, headerShown: false }} />
       <Tabs.Screen
         name="privacy"
-        options={{ href: null, title: 'Privacy Policy', headerLeft: () => <BackToMoreButton /> }}
+        options={{ href: null, title: t('more.privacyPolicy'), headerLeft: () => <BackToMoreButton /> }}
       />
       <Tabs.Screen name="income" options={{ href: null, headerShown: false }} />
       <Tabs.Screen name="accounts" options={{ href: null, headerShown: false }} />
       <Tabs.Screen name="transactions" options={{ href: null, headerShown: false }} />
       <Tabs.Screen
         name="notifications"
-        options={{ href: null, title: 'Notifications', headerLeft: () => <BackToMoreButton /> }}
+        options={{ href: null, title: t('more.notifications'), headerLeft: () => <BackToMoreButton /> }}
       />
       <Tabs.Screen name="recurring" options={{ href: null, headerShown: false }} />
       <Tabs.Screen
         name="feedback"
-        options={{ href: null, title: 'Feedback', headerLeft: () => <BackToMoreButton /> }}
+        options={{ href: null, title: t('more.feedback'), headerLeft: () => <BackToMoreButton /> }}
       />
       <Tabs.Screen
         name="reports"
-        options={{ href: null, title: 'Monthly Report', headerLeft: () => <BackToMoreButton /> }}
+        options={{ href: null, title: t('more.monthlyReport'), headerLeft: () => <BackToMoreButton /> }}
       />
       <Tabs.Screen
         name="subscription"
-        options={{ href: null, title: 'Subscription Plans', headerLeft: () => <BackToMoreButton /> }}
+        options={{ href: null, title: t('more.subscription'), headerLeft: () => <BackToMoreButton /> }}
       />
     </Tabs>
   );

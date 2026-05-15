@@ -1,11 +1,20 @@
+using FinanceApp.Localization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace FinanceApp.Web.Controllers;
 
 [AllowAnonymous]
 public class LandingController : Controller
 {
+    private readonly IStringLocalizer<SharedResource> _localizer;
+
+    public LandingController(IStringLocalizer<SharedResource> localizer)
+    {
+        _localizer = localizer;
+    }
+
     /// <summary>
     /// Public landing page at /. Authenticated users are redirected to the dashboard.
     /// </summary>
@@ -17,8 +26,8 @@ public class LandingController : Controller
         var request = HttpContext.Request;
         var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}".TrimEnd('/');
 
-        ViewData["Title"] = "FinanceApp – Personal Finance & Budget Tracker";
-        ViewData["MetaDescription"] = "Track expenses, manage budgets, and get insights with FinanceApp. Free personal finance and budget tracker with categories, dashboards, and multi-currency support.";
+        ViewData["Title"] = _localizer["Land_PageTitle"].Value;
+        ViewData["MetaDescription"] = _localizer["Land_MetaDescription"].Value;
         ViewData["CanonicalUrl"] = baseUrl + "/";
         ViewData["OgImage"] = baseUrl + Url.Content("~/financeapp-logo.png");
 

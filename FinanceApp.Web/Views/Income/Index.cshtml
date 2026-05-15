@@ -134,16 +134,21 @@ else
                 if (!form || !offcanvasEl.contains(form)) return;
                 e.preventDefault();
                 const data = new FormData(form);
-                data.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]')?.value || '');
-                const res = await fetch(form.action, { method: 'POST', body: data, credentials: 'include', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-                const json = await res.json().catch(() => null);
-                if (json?.success) {
-                    bootstrap.Offcanvas.getInstance(offcanvasEl)?.hide();
-                    location.reload();
-                } else {
-                    const html = await res.text().catch(() => null);
-                    if (html) content.innerHTML = html;
+                const res = await fetch(form.action, { method: 'POST', body: data, credentials: 'include', headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json, text/html;q=0.9' } });
+                const raw = await res.text();
+                if (!raw) return;
+                const trimmed = raw.trimStart();
+                if (trimmed.startsWith('{')) {
+                    try {
+                        const json = JSON.parse(raw);
+                        if (json && json.success) {
+                            bootstrap.Offcanvas.getInstance(offcanvasEl)?.hide();
+                            location.reload();
+                        }
+                    } catch (_) { /* fall through */ }
+                    return;
                 }
+                content.innerHTML = raw;
             });
         })();
     </script>
