@@ -50,7 +50,7 @@ export default function ReportsScreen() {
                 },
               ]}
             >
-              <Text style={[styles.monthChipText, { color: month === i + 1 ? '#fff' : colors.text.body }]}>{m}</Text>
+              <Text style={[styles.monthChipText, { color: month === i + 1 ? colors.brandContrast : colors.text.body }]}>{m}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
