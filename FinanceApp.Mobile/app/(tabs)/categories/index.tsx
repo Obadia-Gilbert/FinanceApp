@@ -8,7 +8,7 @@ import {
   RefreshControl,
   TextInput,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Icon } from '../../../src/components/Icon';
 import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { useTheme } from '../../../src/context/ThemeContext';
@@ -58,8 +58,8 @@ export default function ManageCategoriesScreen() {
         style={[styles.newCategoryBtn, { backgroundColor: colors.brand }]}
         onPress={() => router.push('/(tabs)/categories/create')}
       >
-        <Text style={styles.newCategoryIcon}>+</Text>
-        <Text style={styles.newCategoryText}>New Category</Text>
+        <Text style={[styles.newCategoryIcon, { color: colors.brandContrast }]}>+</Text>
+        <Text style={[styles.newCategoryText, { color: colors.brandContrast }]}>New Category</Text>
       </TouchableOpacity>
 
       <View style={styles.sectionHeader}>
@@ -68,7 +68,7 @@ export default function ManageCategoriesScreen() {
       </View>
 
       <View style={[styles.searchWrap, { backgroundColor: colors.bg.default, borderColor: colors.border }]}>
-        <Ionicons name="search-outline" size={20} color={colors.text.muted} style={styles.searchIcon} />
+        <Icon name="search" size={18} color={colors.text.muted} style={styles.searchIcon} />
         <TextInput
           style={[styles.searchInput, { color: colors.text.primary }]}
           placeholder="Search categories..."
@@ -135,8 +135,8 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 14,
   },
-  newCategoryIcon: { color: '#fff', fontSize: 22, fontWeight: '600' },
-  newCategoryText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  newCategoryIcon: { fontSize: 22, fontWeight: '600' },
+  newCategoryText: { fontSize: 16, fontWeight: '600' },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, marginBottom: 12 },
   sectionTitle: { fontSize: 18, fontWeight: '700' },
   sectionCount: { fontSize: 14 },

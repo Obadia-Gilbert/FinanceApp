@@ -53,10 +53,13 @@ export type ThemeColors = {
   borderFocus: string;
   success: string;
   successSoft: string;
+  successContrast: string;
   danger: string;
   dangerSoft: string;
+  dangerContrast: string;
   warning: string;
   warningSoft: string;
+  warningContrast: string;
   info: string;
   infoSoft: string;
   radius: typeof radiusScale;
@@ -89,10 +92,13 @@ export const light: ThemeColors = {
   borderFocus: '#0D9488',
   success: '#15803D',
   successSoft: '#E7F5EC',
+  successContrast: '#FFFFFF',
   danger: '#C81E1E',
   dangerSoft: '#FCEBEB',
+  dangerContrast: '#FFFFFF',
   warning: '#B45309',
   warningSoft: '#FBF0E2',
+  warningContrast: '#FFFFFF',
   info: '#1D4ED8',
   infoSoft: '#EBF1FE',
   radius: radiusScale,
@@ -123,12 +129,20 @@ export const dark: ThemeColors = {
   border: '#29363F',
   borderStrong: '#3A4A55',
   borderFocus: '#2DD4BF',
+  /* success/danger/warning are tuned bright so they read well as TEXT on a
+     dark surface. That makes them the wrong pick for a SOLID FILL with white
+     text on top (badges, filled buttons) — white-on-#F87171 is ~2.8:1, well
+     under WCAG's 4.5:1. The *Contrast tokens are a dark ink for exactly that
+     fill case, paralleling brandContrast. */
   success: '#4ADE80',
   successSoft: '#10291A',
+  successContrast: '#0B1F12',
   danger: '#F87171',
   dangerSoft: '#2C1516',
+  dangerContrast: '#2C1516',
   warning: '#FBBF24',
   warningSoft: '#2C2110',
+  warningContrast: '#2C2110',
   info: '#60A5FA',
   infoSoft: '#12203A',
   radius: radiusScale,

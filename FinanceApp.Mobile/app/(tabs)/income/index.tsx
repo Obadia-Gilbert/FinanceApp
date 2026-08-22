@@ -13,29 +13,14 @@ import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { useTheme } from '../../../src/context/ThemeContext';
 import { Card } from '../../../src/components/Card';
+import { Icon } from '../../../src/components/Icon';
 import { getIncomes } from '../../../src/api/income';
 import { getCategories } from '../../../src/api/categories';
 import { formatCurrencyCode } from '../../../src/utils/currency';
+import { categoryIcon } from '../../../src/utils/categoryIcon';
 import type { IncomeDto } from '../../../src/types/api';
 
 const MONTHS = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ');
-
-const CATEGORY_ICONS: Record<string, string> = {
-  salary: '💼',
-  freelance: '💻',
-  investment: '📈',
-  gift: '🎁',
-  rental: '🏠',
-  business: '🏢',
-  dividend: '💵',
-  default: '💰',
-};
-
-function iconForCategory(name: string | null): string {
-  if (!name) return CATEGORY_ICONS.default;
-  const key = Object.keys(CATEGORY_ICONS).find((k) => name.toLowerCase().includes(k));
-  return key ? CATEGORY_ICONS[key] : CATEGORY_ICONS.default;
-}
 
 export default function IncomeListScreen() {
   const { colors } = useTheme();
@@ -80,7 +65,7 @@ export default function IncomeListScreen() {
   if (isError) {
     return (
       <View style={[styles.centered, { backgroundColor: colors.bg.alt }]}>
-        <Text style={{ fontSize: 48, marginBottom: 12 }}>📥</Text>
+        <Icon name="error" size={44} color={colors.text.subtle} style={{ marginBottom: 12 }} />
         <Text style={[styles.errorText, { color: colors.danger }]}>
           {(error as Error)?.message ?? 'Failed to load income'}
         </Text>
@@ -124,7 +109,7 @@ export default function IncomeListScreen() {
               onPress={() => setCategoryId(i === 0 ? null : incomeCategories[i - 1]?.id ?? null)}
             >
               <Text
-                style={[styles.pillText, { color: selectedFilterIndex === i ? '#fff' : colors.text.primary }]}
+                style={[styles.pillText, { color: selectedFilterIndex === i ? colors.brandContrast : colors.text.primary }]}
                 numberOfLines={1}
               >
                 {label}
@@ -154,7 +139,7 @@ export default function IncomeListScreen() {
             </View>
           ) : (
             <Card style={styles.empty}>
-              <Text style={{ fontSize: 48, textAlign: 'center', marginBottom: 12 }}>📥</Text>
+              <Icon name="income" size={44} color={colors.text.subtle} style={{ marginBottom: 12, alignSelf: 'center' }} />
               <Text style={[styles.emptyTitle, { color: colors.text.primary }]}>No income yet</Text>
               <Text style={[styles.emptyBody, { color: colors.text.muted }]}>Tap + to add your first income</Text>
             </Card>
@@ -164,7 +149,7 @@ export default function IncomeListScreen() {
           <TouchableOpacity onPress={() => router.push(`/(tabs)/income/${item.id}`)} activeOpacity={0.7}>
             <Card style={[styles.row, { borderColor: colors.border }]}>
               <View style={[styles.rowIcon, { backgroundColor: `${colors.success}15` }]}>
-                <Text style={styles.rowIconText}>{iconForCategory(item.categoryName)}</Text>
+                <Text style={styles.rowIconText}>{categoryIcon(item.categoryName)}</Text>
               </View>
               <View style={styles.rowBody}>
                 <Text style={[styles.rowTitle, { color: colors.text.primary }]} numberOfLines={1}>
@@ -188,7 +173,7 @@ export default function IncomeListScreen() {
         activeOpacity={0.9}
         hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
       >
-        <Text style={styles.fabText}>+</Text>
+        <Icon name="add" size={26} color={colors.brandContrast} />
       </TouchableOpacity>
     </View>
   );
@@ -248,5 +233,5 @@ const styles = StyleSheet.create({
     elevation: 5,
     zIndex: 10,
   },
-  fabText: { color: '#fff', fontSize: 28, fontWeight: '300' },
+  fabText: { fontSize: 28, fontWeight: '300' },
 });

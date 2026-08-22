@@ -106,7 +106,7 @@ export default function EditIncomeScreen() {
               onPress={() => setCurrency(c)}
               style={[styles.chip, { backgroundColor: currency === c ? colors.brand : colors.bg.hover }]}
             >
-              <Text style={[styles.chipText, { color: currency === c ? '#fff' : colors.text.body }]}>{c}</Text>
+              <Text style={[styles.chipText, { color: currency === c ? colors.brandContrast : colors.text.body }]}>{c}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>

@@ -90,7 +90,7 @@ export default function NotificationsScreen() {
             <Text style={[styles.tabText, { color: filter === 'all' ? colors.brand : colors.text.muted }]}>All</Text>
             {unreadCount > 0 && (
               <View style={[styles.badge, { backgroundColor: colors.brand }]}>
-                <Text style={styles.badgeText}>{unreadCount}</Text>
+                <Text style={[styles.badgeText, { color: colors.brandContrast }]}>{unreadCount}</Text>
               </View>
             )}
           </TouchableOpacity>
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
   tab: { flexDirection: 'row', alignItems: 'center', marginRight: 24, paddingVertical: 10 },
   tabText: { fontSize: 15, fontWeight: '600' },
   badge: { marginLeft: 6, minWidth: 20, height: 20, borderRadius: 10, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 6 },
-  badgeText: { color: '#fff', fontSize: 12, fontWeight: '700' },
+  badgeText: { fontSize: 12, fontWeight: '700' },
   markAllText: { fontSize: 14, fontWeight: '600' },
   listContent: { padding: 16, paddingBottom: 24 },
   loadingWrap: { padding: 40, alignItems: 'center' },

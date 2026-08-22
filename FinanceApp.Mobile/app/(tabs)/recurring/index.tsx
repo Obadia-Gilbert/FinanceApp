@@ -6,6 +6,7 @@ import { useTheme } from '../../../src/context/ThemeContext';
 import { Card } from '../../../src/components/Card';
 import { getRecurringTemplates } from '../../../src/api/recurring';
 import { formatCurrencyCode } from '../../../src/utils/currency';
+import { Icon } from '../../../src/components/Icon';
 import type { RecurringTemplateDto } from '../../../src/types/api';
 
 const FREQUENCY_LABELS: Record<number, string> = { 0: 'Weekly', 1: 'Monthly', 2: 'Yearly' };
@@ -48,7 +49,7 @@ export default function RecurringListScreen() {
         onPress={() => router.push('/(tabs)/recurring/create')}
         activeOpacity={0.9}
       >
-        <Text style={styles.fabText}>+</Text>
+        <Text style={[styles.fabText, { color: colors.brandContrast }]}>+</Text>
       </TouchableOpacity>
     </View>
   );
@@ -62,7 +63,7 @@ function RecurringRow({ item, colors }: { item: RecurringTemplateDto; colors: Re
   return (
     <Card style={[styles.row, { borderColor: colors.border }]}>
       <View style={[styles.iconWrap, { backgroundColor: isIncome ? colors.success : colors.danger }]}>
-        <Text style={styles.iconText}>{isIncome ? '💰' : '📤'}</Text>
+        <Icon name={isIncome ? 'income' : 'expense'} size={20} color={isIncome ? colors.successContrast : colors.dangerContrast} />
       </View>
       <View style={styles.body}>
         <Text style={[styles.name, { color: colors.text.primary }]} numberOfLines={1}>
@@ -87,7 +88,6 @@ const styles = StyleSheet.create({
   emptyBody: { fontSize: 14 },
   row: { flexDirection: 'row', alignItems: 'center', padding: 14, marginBottom: 10 },
   iconWrap: { width: 44, height: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center', marginRight: 12 },
-  iconText: { fontSize: 22 },
   body: { flex: 1, minWidth: 0 },
   name: { fontSize: 16, fontWeight: '600' },
   meta: { fontSize: 13, marginTop: 2 },
@@ -107,5 +107,5 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-  fabText: { color: '#fff', fontSize: 28, fontWeight: '300' },
+  fabText: { fontSize: 28, fontWeight: '300' },
 });

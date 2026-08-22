@@ -73,7 +73,7 @@ export default function CreateTransactionScreen() {
         <View style={styles.row}>
           {TYPES.map((t) => (
             <TouchableOpacity key={t} onPress={() => setType(t as 'Income' | 'Expense')} style={[styles.chip, { backgroundColor: type === t ? colors.brand : colors.bg.hover }]}>
-              <Text style={[styles.chipText, { color: type === t ? '#fff' : colors.text.body }]}>{t}</Text>
+              <Text style={[styles.chipText, { color: type === t ? colors.brandContrast : colors.text.body }]}>{t}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -84,7 +84,7 @@ export default function CreateTransactionScreen() {
         <View style={styles.row}>
           {CURRENCY_LIST.map((c) => (
             <TouchableOpacity key={c} onPress={() => setCurrency(c)} style={[styles.chip, { backgroundColor: currency === c ? colors.brand : colors.bg.hover }]}>
-              <Text style={[styles.chipText, { color: currency === c ? '#fff' : colors.text.body }]}>{c}</Text>
+              <Text style={[styles.chipText, { color: currency === c ? colors.brandContrast : colors.text.body }]}>{c}</Text>
             </TouchableOpacity>
           ))}
         </View>

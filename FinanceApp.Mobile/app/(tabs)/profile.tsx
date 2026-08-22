@@ -258,7 +258,7 @@ export default function ProfileScreen() {
       <View style={styles.profileHeader}>
         <View style={styles.avatarWrap}>
           <View style={[styles.avatar, { backgroundColor: colors.brand }]}>
-            <Text style={[styles.avatarText, { color: isDark ? '#0F172A' : '#fff' }]}>
+            <Text style={[styles.avatarText, { color: colors.brandContrast }]}>
               {initial}
             </Text>
           </View>
@@ -266,7 +266,7 @@ export default function ProfileScreen() {
             style={[styles.editAvatarBtn, { backgroundColor: colors.brand }]}
             onPress={() => setEditing(!editing)}
           >
-            <Icon name="camera" size={14} color={isDark ? '#0F172A' : '#fff'} />
+            <Icon name="camera" size={14} color={colors.brandContrast} />
           </TouchableOpacity>
         </View>
         <Text style={[styles.displayName, { color: colors.text.primary }]}>{displayName}</Text>

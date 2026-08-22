@@ -135,7 +135,7 @@ export default function ExpenseDetailScreen() {
                 { borderColor: colors.border, backgroundColor: currency === c ? colors.brand : colors.bg.default },
               ]}
             >
-              <Text style={[styles.chipText, { color: currency === c ? '#fff' : colors.text.body }]}>{c}</Text>
+              <Text style={[styles.chipText, { color: currency === c ? colors.brandContrast : colors.text.body }]}>{c}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>

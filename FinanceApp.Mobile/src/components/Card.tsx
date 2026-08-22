@@ -1,10 +1,13 @@
 import React from 'react';
-import { View, StyleSheet, ViewStyle } from 'react-native';
+import { View, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 
 interface CardProps {
   children: React.ReactNode;
-  style?: ViewStyle | ViewStyle[];
+  // StyleProp (not ViewStyle | ViewStyle[]) so callers can pass a conditional
+  // `condition && {...}` entry — that produces `false`, which the narrower
+  // type rejected even though RN's own style arrays handle it fine.
+  style?: StyleProp<ViewStyle>;
 }
 
 export function Card({ children, style }: CardProps) {

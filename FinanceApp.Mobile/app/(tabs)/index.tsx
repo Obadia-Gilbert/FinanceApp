@@ -105,7 +105,7 @@ export default function DashboardScreen() {
             onPress={() => router.push('/(tabs)/profile')}
             activeOpacity={0.8}
           >
-            <Text style={[styles.avatarText, { color: isDark ? '#0F172A' : '#fff' }]}>
+            <Text style={[styles.avatarText, { color: colors.brandContrast }]}>
               {user?.firstName?.[0] ?? user?.email?.[0] ?? '?'}
             </Text>
           </TouchableOpacity>

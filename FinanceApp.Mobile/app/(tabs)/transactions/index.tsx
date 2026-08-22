@@ -51,14 +51,13 @@ function iconForTransaction(item: TransactionDto): string {
   return categoryIcon(item.categoryName);
 }
 
-function iconBgForTransaction(item: TransactionDto): string {
-  if (item.type === 'Income') return '#10B981';
-  if (item.type === 'Transfer') return '#6B7280';
-  if ((item.categoryName || '').toLowerCase().includes('food')) return '#F59E0B';
-  if ((item.categoryName || '').toLowerCase().includes('transport')) return '#3B82F6';
-  if ((item.categoryName || '').toLowerCase().includes('shopping')) return '#8B5CF6';
-  if ((item.categoryName || '').toLowerCase().includes('housing')) return '#EF4444';
-  return '#6B7280';
+function iconBgForTransaction(item: TransactionDto, colors: ReturnType<typeof useTheme>['colors']): string {
+  // Income/Transfer are transaction types, not categories — route through the
+  // same semantic tokens used for amount colour elsewhere on this screen,
+  // rather than a hardcoded hex disconnected from the theme.
+  if (item.type === 'Income') return colors.successSoft;
+  if (item.type === 'Transfer') return colors.infoSoft;
+  return colors.bg.hover;
 }
 
 export default function TransactionsListScreen() {
@@ -110,7 +109,7 @@ export default function TransactionsListScreen() {
             style={[styles.pill, { backgroundColor: filter === f ? colors.brand : colors.bg.default, borderColor: colors.border }]}
             onPress={() => setFilter(f)}
           >
-            <Text style={[styles.pillText, { color: filter === f ? '#fff' : colors.text.primary }]}>
+            <Text style={[styles.pillText, { color: filter === f ? colors.brandContrast : colors.text.primary }]}>
               {f === 'all' ? 'All' : f}
             </Text>
           </TouchableOpacity>
@@ -140,10 +139,10 @@ export default function TransactionsListScreen() {
 
       <View style={styles.fabRow}>
         <TouchableOpacity style={[styles.fab, { backgroundColor: colors.brand }]} onPress={() => router.push('/(tabs)/transactions/transfer')} activeOpacity={0.9}>
-          <Text style={styles.fabText}>↔</Text>
+          <Text style={[styles.fabText, { color: colors.brandContrast }]}>↔</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.fab, { backgroundColor: colors.brand }]} onPress={() => router.push('/(tabs)/transactions/create')} activeOpacity={0.9}>
-          <Text style={styles.fabText}>+</Text>
+          <Text style={[styles.fabText, { color: colors.brandContrast }]}>+</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -172,7 +171,7 @@ function TransactionRow({ item, colors }: { item: TransactionDto; colors: Return
 
   return (
     <TouchableOpacity style={[styles.row, { borderBottomColor: colors.border }]} activeOpacity={0.7}>
-      <View style={[styles.rowIcon, { backgroundColor: iconBgForTransaction(item) }]}>
+      <View style={[styles.rowIcon, { backgroundColor: iconBgForTransaction(item, colors) }]}>
         <Text style={styles.rowIconText}>{iconForTransaction(item)}</Text>
       </View>
       <View style={styles.rowCenter}>
@@ -214,5 +213,5 @@ const styles = StyleSheet.create({
   emptyBody: { fontSize: 14 },
   fabRow: { position: 'absolute', right: 20, bottom: 24, flexDirection: 'row', gap: 12 },
   fab: { width: 56, height: 56, borderRadius: 28, justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5 },
-  fabText: { color: '#fff', fontSize: 24 },
+  fabText: { fontSize: 24 },
 });

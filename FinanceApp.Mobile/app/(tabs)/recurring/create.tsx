@@ -90,13 +90,13 @@ export default function CreateRecurringScreen() {
             style={[styles.chip, { backgroundColor: type === 0 ? colors.success : colors.bg.hover }]}
             onPress={() => setType(0)}
           >
-            <Text style={[styles.chipText, { color: type === 0 ? '#fff' : colors.text.body }]}>Income</Text>
+            <Text style={[styles.chipText, { color: type === 0 ? colors.brandContrast : colors.text.body }]}>Income</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.chip, { backgroundColor: type === 1 ? colors.danger : colors.bg.hover }]}
             onPress={() => setType(1)}
           >
-            <Text style={[styles.chipText, { color: type === 1 ? '#fff' : colors.text.body }]}>Expense</Text>
+            <Text style={[styles.chipText, { color: type === 1 ? colors.brandContrast : colors.text.body }]}>Expense</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -113,7 +113,7 @@ export default function CreateRecurringScreen() {
                 { borderColor: colors.border, backgroundColor: accountId === a.id ? colors.brand : colors.bg.default },
               ]}
             >
-              <Text style={[styles.optText, { color: accountId === a.id ? '#fff' : colors.text.primary }]}>{a.name}</Text>
+              <Text style={[styles.optText, { color: accountId === a.id ? colors.brandContrast : colors.text.primary }]}>{a.name}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -129,7 +129,7 @@ export default function CreateRecurringScreen() {
               onPress={() => setCurrency(c)}
               style={[styles.chip, { backgroundColor: currency === c ? colors.brand : colors.bg.hover }]}
             >
-              <Text style={[styles.chipText, { color: currency === c ? '#fff' : colors.text.body }]}>{c}</Text>
+              <Text style={[styles.chipText, { color: currency === c ? colors.brandContrast : colors.text.body }]}>{c}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -143,7 +143,7 @@ export default function CreateRecurringScreen() {
               onPress={() => setFrequency(f.value)}
               style={[styles.chip, { backgroundColor: frequency === f.value ? colors.brand : colors.bg.hover }]}
             >
-              <Text style={[styles.chipText, { color: frequency === f.value ? '#fff' : colors.text.body }]}>{f.label}</Text>
+              <Text style={[styles.chipText, { color: frequency === f.value ? colors.brandContrast : colors.text.body }]}>{f.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -163,7 +163,7 @@ export default function CreateRecurringScreen() {
                 { borderColor: colors.border, backgroundColor: categoryId === c.id ? colors.brand : colors.bg.default },
               ]}
             >
-              <Text style={[styles.optText, { color: categoryId === c.id ? '#fff' : colors.text.primary }]}>{c.name}</Text>
+              <Text style={[styles.optText, { color: categoryId === c.id ? colors.brandContrast : colors.text.primary }]}>{c.name}</Text>
             </TouchableOpacity>
           ))}
         </View>

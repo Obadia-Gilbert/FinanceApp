@@ -132,7 +132,7 @@ export default function SubscriptionScreen() {
 
       <Card style={[styles.planCard, { borderColor: colors.brand, borderWidth: 2 }]}>
         <View style={[styles.mostPopular, { backgroundColor: colors.brand }]}>
-          <Text style={styles.mostPopularText}>{t('subscription.mostPopular')}</Text>
+          <Text style={[styles.mostPopularText, { color: colors.brandContrast }]}>{t('subscription.mostPopular')}</Text>
         </View>
         <Text style={[styles.planName, { color: colors.text.primary }]}>{t('subscription.plans.pro')}</Text>
         <View style={styles.priceRow}>
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
   chooseTitle: { fontSize: 20, fontWeight: '700', marginBottom: 16 },
   planCard: { marginBottom: 20, padding: 20, position: 'relative', overflow: 'visible' },
   mostPopular: { position: 'absolute', top: -12, right: 16, paddingHorizontal: 12, paddingVertical: 5, borderRadius: 8 },
-  mostPopularText: { color: '#fff', fontSize: 11, fontWeight: '700', letterSpacing: 0.5 },
+  mostPopularText: { fontSize: 11, fontWeight: '700', letterSpacing: 0.5 },
   planName: { fontSize: 20, fontWeight: '700', marginBottom: 8 },
   priceRow: { flexDirection: 'row', alignItems: 'baseline', marginBottom: 8 },
   price: { fontSize: 32, fontWeight: '800' },

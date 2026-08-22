@@ -191,7 +191,7 @@ export default function RegisterScreen() {
                   agreeTerms && { backgroundColor: colors.brand, borderColor: colors.brand },
                 ]}
               >
-                {agreeTerms ? <Text style={styles.check}>✓</Text> : null}
+                {agreeTerms ? <Text style={[styles.check, { color: colors.brandContrast }]}>✓</Text> : null}
               </View>
             </TouchableOpacity>
             <Text style={[styles.termsText, { color: colors.text.body }]}>
@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  check: { color: '#fff', fontSize: 14, fontWeight: '700' },
+  check: { fontSize: 14, fontWeight: '700' },
   termsText: { flex: 1, fontSize: 14 },
   termsLink: { fontWeight: '600' },
   errorCard: { borderRadius: 10, padding: 12, marginBottom: 12 },

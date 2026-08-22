@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'rea
 import { useRouter } from 'expo-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTheme } from '../../../src/context/ThemeContext';
+import { Icon } from '../../../src/components/Icon';
 import { Input } from '../../../src/components/Input';
 import { Button } from '../../../src/components/Button';
 import { getCategories } from '../../../src/api/categories';
@@ -93,7 +94,7 @@ export default function CreateIncomeScreen() {
               onPress={() => setCurrency(c)}
               style={[styles.chip, { backgroundColor: currency === c ? colors.brand : colors.bg.default, borderColor: colors.border, borderWidth: 1 }]}
             >
-              <Text style={[styles.chipText, { color: currency === c ? '#fff' : colors.text.body }]}>{c}</Text>
+              <Text style={[styles.chipText, { color: currency === c ? colors.brandContrast : colors.text.body }]}>{c}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -113,7 +114,7 @@ export default function CreateIncomeScreen() {
               onPress={() => setAttachedDoc(null)}
               style={[styles.docRemove, { backgroundColor: colors.danger }]}
             >
-              <Text style={styles.docRemoveText}>Remove</Text>
+              <Text style={[styles.docRemoveText, { color: colors.dangerContrast }]}>Remove</Text>
             </TouchableOpacity>
           </View>
         ) : (
@@ -124,7 +125,7 @@ export default function CreateIncomeScreen() {
             }}
             style={[styles.attachBtn, { borderColor: colors.border, backgroundColor: colors.bg.default }]}
           >
-            <Text style={styles.attachIcon}>📷</Text>
+            <Icon name="camera" size={22} color={colors.text.muted} />
             <Text style={[styles.attachLabel, { color: colors.text.body }]}>
               Take photo or choose from library
             </Text>
@@ -191,7 +192,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     gap: 10,
   },
-  attachIcon: { fontSize: 22 },
   attachLabel: { fontSize: 15, flex: 1 },
   docPreview: {
     flexDirection: 'row',
@@ -204,5 +204,5 @@ const styles = StyleSheet.create({
   docThumb: { width: 48, height: 48, borderRadius: 6 },
   docName: { flex: 1, fontSize: 14 },
   docRemove: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6 },
-  docRemoveText: { color: '#fff', fontSize: 14, fontWeight: '500' },
+  docRemoveText: { fontSize: 14, fontWeight: '500' },
 });

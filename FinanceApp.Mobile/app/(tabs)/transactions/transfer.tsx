@@ -68,7 +68,7 @@ export default function TransferScreen() {
         <View style={styles.row}>
           {CURRENCY_LIST.map((c) => (
             <TouchableOpacity key={c} onPress={() => setCurrency(c)} style={[styles.chip, { backgroundColor: currency === c ? colors.brand : colors.bg.hover }]}>
-              <Text style={[styles.chipText, { color: currency === c ? '#fff' : colors.text.body }]}>{c}</Text>
+              <Text style={[styles.chipText, { color: currency === c ? colors.brandContrast : colors.text.body }]}>{c}</Text>
             </TouchableOpacity>
           ))}
         </View>

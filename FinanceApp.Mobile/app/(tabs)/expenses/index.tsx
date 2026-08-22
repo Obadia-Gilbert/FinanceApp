@@ -126,7 +126,7 @@ export default function ExpensesListScreen() {
             ]}
             onPress={() => setCategoryId(null)}
           >
-            <Text style={[styles.pillText, { color: categoryId === null ? '#fff' : colors.text.primary }]}>All</Text>
+            <Text style={[styles.pillText, { color: categoryId === null ? colors.brandContrast : colors.text.primary }]}>All</Text>
           </TouchableOpacity>
           {categories.filter(c => c.type === 'Expense' || c.type === 'Both').map((c) => (
             <TouchableOpacity
@@ -137,7 +137,7 @@ export default function ExpensesListScreen() {
               ]}
               onPress={() => setCategoryId(categoryId === c.id ? null : c.id)}
             >
-              <Text style={[styles.pillText, { color: categoryId === c.id ? '#fff' : colors.text.primary }]}>
+              <Text style={[styles.pillText, { color: categoryId === c.id ? colors.brandContrast : colors.text.primary }]}>
                 {c.name}
               </Text>
             </TouchableOpacity>
@@ -188,7 +188,7 @@ export default function ExpensesListScreen() {
         accessibilityRole="button"
         accessibilityLabel="Add expense"
       >
-        <Text style={styles.fabText}>+</Text>
+        <Text style={[styles.fabText, { color: colors.brandContrast }]}>+</Text>
       </TouchableOpacity>
     </View>
   );
@@ -304,5 +304,5 @@ const styles = StyleSheet.create({
     elevation: 5,
     zIndex: 10,
   },
-  fabText: { color: '#fff', fontSize: 28, fontWeight: '300', lineHeight: 30 },
+  fabText: { fontSize: 28, fontWeight: '300', lineHeight: 30 },
 });

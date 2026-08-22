@@ -10,6 +10,7 @@ import {
 import { useRouter } from 'expo-router';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { useTheme } from '../../../src/context/ThemeContext';
+import { Icon } from '../../../src/components/Icon';
 import { Input } from '../../../src/components/Input';
 import { Button } from '../../../src/components/Button';
 import { Card } from '../../../src/components/Card';
@@ -124,7 +125,7 @@ export default function CreateExpenseScreen() {
                   { borderColor: colors.border, backgroundColor: currency === c ? colors.brand : colors.bg.default },
                 ]}
               >
-                <Text style={[styles.chipText, { color: currency === c ? '#fff' : colors.text.body }]}>
+                <Text style={[styles.chipText, { color: currency === c ? colors.brandContrast : colors.text.body }]}>
                   {c}
                 </Text>
               </TouchableOpacity>
@@ -149,7 +150,7 @@ export default function CreateExpenseScreen() {
               onPress={() => setAttachedDoc(null)}
               style={[styles.docRemove, { backgroundColor: colors.danger }]}
             >
-              <Text style={styles.docRemoveText}>✕</Text>
+              <Icon name="close" size={16} color={colors.dangerContrast} />
             </TouchableOpacity>
           </View>
         ) : (
@@ -161,7 +162,7 @@ export default function CreateExpenseScreen() {
             style={[styles.attachBtn, { borderColor: colors.border, backgroundColor: colors.bg.default }]}
             activeOpacity={0.7}
           >
-            <Text style={styles.attachIcon}>📷</Text>
+            <Icon name="camera" size={22} color={colors.text.muted} />
             <Text style={[styles.attachLabel, { color: colors.text.muted }]}>
               Take photo or choose from library
             </Text>
@@ -247,7 +248,6 @@ const styles = StyleSheet.create({
     borderStyle: 'dashed',
     gap: 10,
   },
-  attachIcon: { fontSize: 22 },
   attachLabel: { fontSize: 15, flex: 1 },
   docPreview: {
     flexDirection: 'row',
@@ -260,5 +260,5 @@ const styles = StyleSheet.create({
   docThumb: { width: 48, height: 48, borderRadius: 8 },
   docName: { flex: 1, fontSize: 14 },
   docRemove: { width: 28, height: 28, borderRadius: 14, justifyContent: 'center', alignItems: 'center' },
-  docRemoveText: { color: '#fff', fontSize: 14, fontWeight: '600' },
+  docRemoveText: { fontSize: 14, fontWeight: '600' },
 });

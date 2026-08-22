@@ -48,12 +48,17 @@ export function Button({
         ? 'transparent'
         : undefined;
 
+  // Filled variants need a contrast-paired token, not a literal white — in dark
+  // theme colors.brand/danger are tuned bright (for legibility as text), so
+  // white-on-fill drops well below WCAG's 4.5:1.
   const textColor =
-    variant === 'primary' || variant === 'danger'
-      ? '#fff'
-      : variant === 'ghost'
-        ? colors.brand
-        : colors.text.primary;
+    variant === 'primary'
+      ? colors.brandContrast
+      : variant === 'danger'
+        ? colors.dangerContrast
+        : variant === 'ghost'
+          ? colors.brand
+          : colors.text.primary;
 
   return (
     <TouchableOpacity

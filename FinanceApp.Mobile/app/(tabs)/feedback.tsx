@@ -13,13 +13,14 @@ import { useTheme } from '../../src/context/ThemeContext';
 import { Card } from '../../src/components/Card';
 import { Button } from '../../src/components/Button';
 import { Input } from '../../src/components/Input';
+import { Icon, type IconName } from '../../src/components/Icon';
 import { getMyFeedback, createFeedback } from '../../src/api/feedback';
 import { ApiError } from '../../src/api/client';
 
-const FEEDBACK_TYPES = [
-  { label: '❓ Question', value: 0, emoji: '❓' },
-  { label: '💡 Suggestion', value: 1, emoji: '💡' },
-  { label: '💬 Comment', value: 2, emoji: '💬' },
+const FEEDBACK_TYPES: { label: string; value: number; icon: IconName }[] = [
+  { label: 'Question', value: 0, icon: 'help' },
+  { label: 'Suggestion', value: 1, icon: 'idea' },
+  { label: 'Comment', value: 2, icon: 'feedback' },
 ];
 
 export default function FeedbackScreen() {
@@ -83,7 +84,8 @@ export default function FeedbackScreen() {
             ]}
             activeOpacity={0.7}
           >
-            <Text style={[styles.typeChipText, { color: type === t.value ? '#fff' : colors.text.primary }]}>{t.label}</Text>
+            <Icon name={t.icon} size={15} color={type === t.value ? colors.brandContrast : colors.text.primary} />
+            <Text style={[styles.typeChipText, { color: type === t.value ? colors.brandContrast : colors.text.primary }]}>{t.label}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -117,7 +119,10 @@ export default function FeedbackScreen() {
       ) : null}
       {success ? (
         <View style={[styles.successCard, { backgroundColor: `${colors.success}10` }]}>
-          <Text style={[styles.successText, { color: colors.success }]}>✓ Thanks! Your feedback was sent.</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <Icon name="success" size={16} color={colors.success} />
+            <Text style={[styles.successText, { color: colors.success }]}>Thanks! Your feedback was sent.</Text>
+          </View>
         </View>
       ) : null}
 
@@ -131,7 +136,7 @@ export default function FeedbackScreen() {
 
       {list.length === 0 ? (
         <View style={styles.emptyWrap}>
-          <Text style={{ fontSize: 48, marginBottom: 12 }}>💬</Text>
+          <Icon name="feedback" size={40} color={colors.text.subtle} style={{ marginBottom: 12 }} />
           <Text style={[styles.emptyText, { color: colors.text.muted }]}>No feedback sent yet.</Text>
         </View>
       ) : (
@@ -162,7 +167,7 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 20, fontWeight: '700', marginBottom: 4 },
   hint: { fontSize: 14, marginBottom: 20 },
   typeRow: { flexDirection: 'row', gap: 10, marginBottom: 16 },
-  typeChip: { paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, borderWidth: 1 },
+  typeChip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, borderWidth: 1 },
   typeChipText: { fontSize: 14, fontWeight: '600' },
   field: { marginBottom: 16 },
   label: { fontSize: 14, fontWeight: '500', marginBottom: 8 },
