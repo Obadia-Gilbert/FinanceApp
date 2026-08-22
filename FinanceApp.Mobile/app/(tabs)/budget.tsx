@@ -14,6 +14,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import Svg, { Circle } from 'react-native-svg';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTheme } from '../../src/context/ThemeContext';
+import { categoryIcon } from '../../src/utils/categoryIcon';
 import { Card } from '../../src/components/Card';
 import { Input } from '../../src/components/Input';
 import { Button } from '../../src/components/Button';
@@ -21,7 +22,7 @@ import { getDashboard } from '../../src/api/dashboard';
 import { getBudget, getCategoryBudgets, setBudget, setCategoryBudget, deleteCategoryBudget } from '../../src/api/budget';
 import { getCategories } from '../../src/api/categories';
 import type { CategoryBudgetDto } from '../../src/types/api';
-import { CURRENCY_LIST, getCurrencyIndex, formatCurrencyCode } from '../../src/utils/currency';
+import { CURRENCY_LIST, formatCurrencyCode } from '../../src/utils/currency';
 
 const MONTHS = 'January February March April May June July August September October November December'.split(' ');
 
@@ -59,21 +60,6 @@ function CircularProgress({ progress, color, bgColor }: { progress: number; colo
   );
 }
 
-const CATEGORY_ICONS: Record<string, string> = {
-  food: '🍽️',
-  transport: '🚗',
-  entertainment: '🎬',
-  shopping: '🛒',
-  health: '❤️',
-  bills: '📄',
-  default: '📊',
-};
-
-function categoryIcon(name: string | null): string {
-  if (!name) return CATEGORY_ICONS.default;
-  const key = Object.keys(CATEGORY_ICONS).find((k) => name.toLowerCase().includes(k));
-  return key ? CATEGORY_ICONS[key] : CATEGORY_ICONS.default;
-}
 
 export default function BudgetScreen() {
   const { colors } = useTheme();
@@ -150,13 +136,13 @@ export default function BudgetScreen() {
       month,
       year,
       amount: num,
-      currency: getCurrencyIndex(currency),
+      currency,
     });
   };
 
   const setCategoryBudgetMutation = useMutation({
     mutationFn: ({ categoryId, amount }: { categoryId: string; amount: number }) =>
-      setCategoryBudget(categoryId, month, year, amount, getCurrencyIndex(categoryBudgetCurrency)),
+      setCategoryBudget(categoryId, month, year, amount, categoryBudgetCurrency),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categoryBudgets', month, year] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });

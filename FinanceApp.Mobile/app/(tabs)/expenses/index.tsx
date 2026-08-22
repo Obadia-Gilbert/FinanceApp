@@ -13,35 +13,16 @@ import {
 import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { useTheme } from '../../../src/context/ThemeContext';
+import { Icon } from '../../../src/components/Icon';
 import { Card } from '../../../src/components/Card';
 import { getExpenses } from '../../../src/api/expenses';
 import { getCategories } from '../../../src/api/categories';
 import { formatCurrencyCode } from '../../../src/utils/currency';
 import type { ExpenseDto } from '../../../src/types/api';
+import { categoryIcon } from '../../../src/utils/categoryIcon';
 
 type DateGroup = { label: string; data: ExpenseDto[] };
 
-const CATEGORY_ICONS: Record<string, string> = {
-  food: '🍽️',
-  transport: '🚗',
-  entertainment: '🎬',
-  shopping: '🛒',
-  health: '❤️',
-  bills: '📄',
-  rent: '🏠',
-  utility: '⚡',
-  education: '📚',
-  travel: '✈️',
-  personal: '👤',
-  insurance: '🛡',
-  default: '💸',
-};
-
-function categoryIcon(name: string | null): string {
-  if (!name) return CATEGORY_ICONS.default;
-  const key = Object.keys(CATEGORY_ICONS).find((k) => name.toLowerCase().includes(k));
-  return key ? CATEGORY_ICONS[key] : CATEGORY_ICONS.default;
-}
 
 function groupByDate(items: ExpenseDto[]): DateGroup[] {
   const today = new Date().toDateString();
@@ -100,7 +81,7 @@ export default function ExpensesListScreen() {
   if (isError) {
     return (
       <View style={[styles.centered, { backgroundColor: colors.bg.alt }]}>
-        <Text style={{ fontSize: 48, marginBottom: 12 }}>💸</Text>
+        <Icon name="error" size={44} color={colors.text.subtle} style={{ marginBottom: 12 }} />
         <Text style={[styles.errorText, { color: colors.danger }]}>
           {(error as Error)?.message ?? 'Failed to load expenses'}
         </Text>
@@ -114,7 +95,7 @@ export default function ExpensesListScreen() {
       {/* Search */}
       <View style={styles.searchRow}>
         <View style={[styles.searchWrap, { backgroundColor: colors.bg.default, borderColor: colors.border }]}>
-          <Text style={styles.searchIcon}>🔍</Text>
+          <Icon name="search" size={16} color={colors.text.subtle} style={styles.searchIcon} />
           <TextInput
             style={[styles.searchInput, { color: colors.text.primary }]}
             placeholder="Search expenses..."
@@ -124,7 +105,7 @@ export default function ExpensesListScreen() {
           />
           {search.length > 0 && (
             <TouchableOpacity onPress={() => setSearch('')}>
-              <Text style={[{ fontSize: 16, color: colors.text.subtle }]}>✕</Text>
+              <Icon name="close" size={16} color={colors.text.subtle} />
             </TouchableOpacity>
           )}
         </View>
@@ -178,7 +159,7 @@ export default function ExpensesListScreen() {
             </View>
           ) : (
             <View style={styles.emptyWrap}>
-              <Text style={{ fontSize: 48, marginBottom: 12 }}>💸</Text>
+              <Icon name="empty" size={44} color={colors.text.subtle} style={{ marginBottom: 12 }} />
               <Text style={[styles.emptyTitle, { color: colors.text.primary }]}>No expenses yet</Text>
               <Text style={[styles.emptyBody, { color: colors.text.muted }]}>Tap + to add your first expense</Text>
             </View>

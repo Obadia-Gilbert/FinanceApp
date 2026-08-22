@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Platform, 
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../src/context/ThemeContext';
+import { Icon } from '../../src/components/Icon';
 import { Card } from '../../src/components/Card';
 import { Button } from '../../src/components/Button';
 import { getSubscription } from '../../src/api/subscription';
@@ -74,7 +75,7 @@ export default function SubscriptionScreen() {
       <Card style={[styles.currentCard, { borderLeftWidth: 4, borderLeftColor: colors.brand }]}>
         <View style={styles.currentRow}>
           <View style={[styles.currentIconWrap, { backgroundColor: `${colors.brand}15` }]}>
-            <Text style={{ fontSize: 20 }}>⭐</Text>
+            <Icon name="subscription" size={20} color={colors.warning} />
           </View>
           <View style={{ flex: 1 }}>
             <Text style={[styles.currentLabel, { color: colors.text.primary }]}>
@@ -115,7 +116,7 @@ export default function SubscriptionScreen() {
           {Array.isArray(freeFeatures) &&
             freeFeatures.map((f, i) => (
               <View key={i} style={styles.featureRow}>
-                <Text style={[styles.check, { color: colors.success }]}>✓</Text>
+                <Icon name="check" size={15} color={colors.success} style={styles.check} />
                 <Text style={[styles.featureText, { color: colors.text.body }]}>{f}</Text>
               </View>
             ))}
@@ -155,7 +156,7 @@ export default function SubscriptionScreen() {
           {Array.isArray(proFeatures) &&
             proFeatures.map((f, i) => (
               <View key={i} style={styles.featureRow}>
-                <Text style={[styles.check, { color: colors.brand }]}>✓</Text>
+                <Icon name="check" size={15} color={colors.brand} style={styles.check} />
                 <Text style={[styles.featureText, { color: colors.text.body }]}>{f}</Text>
               </View>
             ))}
@@ -178,7 +179,7 @@ export default function SubscriptionScreen() {
           {Array.isArray(premiumFeatures) &&
             premiumFeatures.map((f, i) => (
               <View key={i} style={styles.featureRow}>
-                <Text style={[styles.check, { color: colors.brand }]}>✓</Text>
+                <Icon name="check" size={15} color={colors.brand} style={styles.check} />
                 <Text style={[styles.featureText, { color: colors.text.body }]}>{f}</Text>
               </View>
             ))}

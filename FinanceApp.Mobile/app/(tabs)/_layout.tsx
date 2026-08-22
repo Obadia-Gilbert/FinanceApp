@@ -1,17 +1,17 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Tabs } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../src/context/ThemeContext';
 import { BackToMoreButton } from '../../src/components/BackToMoreButton';
 import { HeaderNotificationIcon } from '../../src/components/HeaderNotificationIcon';
-import { HeaderScreenIcon } from '../../src/components/HeaderScreenIcon';
+import { Icon, type IconName } from '../../src/components/Icon';
 
-const tabIcons: Record<string, string> = {
-  index: '▣',
-  expenses: '¢',
-  budget: '◉',
-  more: '☰',
+const tabIcons: Record<string, IconName> = {
+  index: 'dashboard',
+  expenses: 'expense',
+  budget: 'budget',
+  more: 'more',
 };
 
 export default function TabsLayout() {
@@ -42,7 +42,7 @@ export default function TabsLayout() {
           title: t('tabs.dashboard'),
           tabBarLabel: t('tabs.dashboard'),
           headerShown: false,
-          tabBarIcon: ({ color, size }) => <TabIcon char={tabIcons.index} color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <TabIcon name={tabIcons.index} color={color} size={size} />,
         }}
       />
       <Tabs.Screen
@@ -51,7 +51,7 @@ export default function TabsLayout() {
           title: t('tabs.expenses'),
           tabBarLabel: t('tabs.expenses'),
           headerShown: false,
-          tabBarIcon: ({ color, size }) => <TabIcon char={tabIcons.expenses} color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <TabIcon name={tabIcons.expenses} color={color} size={size} />,
         }}
       />
       <Tabs.Screen
@@ -60,9 +60,8 @@ export default function TabsLayout() {
           title: t('tabs.budget'),
           tabBarLabel: t('tabs.budget'),
           headerShown: true,
-          headerLeft: () => <HeaderScreenIcon char="◉" />,
           headerRight: () => <HeaderNotificationIcon />,
-          tabBarIcon: ({ color, size }) => <TabIcon char={tabIcons.budget} color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <TabIcon name={tabIcons.budget} color={color} size={size} />,
         }}
       />
       <Tabs.Screen
@@ -73,11 +72,11 @@ export default function TabsLayout() {
           headerShown: true,
           headerLeft: () => (
             <View style={styles.headerLeftIcon}>
-              <Text style={[styles.headerIconText, { color: colors.text.primary }]}>{tabIcons.more}</Text>
+              <Icon name="more" size={22} color={colors.text.primary} />
             </View>
           ),
           headerRight: () => <HeaderNotificationIcon />,
-          tabBarIcon: ({ color, size }) => <TabIcon char={tabIcons.more} color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <TabIcon name={tabIcons.more} color={color} size={size} />,
         }}
       />
       <Tabs.Screen
@@ -118,10 +117,10 @@ const styles = StyleSheet.create({
   headerIconText: { fontSize: 22 },
 });
 
-function TabIcon({ char, color, size }: { char: string; color: string; size: number }) {
+function TabIcon({ name, color, size }: { name: IconName; color: string; size: number }) {
   return (
     <View style={{ width: size, height: size, justifyContent: 'center', alignItems: 'center' }}>
-      <Text style={{ color, fontSize: size * 0.85 }}>{char}</Text>
+      <Icon name={name} size={size} color={color} />
     </View>
   );
 }

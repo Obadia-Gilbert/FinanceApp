@@ -11,6 +11,8 @@ import {
 import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { useTheme } from '../../../src/context/ThemeContext';
+import { Icon } from '../../../src/components/Icon';
+import { categoryIcon } from '../../../src/utils/categoryIcon';
 import { Card } from '../../../src/components/Card';
 import { getTransactions } from '../../../src/api/transactions';
 import { formatCurrencyCode } from '../../../src/utils/currency';
@@ -42,13 +44,11 @@ function groupByDate(items: TransactionDto[]): DateGroup[] {
 }
 
 function iconForTransaction(item: TransactionDto): string {
+  // Income and transfers are transaction *types*, not categories, so they keep
+  // their own marks; everything else follows the shared category mapping.
   if (item.type === 'Income') return '💰';
   if (item.type === 'Transfer') return '↔️';
-  if ((item.categoryName || '').toLowerCase().includes('food') || (item.categoryName || '').toLowerCase().includes('dining')) return '🍽️';
-  if ((item.categoryName || '').toLowerCase().includes('transport')) return '🚗';
-  if ((item.categoryName || '').toLowerCase().includes('shopping')) return '🛒';
-  if ((item.categoryName || '').toLowerCase().includes('housing')) return '🏠';
-  return '📝';
+  return categoryIcon(item.categoryName);
 }
 
 function iconBgForTransaction(item: TransactionDto): string {
@@ -93,7 +93,7 @@ export default function TransactionsListScreen() {
   return (
     <View style={[styles.container, { backgroundColor: colors.bg.alt }]}>
       <View style={[styles.searchWrap, { backgroundColor: colors.bg.default, borderColor: colors.border }]}>
-        <Text style={styles.searchIcon}>🔍</Text>
+        <Icon name="search" size={16} color={colors.text.subtle} style={styles.searchIcon} />
         <TextInput
           style={[styles.searchInput, { color: colors.text.primary }]}
           placeholder="Search transactions..."

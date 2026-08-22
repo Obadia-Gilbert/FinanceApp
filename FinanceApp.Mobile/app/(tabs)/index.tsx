@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../src/context/ThemeContext';
 import { useAuth } from '../../src/context/AuthContext';
 import { Card } from '../../src/components/Card';
+import { Icon } from '../../src/components/Icon';
 import { getDashboard } from '../../src/api/dashboard';
 import { getUnreadCount } from '../../src/api/notifications';
 import { LineChart } from 'react-native-chart-kit';
@@ -78,7 +79,7 @@ export default function DashboardScreen() {
           contentContainerStyle={[styles.centered, { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 24 }]}
           refreshControl={<RefreshControl refreshing={false} onRefresh={() => refetch()} tintColor={colors.brand} />}
         >
-          <Text style={{ fontSize: 48, marginBottom: 16 }}>📊</Text>
+          <Icon name="error" size={44} color={colors.text.subtle} style={{ marginBottom: 16 }} />
           <Text style={[styles.errorText, { color: colors.danger }]}>
             {(error as Error)?.message ?? t('dashboard.loadFailed')}
           </Text>
@@ -114,7 +115,7 @@ export default function DashboardScreen() {
             style={styles.bellWrap}
             activeOpacity={0.7}
           >
-            <Text style={styles.bellIcon}>🔔</Text>
+            <Icon name="notifications" size={22} color={colors.text.body} />
             {unreadCount > 0 && (
               <View style={[styles.bellBadge, { backgroundColor: colors.danger }]}>
                 <Text style={styles.bellBadgeText} numberOfLines={1}>
@@ -149,9 +150,12 @@ export default function DashboardScreen() {
             {/* Budget alert */}
             {data.isOverBudget && data.budgetAmount != null && (
               <Card style={[styles.alert, { borderLeftWidth: 4, borderLeftColor: colors.danger }]}>
-                <Text style={[styles.alertTitle, { color: colors.danger }]}>
-                  ⚠ {t('dashboard.budgetExceeded')}
-                </Text>
+                <View style={styles.alertTitleRow}>
+                  <Icon name="warning" size={16} color={colors.danger} />
+                  <Text style={[styles.alertTitle, { color: colors.danger }]}>
+                    {t('dashboard.budgetExceeded')}
+                  </Text>
+                </View>
                 <Text style={[styles.alertBody, { color: colors.text.body }]}>
                   {t('dashboard.budgetExceededBody', {
                     spent: data.thisMonthSpend.toLocaleString(),
@@ -207,7 +211,7 @@ export default function DashboardScreen() {
                   <Card style={styles.budgetItem}>
                     <View style={styles.budgetItemLeft}>
                       <View style={[styles.budgetIconWrap, { backgroundColor: colors.brandLight ?? colors.bg.alt }]}>
-                        <Text style={styles.budgetEmoji}>📊</Text>
+                        <Icon name="budget" size={20} color={colors.brand} />
                       </View>
                       <View style={{ flex: 1 }}>
                         <Text style={[styles.budgetName, { color: colors.text.primary }]}>{t('dashboard.total')}</Text>
@@ -233,7 +237,7 @@ export default function DashboardScreen() {
                   <Card key={i} style={styles.budgetItem}>
                     <View style={styles.budgetItemLeft}>
                       <View style={[styles.budgetIconWrap, { backgroundColor: a.isOver ? `${colors.danger}20` : `${colors.warning}20` }]}>
-                        <Text style={styles.budgetEmoji}>{a.isOver ? '⚠️' : '📌'}</Text>
+                        <Icon name="warning" size={20} color={a.isOver ? colors.danger : colors.warning} />
                       </View>
                       <View style={{ flex: 1 }}>
                         <Text style={[styles.budgetName, { color: colors.text.primary }]}>{a.categoryName}</Text>
@@ -267,8 +271,8 @@ export default function DashboardScreen() {
                   onPress={() => router.push(`/(tabs)/expenses/create?t=${Date.now()}`)}
                   activeOpacity={0.7}
                 >
-                  <View style={[styles.quickActionIcon, { backgroundColor: `${colors.danger}15` }]}>
-                    <Text style={{ fontSize: 20 }}>💸</Text>
+                  <View style={[styles.quickActionIcon, { backgroundColor: colors.bg.alt }]}>
+                    <Icon name="expense" size={20} color={colors.text.body} />
                   </View>
                   <Text style={[styles.quickActionLabel, { color: colors.text.primary }]}>{t('dashboard.addExpense')}</Text>
                 </TouchableOpacity>
@@ -277,8 +281,8 @@ export default function DashboardScreen() {
                   onPress={() => router.push('/(tabs)/income/create')}
                   activeOpacity={0.7}
                 >
-                  <View style={[styles.quickActionIcon, { backgroundColor: `${colors.success}15` }]}>
-                    <Text style={{ fontSize: 20 }}>💰</Text>
+                  <View style={[styles.quickActionIcon, { backgroundColor: colors.bg.alt }]}>
+                    <Icon name="income" size={20} color={colors.text.body} />
                   </View>
                   <Text style={[styles.quickActionLabel, { color: colors.text.primary }]}>{t('dashboard.addIncome')}</Text>
                 </TouchableOpacity>
@@ -287,8 +291,8 @@ export default function DashboardScreen() {
                   onPress={() => router.push('/(tabs)/reports')}
                   activeOpacity={0.7}
                 >
-                  <View style={[styles.quickActionIcon, { backgroundColor: `${colors.info}15` }]}>
-                    <Text style={{ fontSize: 20 }}>📊</Text>
+                  <View style={[styles.quickActionIcon, { backgroundColor: colors.bg.alt }]}>
+                    <Icon name="report" size={20} color={colors.text.body} />
                   </View>
                   <Text style={[styles.quickActionLabel, { color: colors.text.primary }]}>{t('dashboard.reports')}</Text>
                 </TouchableOpacity>
@@ -297,8 +301,8 @@ export default function DashboardScreen() {
                   onPress={() => router.push('/(tabs)/budget')}
                   activeOpacity={0.7}
                 >
-                  <View style={[styles.quickActionIcon, { backgroundColor: `${colors.brand}15` }]}>
-                    <Text style={{ fontSize: 20 }}>🎯</Text>
+                  <View style={[styles.quickActionIcon, { backgroundColor: colors.bg.alt }]}>
+                    <Icon name="budget" size={20} color={colors.text.body} />
                   </View>
                   <Text style={[styles.quickActionLabel, { color: colors.text.primary }]}>{t('dashboard.budget')}</Text>
                 </TouchableOpacity>
@@ -338,7 +342,6 @@ const styles = StyleSheet.create({
   avatarText: { fontSize: 18, fontWeight: '700' },
   headerTitle: { flex: 1, fontSize: 20, fontWeight: '700', textAlign: 'center' },
   bellWrap: { padding: 8, position: 'relative' },
-  bellIcon: { fontSize: 22 },
   bellBadge: {
     position: 'absolute',
     top: 2,
@@ -364,7 +367,8 @@ const styles = StyleSheet.create({
   balanceSubLabel: { color: 'rgba(255,255,255,0.8)', fontSize: 12 },
   balanceSubValue: { color: '#fff', fontSize: 15, fontWeight: '600' },
   alert: { marginBottom: 12 },
-  alertTitle: { fontSize: 15, fontWeight: '600', marginBottom: 4 },
+  alertTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 },
+  alertTitle: { fontSize: 15, fontWeight: '600' },
   alertBody: { fontSize: 14 },
   trendCard: { marginBottom: 20 },
   trendHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 },
@@ -386,7 +390,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 12,
   },
-  budgetEmoji: { fontSize: 20 },
   budgetName: { fontSize: 16, fontWeight: '600' },
   budgetMeta: { fontSize: 13, marginTop: 2 },
   progressTrack: { height: 6, borderRadius: 3, marginTop: 8, overflow: 'hidden' },

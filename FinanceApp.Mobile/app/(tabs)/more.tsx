@@ -4,8 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../src/context/ThemeContext';
 import { useAuth } from '../../src/context/AuthContext';
 import { Card } from '../../src/components/Card';
+import { Icon, type IconName } from '../../src/components/Icon';
 
-type MenuItem = { label: string; href: string; icon: string; iconBg: string };
+type MenuItem = { label: string; href: string; icon: IconName };
 
 function MenuSection({
   title,
@@ -33,11 +34,11 @@ function MenuSection({
             onPress={() => onPress(item.href)}
             activeOpacity={0.7}
           >
-            <View style={[styles.menuIconWrap, { backgroundColor: item.iconBg }]}>
-              <Text style={styles.menuIcon}>{item.icon}</Text>
+            <View style={[styles.menuIconWrap, { backgroundColor: colors.bg.alt }]}>
+              <Icon name={item.icon} size={18} color={colors.text.body} />
             </View>
             <Text style={[styles.menuLabel, { color: colors.text.primary }]}>{item.label}</Text>
-            <Text style={[styles.menuArrow, { color: colors.text.subtle }]}>›</Text>
+            <Icon name="forward" size={18} color={colors.text.subtle} />
           </TouchableOpacity>
         ))}
       </Card>
@@ -66,20 +67,20 @@ export default function MoreScreen() {
   };
 
   const features: MenuItem[] = [
-    { label: t('more.income'), href: '/(tabs)/income', icon: '📥', iconBg: `${colors.success}15` },
-    { label: t('more.accounts'), href: '/(tabs)/accounts', icon: '🏦', iconBg: `${colors.brand}15` },
-    { label: t('more.transactions'), href: '/(tabs)/transactions', icon: '↔', iconBg: `${colors.info}15` },
-    { label: t('more.recurring'), href: '/(tabs)/recurring', icon: '🔄', iconBg: `${colors.warning}15` },
-    { label: t('more.categories'), href: '/(tabs)/categories', icon: '🏷', iconBg: `${colors.brand}15` },
-    { label: t('more.monthlyReport'), href: '/(tabs)/reports', icon: '📊', iconBg: `${colors.success}15` },
-    { label: t('more.notifications'), href: '/(tabs)/notifications', icon: '🔔', iconBg: `${colors.danger}15` },
-    { label: t('more.subscription'), href: '/(tabs)/subscription', icon: '⭐', iconBg: `${colors.warning}15` },
+    { label: t('more.income'), href: '/(tabs)/income', icon: 'income' },
+    { label: t('more.accounts'), href: '/(tabs)/accounts', icon: 'accounts' },
+    { label: t('more.transactions'), href: '/(tabs)/transactions', icon: 'transactions' },
+    { label: t('more.recurring'), href: '/(tabs)/recurring', icon: 'recurring' },
+    { label: t('more.categories'), href: '/(tabs)/categories', icon: 'categories' },
+    { label: t('more.monthlyReport'), href: '/(tabs)/reports', icon: 'report' },
+    { label: t('more.notifications'), href: '/(tabs)/notifications', icon: 'notifications' },
+    { label: t('more.subscription'), href: '/(tabs)/subscription', icon: 'subscription' },
   ];
 
   const general: MenuItem[] = [
-    { label: t('more.profile'), href: '/(tabs)/profile', icon: '👤', iconBg: `${colors.brand}15` },
-    { label: t('more.feedback'), href: '/(tabs)/feedback', icon: '💬', iconBg: `${colors.info}15` },
-    { label: t('more.privacyPolicy'), href: '/(tabs)/privacy', icon: '🔒', iconBg: `${colors.text.subtle}20` },
+    { label: t('more.profile'), href: '/(tabs)/profile', icon: 'profile' },
+    { label: t('more.feedback'), href: '/(tabs)/feedback', icon: 'feedback' },
+    { label: t('more.privacyPolicy'), href: '/(tabs)/privacy', icon: 'privacy' },
   ];
 
   return (
@@ -95,7 +96,7 @@ export default function MoreScreen() {
         onPress={handleSignOut}
         activeOpacity={0.7}
       >
-        <Text style={{ fontSize: 18, marginRight: 8 }}>🚪</Text>
+        <Icon name="signOut" size={18} color={colors.danger} style={{ marginRight: 8 }} />
         <Text style={[styles.signOutText, { color: colors.danger }]}>{t('more.signOut')}</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -130,9 +131,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 12,
   },
-  menuIcon: { fontSize: 18 },
   menuLabel: { flex: 1, fontSize: 16 },
-  menuArrow: { fontSize: 20 },
   signOut: {
     marginTop: 8,
     paddingVertical: 14,

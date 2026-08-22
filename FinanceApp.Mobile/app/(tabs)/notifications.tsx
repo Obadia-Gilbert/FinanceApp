@@ -11,6 +11,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTheme } from '../../src/context/ThemeContext';
 import { Card } from '../../src/components/Card';
+import { Icon, type IconName } from '../../src/components/Icon';
 import {
   getNotifications,
   markNotificationRead,
@@ -30,13 +31,13 @@ function relativeTime(dateStr: string): string {
   return date.toLocaleDateString();
 }
 
-function iconForType(type: string): string {
+function iconForType(type: string): IconName {
   const t = (type || '').toLowerCase();
-  if (t.includes('budget')) return '⚠️';
-  if (t.includes('subscription') || t.includes('renew')) return 'ℹ️';
-  if (t.includes('goal') || t.includes('savings')) return '✓';
-  if (t.includes('balance') || t.includes('low')) return '👛';
-  return '🔔';
+  if (t.includes('budget')) return 'warning';
+  if (t.includes('subscription') || t.includes('renew')) return 'info';
+  if (t.includes('goal') || t.includes('savings')) return 'success';
+  if (t.includes('balance') || t.includes('low')) return 'wallet';
+  return 'notifications';
 }
 
 export default function NotificationsScreen() {
@@ -121,7 +122,7 @@ export default function NotificationsScreen() {
             </View>
           ) : (
             <View style={styles.emptyWrap}>
-              <Text style={{ fontSize: 48, marginBottom: 12 }}>🔔</Text>
+              <Icon name="notifications" size={44} color={colors.text.subtle} style={{ marginBottom: 12 }} />
               <Text style={[styles.emptyTitle, { color: colors.text.primary }]}>
                 {filter === 'unread' ? "You're all caught up!" : 'No notifications'}
               </Text>
@@ -161,7 +162,7 @@ function NotificationRow({
   return (
     <Card style={[styles.row, !item.isRead && { borderLeftWidth: 3, borderLeftColor: colors.brand }]}>
       <View style={[styles.iconWrap, { backgroundColor: iconBg }]}>
-        <Text style={styles.iconText}>{icon}</Text>
+        <Icon name={icon} size={18} color={colors.text.body} />
       </View>
       <View style={styles.rowBody}>
         <View style={styles.rowTitleRow}>

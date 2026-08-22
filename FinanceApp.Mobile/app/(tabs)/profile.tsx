@@ -15,6 +15,7 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTheme } from '../../src/context/ThemeContext';
+import { Icon } from '../../src/components/Icon';
 import { useAuth } from '../../src/context/AuthContext';
 import { Card } from '../../src/components/Card';
 import { Input } from '../../src/components/Input';
@@ -265,7 +266,7 @@ export default function ProfileScreen() {
             style={[styles.editAvatarBtn, { backgroundColor: colors.brand }]}
             onPress={() => setEditing(!editing)}
           >
-            <Text style={[styles.editAvatarIcon, { color: isDark ? '#0F172A' : '#fff' }]}>✎</Text>
+            <Icon name="camera" size={14} color={isDark ? '#0F172A' : '#fff'} />
           </TouchableOpacity>
         </View>
         <Text style={[styles.displayName, { color: colors.text.primary }]}>{displayName}</Text>
@@ -364,14 +365,14 @@ export default function ProfileScreen() {
       <Card style={styles.menuCard}>
         <TouchableOpacity style={[styles.menuRow, { borderBottomColor: colors.border }]} onPress={() => setEditing(true)}>
           <View style={[styles.menuIconWrap, { backgroundColor: `${colors.brand}15` }]}>
-            <Text style={styles.menuEmoji}>👤</Text>
+            <Icon name="profile" size={18} color={colors.text.body} />
           </View>
           <Text style={[styles.menuLabel, { color: colors.text.primary }]}>{t('profile.accountSettings')}</Text>
           <Text style={[styles.menuArrow, { color: colors.text.subtle }]}>›</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.menuRow, { borderBottomColor: colors.border }]}>
           <View style={[styles.menuIconWrap, { backgroundColor: `${colors.success}15` }]}>
-            <Text style={styles.menuEmoji}>💵</Text>
+            <Icon name="wallet" size={18} color={colors.text.body} />
           </View>
           <View style={styles.menuLabelWrap}>
             <Text style={[styles.menuLabel, { color: colors.text.primary }]}>{t('profile.currency')}</Text>
@@ -381,7 +382,7 @@ export default function ProfileScreen() {
         </TouchableOpacity>
         <TouchableOpacity style={styles.menuRow} onPress={() => router.push('/(tabs)/privacy')}>
           <View style={[styles.menuIconWrap, { backgroundColor: `${colors.info}15` }]}>
-            <Text style={styles.menuEmoji}>🛡</Text>
+            <Icon name="security" size={18} color={colors.text.body} />
           </View>
           <Text style={[styles.menuLabel, { color: colors.text.primary }]}>{t('profile.securityPrivacy')}</Text>
           <Text style={[styles.menuArrow, { color: colors.text.subtle }]}>›</Text>
@@ -397,7 +398,7 @@ export default function ProfileScreen() {
           activeOpacity={0.7}
         >
           <View style={[styles.menuIconWrap, { backgroundColor: `${colors.brand}15` }]}>
-            <Text style={styles.menuEmoji}>🌐</Text>
+            <Icon name="language" size={18} color={colors.text.body} />
           </View>
           <View style={styles.menuLabelWrap}>
             <Text style={[styles.menuLabel, { color: colors.text.primary }]}>{t('profile.language')}</Text>
@@ -407,7 +408,7 @@ export default function ProfileScreen() {
         </TouchableOpacity>
         <View style={[styles.menuRow, { borderBottomColor: colors.border }]}>
           <View style={[styles.menuIconWrap, { backgroundColor: `${colors.warning}15` }]}>
-            <Text style={styles.menuEmoji}>🌙</Text>
+            <Icon name="settings" size={18} color={colors.text.body} />
           </View>
           <Text style={[styles.menuLabel, { color: colors.text.primary }]}>{t('profile.darkMode')}</Text>
           <Switch
@@ -435,7 +436,7 @@ export default function ProfileScreen() {
         </View>
         <TouchableOpacity style={[styles.menuRow, { borderBottomColor: colors.border }]} onPress={() => router.push('/(tabs)/notifications')}>
           <View style={[styles.menuIconWrap, { backgroundColor: `${colors.danger}15` }]}>
-            <Text style={styles.menuEmoji}>🔔</Text>
+            <Icon name="notifications" size={18} color={colors.text.body} />
           </View>
           <Text style={[styles.menuLabel, { color: colors.text.primary }]}>{t('profile.notifications')}</Text>
           <Text style={[styles.menuArrow, { color: colors.text.subtle }]}>›</Text>

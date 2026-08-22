@@ -12,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { useTheme } from '../../../src/context/ThemeContext';
+import { categoryIcon } from '../../../src/utils/categoryIcon';
 import { Card } from '../../../src/components/Card';
 import { getCategories } from '../../../src/api/categories';
 import { getCategoryBudgets } from '../../../src/api/budget';
@@ -22,27 +23,6 @@ const thisMonth = now.getMonth() + 1;
 const thisYear = now.getFullYear();
 
 /** Map API icon names (e.g. "shopping-cart") or category names to emoji for display. */
-function categoryIconEmoji(icon: string | null | undefined, name: string): string {
-  const n = (name || '').toLowerCase();
-  const i = (icon || '').toLowerCase();
-  // Name-based mapping (most reliable)
-  if (n.includes('food') || n.includes('grocer') || i.includes('cart') || i.includes('shop')) return '🛒';
-  if (n.includes('employment') || n.includes('salary') || n.includes('work') || i.includes('briefcase')) return '💼';
-  if (n.includes('utilit') || n.includes('bill') || i.includes('light') || i.includes('plug')) return '💡';
-  if (n.includes('entertainment') || n.includes('fun') || i.includes('film') || i.includes('game')) return '🎬';
-  if (n.includes('invest') || n.includes('asset') || i.includes('graph') || i.includes('chart')) return '📈';
-  if (n.includes('freelance') || n.includes('side') || n.includes('gig')) return '💻';
-  if (n.includes('transport') || n.includes('car') || i.includes('car')) return '🚗';
-  if (n.includes('health') || i.includes('heart')) return '❤️';
-  if (n.includes('housing') || n.includes('rent') || i.includes('house')) return '🏠';
-  if (n.includes('education') || i.includes('book')) return '📚';
-  if (n.includes('dining') || n.includes('restaurant')) return '🍽️';
-  if (i.includes('doc') || i.includes('file')) return '📄';
-  // Single character or emoji from API – use as-is
-  if (icon && icon.length <= 2 && !/^[a-z-]+$/i.test(icon)) return icon;
-  // Default
-  return '📁';
-}
 
 export default function ManageCategoriesScreen() {
   const { colors } = useTheme();
@@ -120,7 +100,7 @@ export default function ManageCategoriesScreen() {
           return (
             <Card style={[styles.row, { borderColor: colors.border }]}>
               <View style={[styles.iconWrap, { backgroundColor: item.badgeColor || colors.brand }]}>
-                <Text style={styles.iconEmoji}>{categoryIconEmoji(item.icon, item.name)}</Text>
+                <Text style={styles.iconEmoji}>{categoryIcon(item.name, item.icon)}</Text>
               </View>
               <View style={styles.rowBody}>
                 <Text style={[styles.name, { color: colors.text.primary }]}>{item.name}</Text>

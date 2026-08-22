@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import { useTheme } from '../../src/context/ThemeContext';
+import { Icon } from '../../src/components/Icon';
 import { Card } from '../../src/components/Card';
 import { getMonthlyReport } from '../../src/api/reports';
 
@@ -160,7 +161,7 @@ export default function ReportsScreen() {
         </>
       ) : (
         <View style={styles.emptyWrap}>
-          <Text style={{ fontSize: 48, marginBottom: 12 }}>📊</Text>
+          <Icon name="report" size={44} color={colors.text.subtle} style={{ marginBottom: 12 }} />
           <Text style={[styles.emptyTitle, { color: colors.text.primary }]}>No data for {MONTHS[month - 1]} {year}</Text>
           <Text style={[styles.emptyBody, { color: colors.text.muted }]}>Start tracking expenses to see your report.</Text>
         </View>
