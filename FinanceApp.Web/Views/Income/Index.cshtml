@@ -2,21 +2,20 @@
 @using System.Text.Json
 @{
     ViewData["Title"] = L["Inc_PageTitle"].Value;
+    ViewData["PageDescription"] = L["Inc_Subtitle"].Value;
     int pageNumber = ViewBag.PageNumber ?? 1;
     int totalPages = ViewBag.TotalPages ?? 1;
     var jsIncDel = JsonSerializer.Serialize(L["Inc_DeleteConfirm"].Value);
     var jsCommonLoading = JsonSerializer.Serialize(L["Common_Loading"].Value);
 }
 
-<div class="mb-4">
-    <h1 class="visually-hidden">@L["Inc_PageTitle"]</h1>
-    <p class="page-subtitle mb-3">@L["Inc_Subtitle"]</p>
-    <div class="d-flex gap-2 mb-3">
-        <button id="btnAddIncome" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> @L["Inc_Add"]
-        </button>
-    </div>
+@section PageActions {
+    <button id="btnAddIncome" class="btn btn-primary" type="button">
+        <i class="bi bi-plus-lg" aria-hidden="true"></i> @L["Inc_Add"]
+    </button>
+}
 
+<div>
     <div class="offcanvas offcanvas-end" tabindex="-1" id="incomeOffcanvas" aria-labelledby="incomeOffcanvasLabel">
         <div class="offcanvas-header">
             <h5 id="incomeOffcanvasLabel">@L["Inc_OffcanvasTitle"]</h5>
@@ -32,47 +31,63 @@
 
 @if (!Model.Any())
 {
-    <div class="alert alert-info">
-        <i class="bi bi-info-circle me-2"></i>@L["Inc_EmptyPart1"]<strong>@L["Inc_AddStrong"]</strong>@L["Inc_EmptyPart2"]
+    <div class="card">
+        <div class="card-body">
+            <div class="empty-state">
+                <span class="empty-state__icon"><i class="bi bi-arrow-down-left-circle" aria-hidden="true"></i></span>
+                <h2 class="empty-state__title">@L["Inc_EmptyPart1"]</h2>
+                <p class="empty-state__desc">@L["Inc_EmptyPart2"]</p>
+                <button id="btnAddIncomeEmpty" class="btn btn-primary empty-state__action" type="button">
+                    <i class="bi bi-plus-lg" aria-hidden="true"></i> @L["Inc_Add"]
+                </button>
+            </div>
+        </div>
     </div>
 }
 else
 {
-    <div class="card shadow-sm">
+    <div class="card">
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table id="incomeTable" class="table table-hover mb-0">
                     <thead>
                         <tr>
-                            <th>@L["Table_Date"]</th>
-                            <th>@L["Tx_ColAccount"]</th>
-                            <th>@L["Lbl_Category"]</th>
-                            <th class="text-end">@L["Table_Amount"]</th>
-                            <th>@L["Inc_ColDescSource"]</th>
-                            <th></th>
+                            <th scope="col">@L["Table_Date"]</th>
+                            <th scope="col">@L["Tx_ColAccount"]</th>
+                            <th scope="col">@L["Lbl_Category"]</th>
+                            <th scope="col">@L["Inc_ColDescSource"]</th>
+                            <th scope="col" class="col-numeric">@L["Table_Amount"]</th>
+                            <th scope="col" class="col-actions"><span class="visually-hidden">@L["Table_Actions"]</span></th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var item in Model)
                         {
                             <tr>
-                                <td class="text-nowrap">@item.IncomeDate.ToString("yyyy-MM-dd")</td>
+                                <td class="text-nowrap text-muted" style="font-size: var(--text-sm);">@item.IncomeDate.ToString("d MMM yyyy")</td>
                                 <td>@(string.IsNullOrEmpty(item.AccountName) ? "—" : item.AccountName)</td>
-                                <td>@item.CategoryName</td>
-                                <td class="text-end text-success text-nowrap">
-                                    <strong>+ @item.Currency @item.Amount.ToString("N2")</strong>
+                                <td>
+                                    <span class="d-inline-flex align-items-center gap-2">
+                                        <span class="status-dot status-dot--positive" aria-hidden="true"></span>
+                                        <span>@item.CategoryName</span>
+                                    </span>
                                 </td>
-                                <td class="text-truncate" style="max-width:180px;" title="@(item.Description ?? item.Source ?? "—")">@(item.Description ?? item.Source ?? "—")</td>
-                                <td class="text-nowrap">
-                                    <a href="@Url.Action("Edit", "Income", new { id = item.Id })" class="btn btn-sm btn-outline-secondary btn-edit me-1" title="@L["Common_Edit"]" aria-label="@L["Common_Edit"]">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <form method="post" asp-action="Delete" asp-controller="Income" asp-route-id="@item.Id" style="display:inline" onsubmit="return confirm(@Html.Raw(jsIncDel));">
-                                        @Html.AntiForgeryToken()
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="@L["Common_Delete"]" aria-label="@L["Common_Delete"]">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
+                                <td class="text-truncate" style="max-width:200px;" title="@(item.Description ?? item.Source ?? "—")">@(item.Description ?? item.Source ?? "—")</td>
+                                <td class="col-numeric">
+                                    <span class="amount amount--positive">+@item.Amount.ToString("N2")<span class="amount__code">@item.Currency</span></span>
+                                </td>
+                                <td class="col-actions">
+                                    <span class="row-actions">
+                                        <a href="@Url.Action("Edit", "Income", new { id = item.Id })" class="icon-btn btn-edit" title="@L["Common_Edit"]" aria-label="@L["Common_Edit"]">
+                                            <i class="bi bi-pencil" aria-hidden="true"></i>
+                                        </a>
+                                        <form method="post" asp-action="Delete" asp-controller="Income" asp-route-id="@item.Id" style="display:inline" onsubmit="return confirm(@Html.Raw(jsIncDel));">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="icon-btn icon-btn--danger" title="@L["Common_Delete"]" aria-label="@L["Common_Delete"]">
+                                                <i class="bi bi-trash" aria-hidden="true"></i>
+                                            </button>
+                                        </form>
+                                    </span>
                                 </td>
                             </tr>
                         }
@@ -117,8 +132,9 @@ else
                 content.innerHTML = await res.text();
             }
 
-            document.getElementById('btnAddIncome')?.addEventListener('click', () =>
-                loadIntoOffcanvas('@Url.Action("Create", "Income")?partial=true'));
+            const openCreate = () => loadIntoOffcanvas('@Url.Action("Create", "Income")?partial=true');
+            document.getElementById('btnAddIncome')?.addEventListener('click', openCreate);
+            document.getElementById('btnAddIncomeEmpty')?.addEventListener('click', openCreate);
 
             document.getElementById('incomeTable')?.addEventListener('click', async function (e) {
                 const editBtn = e.target.closest('.btn-edit');

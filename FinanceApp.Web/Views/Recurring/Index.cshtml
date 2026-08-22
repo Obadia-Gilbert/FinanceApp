@@ -2,14 +2,13 @@
 @using FinanceApp.Domain.Enums
 @{
     ViewData["Title"] = "Recurring";
+    ViewData["PageDescription"] = "Templates that automatically create income or expense transactions on a schedule.";
     int pageNumber = ViewBag.PageNumber ?? 1;
     int totalPages = ViewBag.TotalPages ?? 1;
     int totalItems = ViewBag.TotalItems ?? 0;
 }
 
 <div class="mb-4">
-    <h1 class="visually-hidden">Recurring transactions</h1>
-    <p class="page-subtitle mb-3">Templates that automatically create income or expense transactions on a schedule.</p>
     <div class="d-flex gap-2 mb-3">
         <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Add recurring</a>
     </div>

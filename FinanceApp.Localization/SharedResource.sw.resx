@@ -21,6 +21,29 @@
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Extensions, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Extensions, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51</value></resheader>
   <data name="Nav_Dashboard" xml:space="preserve"><value>Dashibodi</value></data>
+  <data name="Cat_EmptyTitle" xml:space="preserve"><value>Bado hakuna makundi</value></data>
+  <data name="Cat_EmptyDesc" xml:space="preserve"><value>Makundi hukusanya matumizi na mapato yako ili bajeti na ripoti ziweze kuchambua matumizi. Ongeza la kwanza kuanza.</value></data>
+  <data name="Bud_CurrencyHelp" xml:space="preserve"><value>Matumizi yaliyorekodiwa katika sarafu nyingine hubadilishwa kabla ya kulinganishwa na bajeti hii.</value></data>
+  <data name="Exp_AllCategories" xml:space="preserve"><value>Makundi yote</value></data>
+  <data name="Exp_EmptyTitle" xml:space="preserve"><value>Bado hakuna matumizi</value></data>
+  <data name="Exp_EmptyDesc" xml:space="preserve"><value>Ongeza matumizi yako ya kwanza ili kuanza kufuatilia fedha zako zinakoenda.</value></data>
+  <data name="Exp_RecordsLabel" xml:space="preserve"><value>rekodi</value></data>
+  <data name="Dash_EmptyDashboardHelp" xml:space="preserve"><value>Rekodi matumizi yako ya kwanza na salio, bajeti na mienendo yako itaanza kuonekana hapa.</value></data>
+  <data name="Dash_NeedsAttention" xml:space="preserve"><value>Inahitaji uangalizi</value></data>
+  <data name="Dash_VsLastMonth" xml:space="preserve"><value>ikilinganishwa na mwezi uliopita</value></data>
+  <data name="Dash_NetCashFlow" xml:space="preserve"><value>Mtiririko halisi wa fedha</value></data>
+  <data name="Dash_BudgetProgress" xml:space="preserve"><value>Bajeti ya mwezi</value></data>
+  <data name="Dash_NoCashFlowData" xml:space="preserve"><value>Bado hakuna historia ya kutosha kuonyesha mtiririko wa fedha</value></data>
+  <data name="Dash_NoBudgetSet" xml:space="preserve"><value>Hakuna bajeti iliyowekwa kwa mwezi huu</value></data>
+  <data name="Dash_OfBudgetUsed" xml:space="preserve"><value>kati ya {0} imetumika ({1}%)</value></data>
+  <data name="Dash_TopCategories" xml:space="preserve"><value>Makundi yanayotumia zaidi</value></data>
+  <data name="Dash_NoCategorySpend" xml:space="preserve"><value>Hakuna matumizi yaliyorekodiwa mwezi huu</value></data>
+  <data name="Dash_AllTimeSpend" xml:space="preserve"><value>Matumizi ya jumla</value></data>
+  <data name="Nav_GroupMoney" xml:space="preserve"><value>Fedha</value></data>
+  <data name="Nav_GroupPlanning" xml:space="preserve"><value>Mipango</value></data>
+  <data name="Nav_GroupSetup" xml:space="preserve"><value>Mipangilio</value></data>
+  <data name="Nav_GroupAccount" xml:space="preserve"><value>Akaunti</value></data>
+  <data name="Nav_GroupAdmin" xml:space="preserve"><value>Usimamizi</value></data>
   <data name="Nav_Expenses" xml:space="preserve"><value>Matumizi</value></data>
   <data name="Nav_Income" xml:space="preserve"><value>Mapato</value></data>
   <data name="Nav_Categories" xml:space="preserve"><value>Aina</value></data>

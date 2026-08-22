@@ -26,7 +26,7 @@
 
     <div class="mb-3">
         <label asp-for="Amount" class="form-label">@L["Lbl_BudgetAmount"]</label>
-        <input asp-for="Amount" class="form-control" type="number" step="0.01" min="0.01" placeholder="@L["Bud_CatPlaceholder"]" />
+        <input asp-for="Amount" class="form-control" inputmode="decimal" type="number" step="0.01" min="0.01" placeholder="@L["Bud_CatPlaceholder"]" value="@(Model.Amount == 0 ? string.Empty : Model.Amount.ToString(System.Globalization.CultureInfo.InvariantCulture))" />
         <span asp-validation-for="Amount" class="text-danger small"></span>
     </div>
 

@@ -2,6 +2,7 @@
 @using System.Text.Json
 @{
     ViewData["Title"] = L["Cat_PageTitle"].Value;
+    ViewData["PageDescription"] = L["Cat_Subtitle"].Value;
     var jsCatDtSearch = JsonSerializer.Serialize(L["Cat_DTSearchPlaceholder"].Value);
     var jsCatDtInfo = JsonSerializer.Serialize(L["Cat_DTInfo"].Value);
     var jsCatDtFiltered = JsonSerializer.Serialize(L["Cat_DTInfoFiltered"].Value);
@@ -15,21 +16,11 @@
     var jsCommonLoading = JsonSerializer.Serialize(L["Common_Loading"].Value);
 }
 
-<div class="mb-4">
-    <h1 class="visually-hidden">@L["Cat_PageTitle"]</h1>
-    <p class="page-subtitle mb-3">@L["Cat_Subtitle"]</p>
-    <div class="d-flex flex-wrap gap-2 align-items-center">
-        <button type="button" id="btnAddCategory" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> @L["Cat_AddNew"]
-        </button>
-        <div class="btn-group btn-group-sm" role="group" aria-label="@L["Cat_FilterAria"]">
-            <button type="button" class="btn btn-outline-secondary active" data-filter="all">@L["Cat_FilterAll"]</button>
-            <button type="button" class="btn btn-outline-secondary" data-filter="Expense">@L["Cat_FilterExpense"]</button>
-            <button type="button" class="btn btn-outline-secondary" data-filter="Income">@L["Cat_FilterIncome"]</button>
-            <button type="button" class="btn btn-outline-secondary" data-filter="Both">@L["Cat_FilterBoth"]</button>
-        </div>
-    </div>
-</div>
+@section PageActions {
+    <button type="button" id="btnAddCategory" class="btn btn-primary">
+        <i class="bi bi-plus-lg" aria-hidden="true"></i> @L["Cat_AddNew"]
+    </button>
+}
 
 <!-- Offcanvas for category create/edit/delete (like Expense) -->
 <div class="offcanvas offcanvas-end" tabindex="-1" id="categoryOffcanvas" aria-labelledby="categoryOffcanvasLabel">
@@ -44,86 +35,155 @@
     </div>
 </div>
 
-<div class="card shadow-sm">
-    <div class="card-body">
-        <div class="table-responsive">
-            <table id="categoryTable" class="table table-hover mb-0" aria-label="@L["Cat_TableAria"]">
-                <caption class="visually-hidden">@L["Cat_TableCaption"]</caption>
-                <thead>
-                    <tr>
-                        <th>@L["Cat_ColName"]</th>
-                        <th>@L["Cat_ColUseFor"]</th>
-                        <th>@L["Cat_ColDescription"]</th>
-                        <th style="width: 220px;">@L["Cat_ColActions"]</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var category in Model.Items)
-                    {
-                        var type = category.Type;
-                        var isExpense = type == FinanceApp.Domain.Enums.CategoryType.Expense;
-                        var isIncome = type == FinanceApp.Domain.Enums.CategoryType.Income;
-                        var isBoth = type == FinanceApp.Domain.Enums.CategoryType.Both;
-                        <tr data-category-type="@type">
-                            <td>
-                                @{ var bg = string.IsNullOrEmpty(category.BadgeColor) ? "#6c757d" : category.BadgeColor; }
-                                <span class="category-badge" style="background:@bg; color:#fff;">
-                                    @if (!string.IsNullOrEmpty(category.Icon))
-                                    {
-                                        <i class="bi bi-@category.Icon" style="color:#fff"></i>
-                                    }
-                                    @category.Name
-                                </span>
-                            </td>
-                            <td>
-                                <span class="badge @(isExpense ? "bg-danger" : isIncome ? "bg-success" : "bg-secondary")">@(isExpense ? L["Cat_BadgeExpenseOnly"].Value : isIncome ? L["Cat_BadgeIncomeOnly"].Value : L["Cat_BadgeBoth"].Value)</span>
-                            </td>
-                            <td>@category.Description</td>
-                            <td>
-                                <a class="btn btn-sm btn-warning btn-edit" href="@Url.Action("Edit", "Category", new { id = category.Id })" title="@L["Common_Edit"]" aria-label="@L["Cat_EditAria"]">
-                                    <i class="bi bi-pencil" aria-hidden="true"></i>
-                                </a>
-                                <a class="btn btn-sm btn-danger btn-delete" href="@Url.Action("Delete", "Category", new { id = category.Id })" title="@L["Common_Delete"]" aria-label="@L["Cat_DeleteAria"]">
-                                    <i class="bi bi-trash" aria-hidden="true"></i>
-                                </a>
+@if (!Model.Items.Any())
+{
+    <div class="card">
+        <div class="card-body">
+            <div class="empty-state">
+                <span class="empty-state__icon"><i class="bi bi-tags" aria-hidden="true"></i></span>
+                <h2 class="empty-state__title">@L["Cat_EmptyTitle"]</h2>
+                <p class="empty-state__desc">@L["Cat_EmptyDesc"]</p>
+                <button type="button" id="btnAddCategoryEmpty" class="btn btn-primary empty-state__action">
+                    <i class="bi bi-plus-lg" aria-hidden="true"></i> @L["Cat_AddNew"]
+                </button>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+<div class="card">
+    <div class="data-toolbar">
+        <div class="search-field">
+            <i class="bi bi-search search-field__icon" aria-hidden="true"></i>
+            <label for="categorySearch" class="visually-hidden">@L["Cat_DTSearchPlaceholder"]</label>
+            <input type="search" id="categorySearch" class="form-control form-control-sm" placeholder="@L["Cat_DTSearchPlaceholder"]" />
+        </div>
+        <div class="d-flex gap-1" role="group" aria-label="@L["Cat_FilterAria"]">
+            <button type="button" class="filter-chip filter-chip--active" data-filter="all">@L["Cat_FilterAll"]</button>
+            <button type="button" class="filter-chip" data-filter="Expense">@L["Cat_FilterExpense"]</button>
+            <button type="button" class="filter-chip" data-filter="Income">@L["Cat_FilterIncome"]</button>
+            <button type="button" class="filter-chip" data-filter="Both">@L["Cat_FilterBoth"]</button>
+        </div>
+        <div class="data-toolbar__spacer"></div>
+        <span class="text-muted" id="categoryCount" style="font-size: var(--text-xs);"></span>
+    </div>
+
+    <div class="table-responsive">
+        <table id="categoryTable" class="table table-hover mb-0" aria-label="@L["Cat_TableAria"]">
+            <caption class="visually-hidden">@L["Cat_TableCaption"]</caption>
+            <thead>
+                <tr>
+                    <th scope="col">@L["Cat_ColName"]</th>
+                    <th scope="col">@L["Cat_ColUseFor"]</th>
+                    <th scope="col">@L["Cat_ColDescription"]</th>
+                    <th scope="col" class="col-actions"><span class="visually-hidden">@L["Cat_ColActions"]</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var category in Model.Items)
+                {
+                    var type = category.Type;
+                    var isExpense = type == FinanceApp.Domain.Enums.CategoryType.Expense;
+                    var isIncome = type == FinanceApp.Domain.Enums.CategoryType.Income;
+                    var isBoth = type == FinanceApp.Domain.Enums.CategoryType.Both;
+                    <tr data-category-type="@type">
+                        <td>
+                            @{ var bg = string.IsNullOrEmpty(category.BadgeColor) ? "#6c757d" : category.BadgeColor; }
+                            <span class="category-badge" style="background:@bg; color:#fff;">
+                                @if (!string.IsNullOrEmpty(category.Icon))
+                                {
+                                    <i class="bi bi-@category.Icon" aria-hidden="true"></i>
+                                }
+                                @category.Name
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge @(isExpense ? "bg-danger" : isIncome ? "bg-success" : "bg-secondary")">@(isExpense ? L["Cat_BadgeExpenseOnly"].Value : isIncome ? L["Cat_BadgeIncomeOnly"].Value : L["Cat_BadgeBoth"].Value)</span>
+                        </td>
+                        <td class="text-muted">@(string.IsNullOrEmpty(category.Description) ? "—" : category.Description)</td>
+                        <td class="col-actions">
+                            <span class="row-actions">
                                 @if (isExpense || isBoth)
                                 {
-                                    <a asp-controller="Expense" asp-action="ByCategory" asp-route-categoryId="@category.Id" class="btn btn-sm btn-info" title="@L["Cat_ViewExpensesTitle"]" aria-label="@L["Cat_ViewExpensesAria"]">
+                                    <a asp-controller="Expense" asp-action="ByCategory" asp-route-categoryId="@category.Id" class="icon-btn" title="@L["Cat_ViewExpensesTitle"]" aria-label="@L["Cat_ViewExpensesAria"]">
                                         <i class="bi bi-cash-stack" aria-hidden="true"></i>
                                     </a>
                                 }
                                 @if (isIncome || isBoth)
                                 {
-                                    <a asp-controller="Income" asp-action="Index" class="btn btn-sm btn-success" title="@L["Cat_ViewIncomeTitle"]" aria-label="@L["Cat_ViewIncomeAria"]">
+                                    <a asp-controller="Income" asp-action="Index" class="icon-btn" title="@L["Cat_ViewIncomeTitle"]" aria-label="@L["Cat_ViewIncomeAria"]">
                                         <i class="bi bi-arrow-down-circle" aria-hidden="true"></i>
                                     </a>
                                 }
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+                                <a class="icon-btn btn-edit" href="@Url.Action("Edit", "Category", new { id = category.Id })" title="@L["Common_Edit"]" aria-label="@L["Cat_EditAria"]">
+                                    <i class="bi bi-pencil" aria-hidden="true"></i>
+                                </a>
+                                <a class="icon-btn icon-btn--danger btn-delete" href="@Url.Action("Delete", "Category", new { id = category.Id })" title="@L["Common_Delete"]" aria-label="@L["Cat_DeleteAria"]">
+                                    <i class="bi bi-trash" aria-hidden="true"></i>
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>
+}
 
 @section Scripts {
     <script>
         $(document).ready(function(){
-            $('#categoryTable').DataTable({
+            var $table = $('#categoryTable');
+            if (!$table.length) {
+                // Empty state: only the "add category" button needs wiring.
+                document.getElementById('btnAddCategoryEmpty')?.addEventListener('click', function () {
+                    document.getElementById('btnAddCategory')?.click();
+                });
+                return;
+            }
+            var table = $table.DataTable({
                 paging: true,
                 searching: true,
                 ordering: true,
-                pageLength: 10,
+                pageLength: 15,
+                columnDefs: [{ orderable: false, targets: [3] }],
+                dom: 't<"dt-footer"p>',
                 language: {
-                    search: "",
-                    searchPlaceholder: @Html.Raw(jsCatDtSearch),
                     info: @Html.Raw(jsCatDtInfo),
                     infoFiltered: @Html.Raw(jsCatDtFiltered),
                     lengthMenu: @Html.Raw(jsCatDtLength),
                     paginate: { first: "«", last: "»", next: "›", previous: "‹" }
                 }
             });
+
+            $('#categorySearch').on('input', function () { table.search(this.value).draw(); });
+
+            // Filter by the row's data-category-type rather than the localized
+            // badge text in column 1, so this works in every locale.
+            var activeTypeFilter = 'all';
+            $.fn.dataTable.ext.search.push(function (settings, data, rowIndex) {
+                if (settings.nTable.id !== 'categoryTable' || activeTypeFilter === 'all') return true;
+                var row = table.row(rowIndex).node();
+                return row && row.getAttribute('data-category-type') === activeTypeFilter;
+            });
+            $('[data-filter]').on('click', function () {
+                activeTypeFilter = this.getAttribute('data-filter');
+                $('[data-filter]').removeClass('filter-chip--active');
+                $(this).addClass('filter-chip--active');
+                table.draw();
+            });
+
+            function updateCount() {
+                var info = table.page.info();
+                $('#categoryCount').text(info.recordsDisplay === info.recordsTotal
+                    ? info.recordsTotal + ' ' + '@L["Cat_ColName"]'.toLowerCase()
+                    : info.recordsDisplay + ' / ' + info.recordsTotal);
+                $('.dt-footer').toggle(info.pages > 1);
+            }
+            table.on('draw', updateCount);
+            updateCount();
 
             document.getElementById('btnAddCategory')?.addEventListener('click', async function(e) {
                 e.preventDefault();
@@ -178,20 +238,6 @@
                     bsOff.show();
                     return;
                 }
-            });
-
-            document.querySelectorAll('[data-filter]').forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    var filter = this.getAttribute('data-filter');
-                    document.querySelectorAll('[data-filter]').forEach(function(b) { b.classList.remove('active'); });
-                    this.classList.add('active');
-                    var rows = document.querySelectorAll('#categoryTable tbody tr[data-category-type]');
-                    rows.forEach(function(row) {
-                        var type = row.getAttribute('data-category-type');
-                        var show = filter === 'all' || type === filter;
-                        row.style.display = show ? '' : 'none';
-                    });
-                });
             });
         });
     </script>

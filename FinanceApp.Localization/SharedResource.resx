@@ -21,6 +21,29 @@
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Extensions, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Extensions, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51</value></resheader>
   <data name="Nav_Dashboard" xml:space="preserve"><value>Dashboard</value></data>
+  <data name="Cat_EmptyTitle" xml:space="preserve"><value>No categories yet</value></data>
+  <data name="Cat_EmptyDesc" xml:space="preserve"><value>Categories group your expenses and income so budgets and reports can break spending down. Add your first one to get started.</value></data>
+  <data name="Bud_CurrencyHelp" xml:space="preserve"><value>Spending recorded in other currencies is converted before it is compared to this budget.</value></data>
+  <data name="Exp_AllCategories" xml:space="preserve"><value>All categories</value></data>
+  <data name="Exp_EmptyTitle" xml:space="preserve"><value>No expenses yet</value></data>
+  <data name="Exp_EmptyDesc" xml:space="preserve"><value>Add your first expense to start tracking where your money goes.</value></data>
+  <data name="Exp_RecordsLabel" xml:space="preserve"><value>records</value></data>
+  <data name="Dash_EmptyDashboardHelp" xml:space="preserve"><value>Record your first expense and your balances, budgets and trends will start filling in here.</value></data>
+  <data name="Dash_NeedsAttention" xml:space="preserve"><value>Needs attention</value></data>
+  <data name="Dash_VsLastMonth" xml:space="preserve"><value>vs last month</value></data>
+  <data name="Dash_NetCashFlow" xml:space="preserve"><value>Net cash flow</value></data>
+  <data name="Dash_BudgetProgress" xml:space="preserve"><value>Monthly budget</value></data>
+  <data name="Dash_NoCashFlowData" xml:space="preserve"><value>Not enough history yet to chart cash flow</value></data>
+  <data name="Dash_NoBudgetSet" xml:space="preserve"><value>No budget set for this month</value></data>
+  <data name="Dash_OfBudgetUsed" xml:space="preserve"><value>of {0} used ({1}%)</value></data>
+  <data name="Dash_TopCategories" xml:space="preserve"><value>Top spending categories</value></data>
+  <data name="Dash_NoCategorySpend" xml:space="preserve"><value>No spending recorded this month</value></data>
+  <data name="Dash_AllTimeSpend" xml:space="preserve"><value>All-time spend</value></data>
+  <data name="Nav_GroupMoney" xml:space="preserve"><value>Money</value></data>
+  <data name="Nav_GroupPlanning" xml:space="preserve"><value>Planning</value></data>
+  <data name="Nav_GroupSetup" xml:space="preserve"><value>Setup</value></data>
+  <data name="Nav_GroupAccount" xml:space="preserve"><value>Account</value></data>
+  <data name="Nav_GroupAdmin" xml:space="preserve"><value>Admin</value></data>
   <data name="Nav_Expenses" xml:space="preserve"><value>Expenses</value></data>
   <data name="Nav_Income" xml:space="preserve"><value>Income</value></data>
   <data name="Nav_Categories" xml:space="preserve"><value>Categories</value></data>

@@ -16,7 +16,7 @@
 
     <div class="mb-3">
         <label asp-for="Amount" class="form-label">Amount</label>
-        <input asp-for="Amount" class="form-control" />
+        <input asp-for="Amount" class="form-control" placeholder="0.00" inputmode="decimal" type="number" step="0.01" min="0.01" value="@(Model.Amount == 0 ? string.Empty : Model.Amount.ToString(System.Globalization.CultureInfo.InvariantCulture))" />
         <span asp-validation-for="Amount" class="text-danger"></span>
     </div>
 

@@ -3,6 +3,7 @@
 @using FinanceApp.Domain.Enums
 @{
     ViewData["Title"] = L["Tx_PageTitle"].Value;
+    ViewData["PageDescription"] = L["Tx_Subtitle"].Value;
     int pageNumber = ViewBag.PageNumber;
     int totalPages = ViewBag.TotalPages;
     int totalItems = ViewBag.TotalItems;
@@ -17,18 +18,16 @@
     };
 }
 
-<div class="mb-4">
-    <h1 class="visually-hidden">@L["Tx_PageTitle"]</h1>
-    <p class="page-subtitle mb-3">@L["Tx_Subtitle"]</p>
-    <div class="d-flex gap-2 mb-3">
-        <button id="btnAddTransaction" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> @L["Tx_Add"]
-        </button>
-        <button id="btnTransfer" class="btn btn-outline-primary">
-            <i class="bi bi-arrow-left-right"></i> @L["Tx_Transfer"]
-        </button>
-    </div>
+@section PageActions {
+    <button id="btnAddTransaction" class="btn btn-primary" type="button">
+        <i class="bi bi-plus-lg" aria-hidden="true"></i> @L["Tx_Add"]
+    </button>
+    <button id="btnTransfer" class="btn btn-outline-secondary" type="button">
+        <i class="bi bi-arrow-left-right" aria-hidden="true"></i> @L["Tx_Transfer"]
+    </button>
+}
 
+<div>
     <div class="offcanvas offcanvas-end" tabindex="-1" id="txOffcanvas" aria-labelledby="txOffcanvasLabel">
         <div class="offcanvas-header">
             <h5 id="txOffcanvasLabel">@L["Tx_OffcanvasTitle"]</h5>
@@ -44,25 +43,34 @@
 
 @if (!Model.Any())
 {
-    <div class="alert alert-info">
-        <i class="bi bi-info-circle me-2"></i>@L["Tx_EmptyPart1"]<strong>@L["Tx_AddStrong"]</strong>@L["Tx_EmptyPart2"]
+    <div class="card">
+        <div class="card-body">
+            <div class="empty-state">
+                <span class="empty-state__icon"><i class="bi bi-arrow-left-right" aria-hidden="true"></i></span>
+                <h2 class="empty-state__title">@L["Tx_EmptyPart1"]</h2>
+                <p class="empty-state__desc">@L["Tx_EmptyPart2"]</p>
+                <button id="btnAddTransactionEmpty" class="btn btn-primary empty-state__action" type="button">
+                    <i class="bi bi-plus-lg" aria-hidden="true"></i> @L["Tx_Add"]
+                </button>
+            </div>
+        </div>
     </div>
 }
 else
 {
-    <div class="card shadow-sm">
+    <div class="card">
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table id="txTable" class="table table-hover mb-0">
                     <thead>
                         <tr>
-                            <th>@L["Table_Date"]</th>
-                            <th>@L["Tx_ColAccount"]</th>
-                            <th>@L["Tx_ColType"]</th>
-                            <th>@L["Lbl_Category"]</th>
-                            <th class="text-end">@L["Table_Amount"]</th>
-                            <th>@L["Tx_ColNote"]</th>
-                            <th></th>
+                            <th scope="col">@L["Table_Date"]</th>
+                            <th scope="col">@L["Tx_ColAccount"]</th>
+                            <th scope="col">@L["Tx_ColType"]</th>
+                            <th scope="col">@L["Lbl_Category"]</th>
+                            <th scope="col">@L["Tx_ColNote"]</th>
+                            <th scope="col" class="col-numeric">@L["Table_Amount"]</th>
+                            <th scope="col" class="col-actions"><span class="visually-hidden">@L["Table_Actions"]</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -72,42 +80,44 @@ else
                             var typeIcon = tx.Type == FinanceApp.Domain.Enums.TransactionType.Income ? "bi-arrow-down-circle" : tx.Type == FinanceApp.Domain.Enums.TransactionType.Expense ? "bi-arrow-up-circle" : "bi-arrow-left-right";
                             var sign = tx.Type == FinanceApp.Domain.Enums.TransactionType.Income ? "+" : tx.Type == FinanceApp.Domain.Enums.TransactionType.Expense ? "−" : "⇄";
                             <tr>
-                                <td class="text-nowrap">@tx.Date.ToString("yyyy-MM-dd")</td>
+                                <td class="text-nowrap text-muted" style="font-size: var(--text-sm);">@tx.Date.ToString("d MMM yyyy")</td>
                                 <td>@tx.AccountName</td>
                                 <td>
-                                    <span class="@typeClass">
-                                        <i class="bi @typeIcon me-1"></i>@TxTypeLabel(tx.Type)
+                                    <span class="d-inline-flex align-items-center gap-1 @typeClass" style="font-size: var(--text-sm);">
+                                        <i class="bi @typeIcon" aria-hidden="true"></i>@TxTypeLabel(tx.Type)
                                     </span>
-                                    @if (tx.TransferGroupId.HasValue)
-                                    {
-                                        <span class="badge bg-info text-dark ms-1">@L["Tx_BadgeTransfer"]</span>
-                                    }
                                     @if (tx.IsRecurring)
                                     {
-                                        <span class="badge bg-secondary ms-1"><i class="bi bi-arrow-repeat"></i></span>
+                                        <span class="badge bg-secondary ms-1" title="@L["Nav_Recurring"]"><i class="bi bi-arrow-repeat" aria-hidden="true"></i><span class="visually-hidden">@L["Nav_Recurring"]</span></span>
                                     }
                                 </td>
                                 <td>@(tx.CategoryName ?? "—")</td>
-                                <td class="text-end @typeClass text-nowrap">
-                                    <strong>@sign @tx.Currency @tx.Amount.ToString("N2")</strong>
+                                <td class="text-truncate" style="max-width:180px;" title="@tx.Note">@(tx.Note ?? "—")</td>
+                                <td class="col-numeric">
+                                    <span class="amount @(tx.Type == FinanceApp.Domain.Enums.TransactionType.Income ? "amount--positive" : "")">
+                                        @sign@tx.Amount.ToString("N2")<span class="amount__code">@tx.Currency</span>
+                                    </span>
                                 </td>
-                                <td class="text-truncate" style="max-width:160px;" title="@tx.Note">@(tx.Note ?? "—")</td>
-                                <td class="text-nowrap">
+                                <td class="col-actions">
                                     @if (!tx.TransferGroupId.HasValue)
                                     {
-                                        <a href="@Url.Action("Edit", "Transaction", new { id = tx.Id })" class="btn btn-sm btn-outline-secondary btn-edit me-1">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                        <form method="post" asp-action="Delete" asp-controller="Transaction" asp-route-id="@tx.Id" style="display:inline" onsubmit="return confirm(@Html.Raw(jsTxDelConfirm));">
-                                            @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </form>
+                                        <span class="row-actions">
+                                            <a href="@Url.Action("Edit", "Transaction", new { id = tx.Id })" class="icon-btn btn-edit" title="@L["Common_Edit"]" aria-label="@L["Common_Edit"]">
+                                                <i class="bi bi-pencil" aria-hidden="true"></i>
+                                            </a>
+                                            <form method="post" asp-action="Delete" asp-controller="Transaction" asp-route-id="@tx.Id" style="display:inline" onsubmit="return confirm(@Html.Raw(jsTxDelConfirm));">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="icon-btn icon-btn--danger" title="@L["Common_Delete"]" aria-label="@L["Common_Delete"]">
+                                                    <i class="bi bi-trash" aria-hidden="true"></i>
+                                                </button>
+                                            </form>
+                                        </span>
                                     }
                                     else
                                     {
-                                        <span class="text-muted small">@L["Tx_BadgeTransfer"]</span>
+                                        @* Transfers are a paired record — editing one side alone would
+                                           break the pair, so they are managed from the transfer flow. *@
+                                        <span class="badge bg-info">@L["Tx_BadgeTransfer"]</span>
                                     }
                                 </td>
                             </tr>
@@ -153,8 +163,9 @@ else
                 content.innerHTML = await res.text();
             }
 
-            document.getElementById('btnAddTransaction')?.addEventListener('click', () =>
-                loadIntoOffcanvas('@Url.Action("Create", "Transaction")?partial=true'));
+            const openCreateTx = () => loadIntoOffcanvas('@Url.Action("Create", "Transaction")?partial=true');
+            document.getElementById('btnAddTransaction')?.addEventListener('click', openCreateTx);
+            document.getElementById('btnAddTransactionEmpty')?.addEventListener('click', openCreateTx);
 
             document.getElementById('btnTransfer')?.addEventListener('click', () =>
                 loadIntoOffcanvas('@Url.Action("Transfer", "Transaction")?partial=true'));

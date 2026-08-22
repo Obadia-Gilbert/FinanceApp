@@ -3,165 +3,162 @@
 @{
     ViewData["Title"] = L["Bud_PageTitle"].Value;
     var monthName = ViewBag.MonthName as string ?? new DateTime(Model.Year, Model.Month, 1).ToString("MMMM yyyy");
+    ViewData["PageDescription"] = L["Bud_Subtitle", monthName].Value;
+
     var saved = TempData["BudgetSaved"] as bool? == true;
     var categoryBudgetSaved = TempData["CategoryBudgetSaved"] as bool? == true;
     var categoryBudgetDeleted = TempData["CategoryBudgetDeleted"] as bool? == true;
     var categoryBudgetError = TempData["CategoryBudgetError"] as string;
     var categoryBudgets = ViewBag.CategoryBudgets as IEnumerable<FinanceApp.Web.Models.CategoryBudgetItemViewModel> ?? Enumerable.Empty<FinanceApp.Web.Models.CategoryBudgetItemViewModel>();
-    var exceededCategories = ViewBag.CategoryBudgetExceeded as IEnumerable<string> ?? Enumerable.Empty<string>();
     var jsBudAddTitle = JsonSerializer.Serialize(L["Bud_AddCatBudget"].Value);
     var jsBudSaving = JsonSerializer.Serialize(L["Common_Saving"].Value);
     var jsBudSaveCat = JsonSerializer.Serialize(L["Bud_SaveCatBudget"].Value);
     var jsBudUnable = JsonSerializer.Serialize(L["Bud_UnableLoadForm"].Value);
+    var jsRemoveConfirm = JsonSerializer.Serialize(L["Bud_RemoveConfirm"].Value);
 }
 
-<div class="container-fluid">
-    <div class="row mb-4">
-        <div class="col-12">
-            <h1 class="visually-hidden">@L["Bud_PageTitle"]</h1>
-            <p class="page-subtitle mb-0">@L["Bud_Subtitle", monthName]</p>
+@section PageActions {
+    <button type="button" id="btnAddCategoryBudget" class="btn btn-primary">
+        <i class="bi bi-plus-lg" aria-hidden="true"></i> @L["Bud_AddCatBudget"]
+    </button>
+}
+
+@if (saved)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle" aria-hidden="true"></i>
+        <div class="flex-grow-1">@L["Bud_SavedAlert", monthName]</div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="@L["Common_Close"]"></button>
+    </div>
+}
+@if (categoryBudgetSaved)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle" aria-hidden="true"></i>
+        <div class="flex-grow-1">@L["Bud_CatSaved"]</div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="@L["Common_Close"]"></button>
+    </div>
+}
+@if (categoryBudgetDeleted)
+{
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        <i class="bi bi-info-circle" aria-hidden="true"></i>
+        <div class="flex-grow-1">@L["Bud_CatRemoved"]</div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="@L["Common_Close"]"></button>
+    </div>
+}
+@if (!string.IsNullOrEmpty(categoryBudgetError))
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+        <div class="flex-grow-1">@categoryBudgetError</div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="@L["Common_Close"]"></button>
+    </div>
+}
+
+<div class="row g-3">
+    @* ── Overall monthly budget ──────────────────────────────────── *@
+    <div class="col-lg-5">
+        <div class="card h-100">
+            <div class="card-body">
+                <h2 class="card-title mb-1">@L["Bud_SetBudgetCardTitle", monthName]</h2>
+                <p class="text-muted mb-4" style="font-size: var(--text-sm);">@L["Bud_SetBudgetHelp"]</p>
+
+                <form asp-action="Set" method="post">
+                    <input type="hidden" asp-for="Month" />
+                    <input type="hidden" asp-for="Year" />
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Amount" class="form-label">@L["Lbl_BudgetAmount"]<span class="req" aria-hidden="true">*</span></label>
+                        <input asp-for="Amount" class="form-control" type="number" step="0.01" min="0.01" inputmode="decimal" placeholder="@L["Bud_PlaceholderAmount"]" value="@(Model.Amount == 0 ? string.Empty : Model.Amount.ToString(System.Globalization.CultureInfo.InvariantCulture))" />
+                        <span asp-validation-for="Amount" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Currency" class="form-label">@L["Lbl_Currency"]</label>
+                        <select asp-for="Currency" class="form-select">
+                            @foreach (var c in Enum.GetValues(typeof(FinanceApp.Domain.Enums.Currency)))
+                            {
+                                <option value="@c">@c</option>
+                            }
+                        </select>
+                        <div class="form-text">@L["Bud_CurrencyHelp"]</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">@L["Bud_SaveBudget"]</button>
+                </form>
+            </div>
         </div>
     </div>
 
-    @if (saved)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle me-2"></i>@L["Bud_SavedAlert", monthName]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="@L["Common_Close"]"></button>
-        </div>
-    }
-    @if (categoryBudgetSaved)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle me-2"></i>@L["Bud_CatSaved"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="@L["Common_Close"]"></button>
-        </div>
-    }
-    @if (categoryBudgetDeleted)
-    {
-        <div class="alert alert-info alert-dismissible fade show" role="alert">
-            <i class="bi bi-info-circle me-2"></i>@L["Bud_CatRemoved"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="@L["Common_Close"]"></button>
-        </div>
-    }
-    @if (!string.IsNullOrEmpty(categoryBudgetError))
-    {
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-triangle me-2"></i>@categoryBudgetError
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="@L["Common_Close"]"></button>
-        </div>
-    }
-    @if (exceededCategories.Any())
-    {
-        <div class="alert alert-danger d-flex align-items-start mb-3" role="alert">
-            <i class="bi bi-exclamation-triangle-fill fs-5 me-3 mt-1"></i>
-            <div class="flex-grow-1">
-                <strong>@L["Bud_CatExceededTitle", monthName]</strong>
-                <p class="mb-0 mt-1">@L["Bud_CatExceededIntro"]</p>
-                <ul class="mb-0 mt-2">
-                    @foreach (var cat in exceededCategories)
-                    {
-                        <li>@cat</li>
-                    }
-                </ul>
-            </div>
-        </div>
-    }
-
-    <div class="row">
-        <div class="col-lg-6">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">@L["Bud_SetBudgetCardTitle", monthName]</h5>
-                    <p class="text-muted small">@L["Bud_SetBudgetHelp"]</p>
-
-                    <form asp-action="Set" method="post" class="mt-3">
-                        <input type="hidden" asp-for="Month" />
-                        <input type="hidden" asp-for="Year" />
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
-
-                        <div class="mb-3">
-                            <label asp-for="Amount" class="form-label">@L["Lbl_BudgetAmount"]</label>
-                            <input asp-for="Amount" class="form-control" type="number" step="0.01" min="0.01" placeholder="@L["Bud_PlaceholderAmount"]" />
-                            <span asp-validation-for="Amount" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Currency" class="form-label">@L["Lbl_Currency"]</label>
-                            <select asp-for="Currency" class="form-select">
-                                @foreach (var c in Enum.GetValues(typeof(FinanceApp.Domain.Enums.Currency)))
-                                {
-                                    <option value="@c">@c</option>
-                                }
-                            </select>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">@L["Bud_SaveBudget"]</button>
-                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">@L["Bud_BackDashboard"]</a>
-                    </form>
+    @* ── Per-category budgets, as progress rather than a bare table ── *@
+    <div class="col-lg-7">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="section-header">
+                    <h2 class="card-title">@L["Bud_CatBudgetsTitle", monthName]</h2>
                 </div>
-            </div>
-        </div>
 
-        <div class="col-lg-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="card-title mb-0">@L["Bud_CatBudgetsTitle", monthName]</h5>
-                        <button type="button" id="btnAddCategoryBudget" class="btn btn-sm btn-primary">
-                            <i class="bi bi-plus-circle"></i> @L["Bud_AddCatBudget"]
+                @if (categoryBudgets.Any())
+                {
+                    <ul class="list-unstyled mb-0">
+                        @foreach (var cb in categoryBudgets)
+                        {
+                            var currency = cb.Currency ?? "TZS";
+                            var pct = cb.Amount > 0 ? (double)(cb.Spent / cb.Amount * 100m) : 0d;
+                            var fillClass = cb.IsOver ? "meter__fill--over" : cb.IsWarning ? "meter__fill--warning" : "";
+                            <li class="budget-row">
+                                <div class="budget-row__main">
+                                    <div class="d-flex justify-content-between align-items-baseline gap-2 mb-1">
+                                        <span class="budget-row__name text-truncate">@cb.CategoryName</span>
+                                        <span class="budget-row__figures">
+                                            @cb.Spent.ToString("N0") / @cb.Amount.ToString("N0") @currency
+                                        </span>
+                                    </div>
+                                    <div class="meter" role="progressbar"
+                                         aria-valuenow="@Math.Round(pct)" aria-valuemin="0" aria-valuemax="100"
+                                         aria-label="@cb.CategoryName">
+                                        <div class="meter__fill @fillClass" style="width: @(Math.Min(100, pct).ToString("0.#", System.Globalization.CultureInfo.InvariantCulture))%"></div>
+                                    </div>
+                                    <div class="mt-1">
+                                        @if (cb.IsOver)
+                                        {
+                                            <span class="badge bg-danger">@L["Bud_OverLimit"]</span>
+                                        }
+                                        else if (cb.IsWarning)
+                                        {
+                                            <span class="badge bg-warning">@L["Bud_NearLimit"]</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success">@L["Bud_OnTrack"]</span>
+                                        }
+                                        <span class="text-muted ms-1" style="font-size: var(--text-xs);">@pct.ToString("0")%</span>
+                                    </div>
+                                </div>
+                                <form asp-action="DeleteCategoryBudget" method="post" class="js-confirm-remove">
+                                    <input type="hidden" name="id" value="@cb.Id" />
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="icon-btn icon-btn--danger" title="@L["Common_Delete"]" aria-label="@L["Bud_RemoveAria"]">
+                                        <i class="bi bi-trash" aria-hidden="true"></i>
+                                    </button>
+                                </form>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <span class="empty-state__icon"><i class="bi bi-pie-chart" aria-hidden="true"></i></span>
+                        <h3 class="empty-state__title">@L["Bud_NoCatBudgets"]</h3>
+                        <p class="empty-state__desc">@L["Bud_CatBudgetHelp"]</p>
+                        <button type="button" id="btnAddCategoryBudgetEmpty" class="btn btn-outline-secondary empty-state__action">
+                            <i class="bi bi-plus-lg" aria-hidden="true"></i> @L["Bud_AddCatBudget"]
                         </button>
                     </div>
-                    <p class="text-muted small">@L["Bud_CatBudgetHelp"]</p>
-                    @if (categoryBudgets.Any())
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-sm table-hover mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>@L["Lbl_Category"]</th>
-                                        <th>@L["Bud_ColSpentBudget"]</th>
-                                        <th>@L["Bud_Status"]</th>
-                                        <th style="width: 80px;"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var cb in categoryBudgets)
-                                    {
-                                        var currency = cb.Currency ?? "TZS";
-                                        var isOver = cb.IsOver;
-                                        var isWarning = cb.IsWarning;
-                                        <tr>
-                                            <td>@cb.CategoryName</td>
-                                            <td>@cb.Spent.ToString("N0") / @cb.Amount.ToString("N0") @currency</td>
-                                            <td>
-                                                @if (isOver)
-                                                { <span class="badge bg-danger">@L["Bud_OverLimit"]</span> }
-                                                else if (isWarning)
-                                                { <span class="badge bg-warning text-dark">@L["Bud_NearLimit"]</span> }
-                                                else
-                                                { <span class="badge bg-success">@L["Bud_OnTrack"]</span> }
-                                            </td>
-                                            <td>
-                                                <form asp-action="DeleteCategoryBudget" method="post" class="d-inline" onsubmit="return confirm(@Html.Raw(JsonSerializer.Serialize(L["Bud_RemoveConfirm"].Value)));">
-                                                    <input type="hidden" name="id" value="@cb.Id" />
-                                                    @Html.AntiForgeryToken()
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="@L["Common_Delete"]" aria-label="@L["Bud_RemoveAria"]">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    }
-                    else
-                    {
-                        <p class="text-muted mb-0">@L["Bud_NoCatBudgets"]</p>
-                    }
-                </div>
+                }
             </div>
         </div>
     </div>
@@ -169,11 +166,11 @@
 
 <!-- Offcanvas for add category budget -->
 <div class="offcanvas offcanvas-end" tabindex="-1" id="categoryBudgetOffcanvas" aria-labelledby="categoryBudgetOffcanvasLabel">
-    <div class="offcanvas-header border-bottom">
-        <h5 class="offcanvas-title fw-600" id="categoryBudgetOffcanvasLabel">@L["Bud_AddCatBudget"]</h5>
-        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="@L["Common_Close"]"></button>
+    <div class="offcanvas-header">
+        <h2 class="offcanvas-title" id="categoryBudgetOffcanvasLabel">@L["Bud_AddCatBudget"]</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="@L["Common_Close"]"></button>
     </div>
-    <div class="offcanvas-body px-0" id="categoryBudgetOffcanvasContent">
+    <div class="offcanvas-body" id="categoryBudgetOffcanvasContent">
         <div class="p-3 text-center text-muted">@L["Bud_OffcanvasPlaceholder"]</div>
     </div>
 </div>
@@ -182,43 +179,47 @@
     <partial name="_ValidationScriptsPartial" />
     <script>
         (function() {
-            var btn = document.getElementById('btnAddCategoryBudget');
             var content = document.getElementById('categoryBudgetOffcanvasContent');
             var label = document.getElementById('categoryBudgetOffcanvasLabel');
             var offcanvasEl = document.getElementById('categoryBudgetOffcanvas');
-            if (!btn || !content) return;
+            if (!content) return;
 
-            btn.addEventListener('click', async function() {
+            async function openCategoryBudgetForm() {
                 label.textContent = @Html.Raw(jsBudAddTitle);
                 content.innerHTML = '<div class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>' + @Html.Raw(JsonSerializer.Serialize(L["Common_Loading"].Value)) + '</div>';
-                if (offcanvasEl) { var o = new bootstrap.Offcanvas(offcanvasEl); o.show(); }
-                var url = '@Url.Action("AddCategoryBudget", "Budget")?partial=true';
-                var res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                if (offcanvasEl) { bootstrap.Offcanvas.getOrCreateInstance(offcanvasEl).show(); }
+                var res = await fetch('@Url.Action("AddCategoryBudget", "Budget")?partial=true', { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
                 if (!res.ok) { content.innerHTML = '<div class="p-3 text-danger">' + @Html.Raw(jsBudUnable) + '</div>'; return; }
-                var html = await res.text();
-                content.innerHTML = html;
+                content.innerHTML = await res.text();
 
                 var form = content.querySelector('#categoryBudgetForm');
-                if (form) {
-                    form.addEventListener('submit', async function(e) {
-                        e.preventDefault();
-                        var submitBtn = form.querySelector('button[type="submit"]');
-                        if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>' + @Html.Raw(jsBudSaving); }
-                        var formData = new FormData(form);
-                        var postRes = await fetch(form.action, {
-                            method: 'POST',
-                            body: formData,
-                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                        });
-                        if (postRes.ok) {
-                            var data = await postRes.json();
-                            if (data && data.redirect) { window.location.href = data.redirect; return; }
-                        }
-                        var errHtml = await postRes.text();
-                        content.innerHTML = errHtml;
-                        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = @Html.Raw(jsBudSaveCat); }
+                if (!form) return;
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    var submitBtn = form.querySelector('button[type="submit"]');
+                    if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>' + @Html.Raw(jsBudSaving); }
+                    var postRes = await fetch(form.action, {
+                        method: 'POST',
+                        body: new FormData(form),
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
                     });
-                }
+                    if (postRes.ok) {
+                        var data = await postRes.json();
+                        if (data && data.redirect) { window.location.href = data.redirect; return; }
+                    }
+                    content.innerHTML = await postRes.text();
+                    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = @Html.Raw(jsBudSaveCat); }
+                });
+            }
+
+            document.getElementById('btnAddCategoryBudget')?.addEventListener('click', openCategoryBudgetForm);
+            document.getElementById('btnAddCategoryBudgetEmpty')?.addEventListener('click', openCategoryBudgetForm);
+
+            // Removing a budget is destructive and not undoable — confirm first.
+            document.querySelectorAll('form.js-confirm-remove').forEach(function (f) {
+                f.addEventListener('submit', function (e) {
+                    if (!window.confirm(@Html.Raw(jsRemoveConfirm))) { e.preventDefault(); }
+                });
             });
         })();
     </script>

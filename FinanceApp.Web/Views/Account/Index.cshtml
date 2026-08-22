@@ -3,19 +3,18 @@
 
 @{
     ViewData["Title"] = L["Acc_PageTitle"].Value;
+    ViewData["PageDescription"] = L["Acc_Subtitle"].Value;
     var jsLoading = JsonSerializer.Serialize(L["Common_Loading"].Value);
     var jsFailedLoad = JsonSerializer.Serialize(L["Acc_FailedLoadForm"].Value);
 }
 
-<div class="mb-4">
-    <h1 class="visually-hidden">@L["Acc_PageTitle"]</h1>
-    <p class="page-subtitle mb-3">@L["Acc_Subtitle"]</p>
-    <div class="d-flex gap-2 mb-3">
-        <button id="btnAddAccount" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> @L["Acc_Add"]
-        </button>
-    </div>
+@section PageActions {
+    <button id="btnAddAccount" class="btn btn-primary" type="button">
+        <i class="bi bi-plus-lg" aria-hidden="true"></i> @L["Acc_Add"]
+    </button>
+}
 
+<div>
     <div class="offcanvas offcanvas-end" tabindex="-1" id="accountOffcanvas" aria-labelledby="accountOffcanvasLabel">
         <div class="offcanvas-header">
             <h5 id="accountOffcanvasLabel">@L["Acc_OffcanvasTitle"]</h5>
@@ -31,13 +30,22 @@
 
 @if (!Model.Any())
 {
-    <div class="alert alert-info">
-        <i class="bi bi-info-circle me-2"></i>@L["Acc_EmptyPart1"]<strong>@L["Acc_AddStrong"]</strong>@L["Acc_EmptyPart2"]
+    <div class="card">
+        <div class="card-body">
+            <div class="empty-state">
+                <span class="empty-state__icon"><i class="bi bi-bank" aria-hidden="true"></i></span>
+                <h2 class="empty-state__title">@L["Acc_EmptyPart1"]</h2>
+                <p class="empty-state__desc">@L["Acc_EmptyPart2"]</p>
+                <button id="btnAddAccountEmpty" class="btn btn-primary empty-state__action" type="button">
+                    <i class="bi bi-plus-lg" aria-hidden="true"></i> @L["Acc_Add"]
+                </button>
+            </div>
+        </div>
     </div>
 }
 else
 {
-    <div class="row g-3 mb-4">
+    <div class="row g-3 mb-4" id="accountCardsRow">
         @foreach (var account in Model.Where(a => a.IsActive))
         {
             var typeIcon = account.Type switch
@@ -48,32 +56,32 @@ else
                 FinanceApp.Domain.Enums.AccountType.Cash => "bi-cash-stack",
                 _ => "bi-bank"
             };
-            var balanceClass = account.CurrentBalance >= 0 ? "text-success" : "text-danger";
+            var balanceClass = account.CurrentBalance >= 0 ? "amount--positive" : "amount--negative";
             <div class="col-sm-6 col-lg-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-2">
-                            <span class="fs-3 me-2 text-primary"><i class="bi @typeIcon"></i></span>
-                            <div>
-                                <h6 class="card-title mb-0">@account.Name</h6>
-                                <small class="text-muted">@AccountDisplayHelper.LocalizedAccountType(L, account.Type) · @account.Currency</small>
+                <div class="card h-100">
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <span class="dashboard-kpi-icon rounded-2"><i class="bi @typeIcon" aria-hidden="true"></i></span>
+                            <div class="min-w-0">
+                                <h3 class="card-title text-truncate">@account.Name</h3>
+                                <span class="text-muted" style="font-size: var(--text-xs);">@AccountDisplayHelper.LocalizedAccountType(L, account.Type)</span>
                             </div>
                         </div>
-                        <p class="fs-5 fw-bold @balanceClass mb-1">
-                            @account.Currency @account.CurrentBalance.ToString("N2")
+                        <p class="amount @balanceClass mb-1" style="font-size: var(--text-md);">
+                            @account.CurrentBalance.ToString("N2")<span class="amount__code">@account.Currency</span>
                         </p>
                         @if (!string.IsNullOrEmpty(account.Description))
                         {
-                            <p class="text-muted small mb-2">@account.Description</p>
+                            <p class="text-muted mb-2" style="font-size: var(--text-sm);">@account.Description</p>
                         }
-                        <div class="d-flex gap-2 mt-auto">
-                            <a href="@Url.Action("Edit", "Account", new { id = account.Id })" class="btn btn-sm btn-outline-secondary btn-edit">
-                                <i class="bi bi-pencil"></i> @L["Acc_Edit"]
+                        <div class="d-flex gap-2 mt-auto pt-2">
+                            <a href="@Url.Action("Edit", "Account", new { id = account.Id })" class="btn btn-outline-secondary btn-sm btn-edit">
+                                <i class="bi bi-pencil" aria-hidden="true"></i> @L["Acc_Edit"]
                             </a>
                             <form method="post" asp-action="Delete" asp-route-id="@account.Id" onsubmit="return confirm(@JsonSerializer.Serialize(L["Acc_DeactivateConfirm", account.Name ?? ""].Value));">
                                 @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-sm btn-outline-danger">
-                                    <i class="bi bi-archive"></i> @L["Acc_Deactivate"]
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    <i class="bi bi-archive" aria-hidden="true"></i> @L["Acc_Deactivate"]
                                 </button>
                             </form>
                         </div>
@@ -86,15 +94,15 @@ else
     @if (Model.Any(a => !a.IsActive))
     {
         <details class="mb-3">
-            <summary class="text-muted small mb-2">@L["Acc_InactiveSummary", Model.Count(a => !a.IsActive)]</summary>
+            <summary class="text-muted mb-2" style="font-size: var(--text-sm); cursor: pointer;">@L["Acc_InactiveSummary", Model.Count(a => !a.IsActive)]</summary>
             <div class="row g-3 mt-1">
                 @foreach (var account in Model.Where(a => !a.IsActive))
                 {
                     <div class="col-sm-6 col-lg-4">
-                        <div class="card shadow-sm h-100 border-secondary opacity-75">
+                        <div class="card h-100" style="opacity: 0.7;">
                             <div class="card-body">
-                                <h6 class="card-title text-muted">@account.Name <span class="badge bg-secondary ms-1">@L["Acc_InactiveBadge"]</span></h6>
-                                <small class="text-muted">@AccountDisplayHelper.LocalizedAccountType(L, account.Type) · @account.Currency</small>
+                                <h3 class="card-title text-muted">@account.Name <span class="badge bg-secondary ms-1">@L["Acc_InactiveBadge"]</span></h3>
+                                <span class="text-muted" style="font-size: var(--text-xs);">@AccountDisplayHelper.LocalizedAccountType(L, account.Type) · @account.Currency</span>
                             </div>
                         </div>
                     </div>
@@ -119,8 +127,9 @@ else
                 content.innerHTML = await res.text();
             }
 
-            document.getElementById('btnAddAccount')?.addEventListener('click', () =>
-                loadIntoOffcanvas('@Url.Action("Create", "Account")?partial=true'));
+            const openCreateAccount = () => loadIntoOffcanvas('@Url.Action("Create", "Account")?partial=true');
+            document.getElementById('btnAddAccount')?.addEventListener('click', openCreateAccount);
+            document.getElementById('btnAddAccountEmpty')?.addEventListener('click', openCreateAccount);
 
             document.getElementById('accountCardsRow')?.addEventListener('click', async function (e) {
                 const editBtn = e.target.closest('.btn-edit');

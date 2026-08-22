@@ -39,7 +39,7 @@
     <meta name="twitter:title" content="@title" />
     <meta name="twitter:description" content="@metaDescription" />
 
-    <link rel="icon" type="image/png" href="@Url.Content("~/financeapp-logo.png")" />
+    <link rel="icon" type="image/png" href="~/financeapp-logo.png" asp-append-version="true" />
     <meta name="request-verification-token" content="@Antiforgery.GetAndStoreTokens(Context).RequestToken" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -69,7 +69,7 @@
         <nav class="navbar navbar-expand-lg navbar-light">
             <div class="container">
                 <a class="navbar-brand fw-bold d-flex align-items-center gap-2" asp-controller="Landing" asp-action="Index">
-                    <img src="~/financeapp-logo.png" alt="@L["Land_BrandName"]" width="32" height="32" class="rounded" />
+                    <img src="~/financeapp-logo.png" asp-append-version="true" alt="@L["Land_BrandName"]" width="32" height="32" class="rounded" />
                     <span>@L["Land_BrandName"]</span>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#landingNav" aria-controls="landingNav" aria-expanded="false" aria-label="@L["Land_AriaToggleNav"]">
@@ -103,7 +103,7 @@
         <div class="container">
             <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 py-4">
                 <div class="d-flex align-items-center gap-2">
-                    <img src="~/financeapp-logo.png" alt="@L["Land_BrandName"]" width="24" height="24" class="rounded" />
+                    <img src="~/financeapp-logo.png" asp-append-version="true" alt="@L["Land_BrandName"]" width="24" height="24" class="rounded" />
                     <span class="fw-semibold">@L["Land_BrandName"]</span>
                 </div>
                 <div class="d-flex flex-wrap align-items-center justify-content-center gap-3 small">

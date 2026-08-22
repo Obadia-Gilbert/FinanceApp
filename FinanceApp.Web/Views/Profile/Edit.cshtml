@@ -1,11 +1,10 @@
 @model FinanceApp.Web.Models.ProfileEditViewModel
 @{
     ViewData["Title"] = "Edit Profile";
+    ViewData["PageDescription"] = "Update your name, phone, country, and profile photo.";
 }
 
 <div class="mb-4">
-    <h1 class="visually-hidden">Edit Profile</h1>
-    <p class="page-subtitle mb-0">Update your name, phone, country, and profile photo.</p>
 </div>
 
 @if (TempData["ProfileUpdated"] as bool? == true)
