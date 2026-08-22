@@ -11,6 +11,8 @@ function googleReversedUrlScheme(clientId) {
 module.exports = () => {
   const fbId = process.env.EXPO_PUBLIC_FACEBOOK_APP_ID?.trim();
   const iosClientId = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID?.trim();
+  const webClientId = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID?.trim();
+  const androidClientId = process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID?.trim();
 
   const schemes = ['financeapp'];
   if (fbId) schemes.push(`fb${fbId}`);
@@ -27,11 +29,21 @@ module.exports = () => {
     ]);
   }
 
+  const expoOwner = process.env.EXPO_PUBLIC_EXPO_OWNER?.trim();
+
   return {
     expo: {
       ...base.expo,
+      ...(expoOwner ? { owner: expoOwner } : {}),
       scheme: schemes.length === 1 ? schemes[0] : schemes,
       plugins,
+      extra: {
+        ...(base.expo.extra ?? {}),
+        EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: webClientId ?? '',
+        EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID: iosClientId ?? '',
+        EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID: androidClientId ?? '',
+        EXPO_PUBLIC_FACEBOOK_APP_ID: fbId ?? '',
+      },
     },
   };
 };

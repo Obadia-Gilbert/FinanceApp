@@ -63,6 +63,10 @@ EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID=<android-client-id>.apps.googleusercontent.
 
 `app.config.js` derives the iOS reversed URL scheme **from the iOS client ID**. Without `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID`, the native Google plugin is intentionally omitted (Expo Go browser flow can still work).
 
+### Web MVC + API (browser login on localhost)
+
+For **FinanceApp.Web** (Continue with Google on Login/Register) and matching **FinanceApp.API** token settings, add Google Cloud redirect URIs for `/signin-google` and set user secrets as described in [WEB_GOOGLE_OAUTH.md](./WEB_GOOGLE_OAUTH.md).
+
 ### API audience configuration (user secrets, not committed)
 
 `FinanceApp.API` validates the Google **ID token** against an audience list:
@@ -80,7 +84,8 @@ The audience list **must include every client ID that the mobile app may use to 
 
 | Run target | Google flow used | Required env keys | Notes |
 |------------|------------------|-------------------|-------|
-| **Expo Go** (any sim/device) | Browser OAuth via `expo-auth-session` (`GoogleSignInExpoGo.tsx`). | At minimum `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`; ideally also iOS/Android client IDs. | Add Expo proxy URL to the **Web** OAuth client’s **Authorized redirect URIs** (Google Cloud) if Expo proxy is in use. |
+| **Expo Go (iOS)** | Browser OAuth via `expo-auth-session` using the **iOS** OAuth client + reversed URL scheme (`com.googleusercontent.apps.…:/oauthredirect`). | Web + **iOS** client IDs in `.env`. | No Web redirect URI needed when iOS client ID is set. `auth.expo.io` is deprecated and often breaks; do not rely on it if you have an iOS client. |
+| **Expo Go (Android / no iOS id)** | Browser OAuth with **Web** client + `https://auth.expo.io/@anonymous/financeapp-mobile` (fallback only). | Web client ID. | Add that https URI on the **Web application** client. Prefer `npx expo run:ios` / dev build for reliable Google sign-in. |
 | **Dev build (iOS)** | Native via `@react-native-google-signin/google-signin` (`GoogleSignInButtonImpl.tsx`). | Web + **iOS** client IDs. | Reversed URL scheme is auto-injected from the iOS client ID. Must be a full dev build, not Expo Go. |
 | **Dev build (Android)** | Native. | Web + **Android** client IDs (Android needs SHA-1s in Cloud Console). | |
 
@@ -88,7 +93,10 @@ The audience list **must include every client ID that the mobile app may use to 
 
 | Symptom | Likely cause | Fix |
 |--------|--------------|------|
-| `redirect_uri_mismatch` | Web OAuth client authorized redirect URIs don’t include the proxy / scheme being used. | Add Expo proxy URL or the native scheme `com.googleusercontent.apps.<ios-prefix>:/oauthredirect` to the matching client. |
+| Tapping **Google** shows an in-app alert (“Add EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID…”) | `.env` is missing Google keys (often after copying only the API URL / LAN IP from `.env.example`). Email/password login still works. | Copy the Google block from `FinanceApp.Mobile/.env.example` into `.env`, paste your OAuth client IDs, then `npx expo start -c`. |
+| Google button spins or “still loading” | Auth request never finished (wrong client/redirect pair, or empty `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID` treated as set). | Set **both** Web and iOS client IDs in `.env`, restart with `npx expo start -c`. Metro logs `[Google OAuth] clientId` and `redirectUri` — iOS Expo Go should show the **iOS** client id and `com.googleusercontent.apps.…:/oauthredirect`. |
+| `redirect_uri_mismatch` or **400 invalid_request** | Redirect does not match the OAuth client in use (e.g. `auth.expo.io` with iOS client id, or `exp://` on Web client). | **iOS Expo Go:** use iOS client ID + reversed scheme (automatic in app); do **not** add `com.googleusercontent.apps.…` to the **Web** client. **Web-only fallback:** add `https://auth.expo.io/@anonymous/financeapp-mobile` on the Web client. **Best fix:** `npx expo run:ios` (native SDK). |
+| Console: **Invalid Redirect: must use http or https** | Custom scheme added under the **Web application** client. | Remove it from the Web client; iOS scheme is configured on the **iOS** OAuth client (bundle `com.financeapp.mobile`). |
 | `Google did not return an ID token` | Mismatch between platform and configured client; Web client used for native flow. | Set the platform-specific client ID (iOS or Android) in `.env` and rebuild. |
 | API returns `Api_OAuthNotConfigured` | API is missing `Authentication:Google:ClientId` / `Authentication:Google:IdTokenAudiences`. | Set the user secrets shown above. |
 | API returns `Api_OAuthInvalidToken` | Token signed for a client ID not in the API’s audience list. | Add that client ID to `Authentication:Google:IdTokenAudiences`. |

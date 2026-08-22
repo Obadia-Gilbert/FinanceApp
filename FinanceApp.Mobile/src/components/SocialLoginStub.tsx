@@ -2,10 +2,10 @@ import { Alert, Text, TouchableOpacity } from 'react-native';
 import type { ThemeColors } from '../theme/colors';
 
 const GOOGLE_SETUP =
-  'Add EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID to .env (Web application OAuth client from Google Cloud), then restart Expo. For iOS development builds with the native Google SDK, also set EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID (bundle com.financeapp.mobile). Add test users on the OAuth consent screen if the app is in Testing.';
+  'Add EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID to FinanceApp.Mobile/.env (Web application OAuth client from Google Cloud), then restart Expo with: npx expo start -c\n\nFor iOS development builds with the native Google SDK, also set EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID (bundle com.financeapp.mobile). Add test users on the OAuth consent screen if the app is in Testing.\n\nStep-by-step: FinanceApp.Documentations/MOBILE_AUTH.md (§3 Google Sign-In). Copy missing keys from .env.example.';
 
 const FACEBOOK_SETUP =
-  'Add EXPO_PUBLIC_FACEBOOK_APP_ID to .env (same App ID as FinanceApp.Web Authentication:Facebook:AppId), then restart Expo. See env.example.';
+  'Add EXPO_PUBLIC_FACEBOOK_APP_ID to FinanceApp.Mobile/.env (same App ID as FinanceApp.Web Authentication:Facebook:AppId), then restart Expo with: npx expo start -c\n\nSee FinanceApp.Documentations/MOBILE_AUTH.md (§4 Facebook Login) and .env.example.';
 
 type Props = {
   provider: 'google' | 'facebook';

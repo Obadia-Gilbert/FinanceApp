@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
+import { publicEnv } from '../env/publicEnv';
+import { buildGoogleExpoGoAuthConfig } from '../auth/googleExpoGoAuthConfig';
 import type { GoogleSignInButtonProps } from './GoogleSignInButton.types';
 
 WebBrowser.maybeCompleteAuthSession();
@@ -12,14 +14,22 @@ WebBrowser.maybeCompleteAuthSession();
  */
 export default function GoogleSignInExpoGo({ colors, style, onIdToken, onError }: GoogleSignInButtonProps) {
   const [pending, setPending] = useState(false);
-  const webClientId = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
-  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
-    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
-    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
-    webClientId,
-    /** Fallback when platform-specific OAuth client ID is not set (e.g. Android + web-only env). */
-    clientId: webClientId,
-  });
+  const webClientId = publicEnv('EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID');
+  const { config, redirectUri } = useMemo(() => buildGoogleExpoGoAuthConfig(), []);
+
+  useEffect(() => {
+    if (__DEV__) {
+      console.warn('[Google OAuth] clientId:', config.clientId);
+      console.warn('[Google OAuth] redirectUri:', redirectUri);
+      if (redirectUri.startsWith('https://auth.expo.io')) {
+        console.warn(
+          '[Google OAuth] auth.expo.io is deprecated. Prefer EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID (iOS) or npx expo run:ios.'
+        );
+      }
+    }
+  }, [config.clientId, redirectUri]);
+
+  const [request, response, promptAsync] = Google.useIdTokenAuthRequest(config);
 
   useEffect(() => {
     if (response?.type === 'error') {
@@ -39,10 +49,12 @@ export default function GoogleSignInExpoGo({ colors, style, onIdToken, onError }
       if (idToken) onIdToken(idToken);
       else
         onError(
-          'Google did not return an ID token. Add authorized redirect URIs in Google Cloud (including Expo proxy if shown in the browser error).'
+          'Google did not return an ID token. On iOS set EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID, or add the redirect URI from Metro to your Web OAuth client.'
         );
     }
   }, [response, onError, onIdToken]);
+
+  const waitingForRequest = !request;
 
   return (
     <TouchableOpacity
@@ -58,17 +70,36 @@ export default function GoogleSignInExpoGo({ colors, style, onIdToken, onError }
           borderWidth: 1,
           backgroundColor: colors.bg.default,
           borderColor: colors.border,
+          opacity: waitingForRequest ? 0.65 : 1,
         },
         style,
       ]}
-      disabled={!request || pending}
+      disabled={pending}
       onPress={() => {
+        if (!webClientId) {
+          onError('Missing EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID in .env');
+          return;
+        }
+        if (!request) {
+          onError('Google sign-in is still loading. Restart Expo with: npx expo start -c');
+          return;
+        }
         setPending(true);
-        void promptAsync().catch(() => setPending(false));
+        void promptAsync()
+          .then((result) => {
+            if (result.type === 'locked') {
+              setPending(false);
+              onError('Another sign-in is in progress. Close the browser window and try again.');
+            }
+          })
+          .catch((e: unknown) => {
+            setPending(false);
+            onError(e instanceof Error ? e.message : 'Google sign-in failed');
+          });
       }}
       activeOpacity={0.7}
     >
-      {pending ? (
+      {pending || waitingForRequest ? (
         <ActivityIndicator color={colors.text.primary} />
       ) : (
         <>

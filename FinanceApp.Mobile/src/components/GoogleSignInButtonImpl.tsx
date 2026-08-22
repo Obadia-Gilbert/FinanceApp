@@ -12,6 +12,7 @@ import {
   statusCodes,
   isErrorWithCode,
 } from '@react-native-google-signin/google-signin';
+import { publicEnv } from '../env/publicEnv';
 import type { GoogleSignInButtonProps } from './GoogleSignInButton.types';
 
 export default function GoogleSignInButtonImpl({
@@ -23,8 +24,8 @@ export default function GoogleSignInButtonImpl({
   const [pending, setPending] = useState(false);
 
   useEffect(() => {
-    const web = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID?.trim();
-    const ios = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID?.trim();
+    const web = publicEnv('EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID');
+    const ios = publicEnv('EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID');
     if (!web) return;
 
     GoogleSignin.configure({
@@ -35,12 +36,12 @@ export default function GoogleSignInButtonImpl({
   }, []);
 
   const handlePress = async () => {
-    const web = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID?.trim();
+    const web = publicEnv('EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID');
     if (!web) {
       onError('Missing EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID in .env');
       return;
     }
-    if (Platform.OS === 'ios' && !process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID?.trim()) {
+    if (Platform.OS === 'ios' && !publicEnv('EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID')) {
       onError(
         'Missing EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID — add an iOS OAuth client from Google Cloud (bundle com.financeapp.mobile).'
       );

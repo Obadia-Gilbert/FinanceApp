@@ -14,6 +14,7 @@ Project documentation for FinanceApp.
 | [LANGUAGE_SWITCHING_TODO.md](./LANGUAGE_SWITCHING_TODO.md) | i18n: baseline implemented (en / es / sw); optional follow-up tasks |
 | [GOING_LIVE.md](./GOING_LIVE.md) | Production deployment: VPS vs Azure, DB strategy, HTTPS/CORS, secrets, jobs, mobile go-live |
 | [MOBILE_AUTH.md](./MOBILE_AUTH.md) | Mobile auth setup + troubleshooting: API URL per target, Google/Facebook OAuth clients, API user secrets |
+| [WEB_GOOGLE_OAUTH.md](./WEB_GOOGLE_OAUTH.md) | Web (`FinanceApp.Web`) + API Google OAuth: Cloud Console redirect URIs, user secrets, `/signin-google` |
 | [EMAIL_BREVO.md](./EMAIL_BREVO.md) | Brevo (ex-Sendinblue) transactional email setup: HTTP API vs SMTP relay, sender verification, user-secrets config |
 
 ---
