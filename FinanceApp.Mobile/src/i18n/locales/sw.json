@@ -52,7 +52,9 @@
     "subscription": "Michango",
     "profile": "Wasifu",
     "feedback": "Maoni",
-    "privacyPolicy": "Sera ya faragha"
+    "privacyPolicy": "Sera ya faragha",
+    "upgradeBadge": "Boresha",
+    "viewProfile": "Angalia wasifu wa {{name}}"
   },
   "auth": {
     "forgotPassword": {
@@ -139,7 +141,11 @@
     "renewsEnds": "Husasisha/kwisha: {{date}}",
     "restorePurchases": "Rejesha ununuzi",
     "choosePlan": "Chagua mpango wako",
-    "plans": { "free": "Bure", "pro": "Pro", "premium": "Premium" },
+    "plans": {
+      "free": "Bure",
+      "pro": "Pro",
+      "premium": "Premium"
+    },
     "forever": "/ milele",
     "perMonth": "/ mwezi",
     "freeDesc": "Anza na ufuatiliaji wa kimsingi wa fedha.",
@@ -157,9 +163,27 @@
     "restoreSuccessTitle": "Imerejeshwa",
     "restoreSuccessBody": "Usajili wako umesawazishwa na seva.",
     "features": {
-      "free": ["Ufuatiliaji wa msingi wa matumizi", "Usimamizi wa bajeti", "Ripoti za kila mwezi", "Hadi akaunti 3"],
-      "pro": ["Bajeti zisizo na kikomo", "Maarifa ya AI", "Skani ya risiti (OCR)", "Hamisha CSV na PDF", "Jamii maalum", "Msaada wa kipaumbele"],
-      "premium": ["Vipengele vyote vya Pro", "Watumiaji wengi", "Muunganisho wa API", "Msaada maalum", "Chapa maalum"]
+      "free": [
+        "Ufuatiliaji wa msingi wa matumizi",
+        "Usimamizi wa bajeti",
+        "Ripoti za kila mwezi",
+        "Hadi akaunti 3"
+      ],
+      "pro": [
+        "Bajeti zisizo na kikomo",
+        "Maarifa ya AI",
+        "Skani ya risiti (OCR)",
+        "Hamisha CSV na PDF",
+        "Jamii maalum",
+        "Msaada wa kipaumbele"
+      ],
+      "premium": [
+        "Vipengele vyote vya Pro",
+        "Watumiaji wengi",
+        "Muunganisho wa API",
+        "Msaada maalum",
+        "Chapa maalum"
+      ]
     },
     "faq": {
       "cancel": {

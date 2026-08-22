@@ -27,7 +27,12 @@ export default function TabsLayout() {
         headerRight: () => <HeaderNotificationIcon />,
         tabBarActiveTintColor: colors.brand,
         tabBarInactiveTintColor: colors.text.muted,
-        sceneContainerStyle: { paddingTop: insets.top },
+        // No sceneContainerStyle here: every screen already gets its top safe-area
+        // handled either by its own native header (headerShown: true, or a nested
+        // Stack under app/(tabs)/*/_layout.tsx) or, for the one screen with neither
+        // (Dashboard), by its own manual `insets.top` padding. This prop isn't part
+        // of this navigator's type at all — it was adding a redundant extra gap under
+        // every header, most visible as blank space above Budget's content.
         tabBarStyle: {
           backgroundColor: colors.bg.default,
           borderTopColor: colors.border,

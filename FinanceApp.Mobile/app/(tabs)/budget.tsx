@@ -88,7 +88,7 @@ export default function BudgetScreen() {
     queryFn: getDashboard,
   });
 
-  const { data: budget, refetch, isRefetching } = useQuery({
+  const { data: budget, refetch } = useQuery({
     queryKey: ['budget', month, year],
     queryFn: () => getBudget(month, year),
   });
@@ -104,13 +104,26 @@ export default function BudgetScreen() {
     },
   });
 
-  // Refetch budget and category budgets when screen is focused (e.g. after adding an expense)
+  // Refetch budget and category budgets when screen is focused (e.g. after adding an expense).
+  // This must NOT drive RefreshControl's `refreshing` prop — binding it to the query's
+  // own isRefetching made the native pull-to-refresh spinner (and the blank gap it
+  // reserves) appear every time the tab regained focus, not just on an actual user pull.
   useFocusEffect(
     useCallback(() => {
       refetch();
       refetchCategoryBudgets();
     }, [refetch, refetchCategoryBudgets])
   );
+
+  const [userRefreshing, setUserRefreshing] = useState(false);
+  const handleRefresh = async () => {
+    setUserRefreshing(true);
+    try {
+      await Promise.all([refetch(), refetchCategoryBudgets()]);
+    } finally {
+      setUserRefreshing(false);
+    }
+  };
 
   const { data: categories = [] } = useQuery({
     queryKey: ['categories'],
@@ -214,8 +227,8 @@ export default function BudgetScreen() {
       contentContainerStyle={styles.content}
       refreshControl={
         <RefreshControl
-          refreshing={isRefetching}
-          onRefresh={() => refetch()}
+          refreshing={userRefreshing}
+          onRefresh={handleRefresh}
           tintColor={colors.brand}
         />
       }
@@ -368,7 +381,7 @@ export default function BudgetScreen() {
                     { borderColor: colors.border, backgroundColor: categoryBudgetCategoryId === c.id ? colors.brand : colors.bg.hover },
                   ]}
                 >
-                  <Text style={[styles.currencyChipText, { color: categoryBudgetCategoryId === c.id ? '#fff' : colors.text.body }]} numberOfLines={1}>
+                  <Text style={[styles.currencyChipText, { color: categoryBudgetCategoryId === c.id ? colors.brandContrast : colors.text.body }]} numberOfLines={1}>
                     {c.name}
                   </Text>
                 </TouchableOpacity>
@@ -393,7 +406,7 @@ export default function BudgetScreen() {
                     onPress={() => setCategoryBudgetCurrency(c)}
                     style={[styles.currencyChip, { borderColor: colors.border, backgroundColor: categoryBudgetCurrency === c ? colors.brand : colors.bg.hover }]}
                   >
-                    <Text style={[styles.currencyChipText, { color: categoryBudgetCurrency === c ? '#fff' : colors.text.body }]}>{c}</Text>
+                    <Text style={[styles.currencyChipText, { color: categoryBudgetCurrency === c ? colors.brandContrast : colors.text.body }]}>{c}</Text>
                   </TouchableOpacity>
                 ))}
               </ScrollView>
@@ -438,7 +451,7 @@ export default function BudgetScreen() {
                     onPress={() => setCurrency(c)}
                     style={[styles.currencyChip, { borderColor: colors.border, backgroundColor: currency === c ? colors.brand : colors.bg.hover }]}
                   >
-                    <Text style={[styles.currencyChipText, { color: currency === c ? '#fff' : colors.text.body }]}>{c}</Text>
+                    <Text style={[styles.currencyChipText, { color: currency === c ? colors.brandContrast : colors.text.body }]}>{c}</Text>
                   </TouchableOpacity>
                 ))}
               </ScrollView>

@@ -52,7 +52,9 @@
     "subscription": "Subscription",
     "profile": "Profile",
     "feedback": "Feedback",
-    "privacyPolicy": "Privacy Policy"
+    "privacyPolicy": "Privacy Policy",
+    "upgradeBadge": "Upgrade",
+    "viewProfile": "View {{name}}'s profile"
   },
   "auth": {
     "forgotPassword": {
@@ -139,7 +141,11 @@
     "renewsEnds": "Renews/ends: {{date}}",
     "restorePurchases": "Restore purchases",
     "choosePlan": "Choose Your Plan",
-    "plans": { "free": "Free", "pro": "Pro", "premium": "Premium" },
+    "plans": {
+      "free": "Free",
+      "pro": "Pro",
+      "premium": "Premium"
+    },
     "forever": "/ forever",
     "perMonth": "/ month",
     "freeDesc": "Get started with essential finance tracking.",
@@ -157,9 +163,27 @@
     "restoreSuccessTitle": "Restored",
     "restoreSuccessBody": "Your subscription was synced with the server.",
     "features": {
-      "free": ["Basic expense tracking", "Budget management", "Monthly reports", "Up to 3 accounts"],
-      "pro": ["Unlimited Budgets", "AI-Powered Insights", "Receipt Scanning (OCR)", "CSV & PDF Export", "Custom Categories", "Priority Support"],
-      "premium": ["All Pro Features", "Multi-user Access", "API Integration", "Dedicated Support", "Custom Branding"]
+      "free": [
+        "Basic expense tracking",
+        "Budget management",
+        "Monthly reports",
+        "Up to 3 accounts"
+      ],
+      "pro": [
+        "Unlimited Budgets",
+        "AI-Powered Insights",
+        "Receipt Scanning (OCR)",
+        "CSV & PDF Export",
+        "Custom Categories",
+        "Priority Support"
+      ],
+      "premium": [
+        "All Pro Features",
+        "Multi-user Access",
+        "API Integration",
+        "Dedicated Support",
+        "Custom Branding"
+      ]
     },
     "faq": {
       "cancel": {
