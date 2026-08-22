@@ -59,9 +59,10 @@ Amounts can be recorded in any of the supported currencies (`FinanceApp.Domain/E
 
 - **Storage:** `Currency` persists as its **ISO-4217 code** (`"TZS"`), not the enum's ordinal — `.HasConversion<string>()` in `FinanceDbContext`, migration `20260822114040_CurrencyAsIsoCode`. Adding a currency anywhere in the enum no longer affects existing rows.
 - **Wire format:** the API serializes enums as strings (`"currency":"TZS"`) via `JsonStringEnumConverter`.
-- **Comparison:** all "spend vs. budget" logic converts through `ICurrencyConversionService` (`SumInCurrency` / `SumCategoryInCurrency`). Conversion uses configurable fixed rates under `ExchangeRates` in appsettings, with built-in fallbacks — **not live forex**.
+- **Comparison:** all "spend vs. budget" logic converts through `ICurrencyConversionService` (`SumInCurrency` / `SumCategoryInCurrency`), which now resolves rates through `IExchangeRateStore`.
+- **Live rates:** `ExchangeRateRefreshJob` (Infrastructure) fetches from the free, no-key `open.er-api.com` endpoint on a configurable interval (`ExchangeRates:Provider` in `Shared/appsettings.shared.json`, default every 8h) and pushes them into `ExchangeRateStore`. Rate resolution is three-tier: **live-fetched > configured override (`ExchangeRates:{CODE}`) > hardcoded default** — a failed or not-yet-run fetch never blocks a conversion, it just falls through to the next tier.
 
-**Not yet done:** live exchange-rate fetching, per-transaction historical rate capture, a user-level base currency, and per-currency decimal precision (JPY has 0 decimals, code currently assumes 2).
+**Not yet done:** per-transaction historical rate capture, a user-level base currency, and per-currency decimal precision (JPY has 0 decimals, code currently assumes 2).
 
 ### Localization
 

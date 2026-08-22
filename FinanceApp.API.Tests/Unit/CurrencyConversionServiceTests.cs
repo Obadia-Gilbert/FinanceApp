@@ -17,7 +17,8 @@ public class CurrencyConversionServiceTests
     {
         var values = rates.ToDictionary(r => $"ExchangeRates:{r.Code}", r => (string?)r.Rate);
         var config = new ConfigurationBuilder().AddInMemoryCollection(values).Build();
-        return new CurrencyConversionService(config);
+        var store = new ExchangeRateStore(config);
+        return new CurrencyConversionService(store);
     }
 
     // 1 USD = 2500 TZS  ->  1 TZS = 0.0004 USD

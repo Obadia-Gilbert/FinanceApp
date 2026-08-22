@@ -72,6 +72,12 @@ builder.Services.AddScoped<IStripeBillingService, StripeBillingService>();
 builder.Services.AddScoped<IStripeBillingWebhookHandler, StripeBillingWebhookHandler>();
 builder.Services.AddScoped<ISharedReportService, SharedReportService>();
 builder.Services.AddSingleton<ICurrencyConversionService, CurrencyConversionService>();
+builder.Services.Configure<FinanceApp.Infrastructure.Services.ExchangeRateSettings>(
+    builder.Configuration.GetSection("ExchangeRates:Provider"));
+builder.Services.AddHttpClient(FinanceApp.Infrastructure.Services.ExchangeRateApiProvider.HttpClientName);
+builder.Services.AddSingleton<IExchangeRateStore, FinanceApp.Infrastructure.Services.ExchangeRateStore>();
+builder.Services.AddSingleton<IExchangeRateProvider, FinanceApp.Infrastructure.Services.ExchangeRateApiProvider>();
+builder.Services.AddHostedService<FinanceApp.Infrastructure.Services.ExchangeRateRefreshJob>();
 //builder.Services.AddTransient<IEmailSender, IdentityEmailSender>();
 
 builder.Services

@@ -1,6 +1,6 @@
 # Where We Left Off
 
-**Last updated:** 22 August 2026 — aligned with [README.md](./README.md) and [Current-State.md](./FinanceApp.Documentations/Current-State.md): backend + web + **Expo mobile** (`FinanceApp.Mobile`), notifications, monthly report + share, recurring job, **localization (en / es / sw)**, **multi-currency correctness + ISO-4217 storage**, tests.
+**Last updated:** 23 August 2026 — aligned with [README.md](./README.md) and [Current-State.md](./FinanceApp.Documentations/Current-State.md): backend + web + **Expo mobile** (`FinanceApp.Mobile`), notifications, monthly report + share, recurring job, **localization (en / es / sw)**, **multi-currency correctness + ISO-4217 storage + live forex**, tests.
 
 > **When to edit this file:** Bump the date above and adjust sections when the stack, ports, or priorities in README / Current-State change materially (not every small commit).
 
@@ -24,7 +24,9 @@
 
 **Phase 1 — currency identity (done).** `Currency` now persists as its **ISO-4217 code** rather than the enum's ordinal int, so inserting a new currency into the enum can no longer silently reassign the meaning of existing rows. Migration `20260822114040_CurrencyAsIsoCode` (hand-written, `CASE`-mapped, reversible). API emits string enums; mobile no longer sends ordinal indices.
 
-**Phase 2+ — not started.** User-level base currency (+ currency selection at signup), per-transaction historical rate capture, live forex ingestion with a background refresh job and cached fallback, and per-currency decimal precision. See the plan discussion for sequencing — live forex is last and depends on the earlier phases.
+**Phase 2 — live forex (done).** `ExchangeRateRefreshJob` fetches from `open.er-api.com` (free, no key) on a configurable interval and feeds `ExchangeRateStore`, which resolves each currency live-fetched > configured override > hardcoded default so a network hiccup never blocks a conversion. Registered in both Web and API, each keeping its own in-memory store. See `FinanceApp.Documentations/Current-State.md` → Multi-currency for the resolution chain.
+
+**Phase 3+ — not started.** User-level base currency (+ currency selection at signup), per-transaction historical rate capture, and per-currency decimal precision.
 
 ---
 
