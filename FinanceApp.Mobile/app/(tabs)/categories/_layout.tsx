@@ -1,10 +1,10 @@
 import { View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { Stack } from 'expo-router';
 import { useTheme } from '../../../src/context/ThemeContext';
 import { BackToMoreButton } from '../../../src/components/BackToMoreButton';
+import { Icon } from '../../../src/components/Icon';
 
-/** Decorative header affordance aligned with in-page search (theme-safe; no emoji color issues). */
+/** Decorative header affordance aligned with in-page search. */
 function HeaderSearchGlyph() {
   const { colors } = useTheme();
   return (
@@ -15,7 +15,7 @@ function HeaderSearchGlyph() {
       accessibilityLabel="Search categories"
       accessibilityRole="image"
     >
-      <Ionicons name="search-outline" size={24} color={colors.text.muted} />
+      <Icon name="search" size={22} color={colors.text.muted} />
     </View>
   );
 }

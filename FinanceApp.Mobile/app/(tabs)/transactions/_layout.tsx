@@ -1,7 +1,8 @@
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import { Stack } from 'expo-router';
 import { useTheme } from '../../../src/context/ThemeContext';
 import { BackToMoreButton } from '../../../src/components/BackToMoreButton';
+import { Icon } from '../../../src/components/Icon';
 
 export default function TransactionsLayout() {
   const { colors } = useTheme();
@@ -21,7 +22,7 @@ export default function TransactionsLayout() {
           headerLeft: () => <BackToMoreButton />,
           headerRight: () => (
             <View style={{ marginRight: 16 }}>
-              <Text style={{ fontSize: 20 }}>📅</Text>
+              <Icon name="calendar" size={20} color={colors.text.body} />
             </View>
           ),
         }}

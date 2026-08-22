@@ -11,6 +11,7 @@ import {
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../src/context/ThemeContext';
+import { Icon } from '../../src/components/Icon';
 import { Input } from '../../src/components/Input';
 import { Button } from '../../src/components/Button';
 import { resetPassword } from '../../src/api/auth';
@@ -122,7 +123,7 @@ export default function ResetPasswordScreen() {
         </TouchableOpacity>
 
         <View style={[styles.iconWrap, { backgroundColor: colors.brandLight ?? '#EFF6FF' }]}>
-          <Text style={styles.lockIcon}>{done ? '✅' : '🔑'}</Text>
+          <Icon name={done ? 'success' : 'key'} size={32} color={done ? colors.success : colors.brand} />
         </View>
         <Text style={[styles.title, { color: colors.text.primary }]}>
           {done ? t('auth.resetPassword.successTitle') : t('auth.resetPassword.title')}
@@ -249,7 +250,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginBottom: 20,
   },
-  lockIcon: { fontSize: 36 },
   title: { fontSize: 24, fontWeight: '700', textAlign: 'center', marginBottom: 12 },
   instruction: { fontSize: 15, textAlign: 'center', marginBottom: 28, lineHeight: 22 },
   form: { marginBottom: 24 },

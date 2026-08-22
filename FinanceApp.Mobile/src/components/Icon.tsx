@@ -23,11 +23,17 @@ export const iconNames = {
   report: 'document-text-outline',
   categories: 'pricetags-outline',
   accounts: 'business-outline',
+  accountSavings: 'save-outline',
+  accountCreditCard: 'card-outline',
+  accountCash: 'cash-outline',
+  accountInvestment: 'trending-up-outline',
   more: 'ellipsis-horizontal',
   profile: 'person-outline',
   subscription: 'star-outline',
   notifications: 'notifications-outline',
   feedback: 'chatbubble-ellipses-outline',
+  help: 'help-circle-outline',
+  idea: 'bulb-outline',
   privacy: 'lock-closed-outline',
   language: 'globe-outline',
   signOut: 'log-out-outline',
@@ -61,6 +67,10 @@ export const iconNames = {
   settings: 'settings-outline',
   clock: 'time-outline',
   cookie: 'nutrition-outline',
+  external: 'open-outline',
+  mail: 'mail-outline',
+  lock: 'lock-closed-outline',
+  key: 'key-outline',
 } as const;
 
 export type IconName = keyof typeof iconNames;

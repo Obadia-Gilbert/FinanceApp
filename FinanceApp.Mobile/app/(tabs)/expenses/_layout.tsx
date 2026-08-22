@@ -1,7 +1,6 @@
 import { Stack } from 'expo-router';
 import { useTheme } from '../../../src/context/ThemeContext';
 import { HeaderNotificationIcon } from '../../../src/components/HeaderNotificationIcon';
-import { HeaderScreenIcon } from '../../../src/components/HeaderScreenIcon';
 
 export default function ExpensesLayout() {
   const { colors } = useTheme();
@@ -15,7 +14,7 @@ export default function ExpensesLayout() {
         headerRight: () => <HeaderNotificationIcon />,
       }}
     >
-      <Stack.Screen name="index" options={{ title: 'Expenses', headerLeft: () => <HeaderScreenIcon char="¢" /> }} />
+      <Stack.Screen name="index" options={{ title: 'Expenses' }} />
       <Stack.Screen name="create" options={{ title: 'Add expense' }} />
       <Stack.Screen name="[id]" options={{ title: 'Expense' }} />
     </Stack>

@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useTheme } from '../../src/context/ThemeContext';
+import { Icon, type IconName } from '../../src/components/Icon';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function PrivacyScreen() {
@@ -26,13 +27,13 @@ export default function PrivacyScreen() {
         </Text>
       </View>
 
-      <Section title="01  Overview" icon="🛡" colors={colors}>
+      <Section title="01  Overview" icon="security" colors={colors}>
         <Text style={[styles.body, { color: colors.text.body }]}>
           FinanceApp is a personal finance management application. We are committed to protecting your privacy and handling your data with care, transparency, and respect. This policy applies to all users of FinanceApp and describes how we collect, use, and safeguard your information when you use our service.
         </Text>
       </Section>
 
-      <Section title="02  Information We Collect" icon="📊" colors={colors}>
+      <Section title="02  Information We Collect" icon="report" colors={colors}>
         <Text style={[styles.body, { color: colors.text.body }]}>We collect the minimum information necessary to provide the service:</Text>
         <Text style={[styles.subhead, { color: colors.text.primary }]}>Account information</Text>
         <Bullet colors={colors} text="Name, email address, and password (stored as a secure hash — we never store plain-text passwords)" />
@@ -49,7 +50,7 @@ export default function PrivacyScreen() {
         <Bullet colors={colors} text="Anti-forgery tokens for security" />
       </Section>
 
-      <Section title="03  How We Use Your Data" icon="⚙" colors={colors}>
+      <Section title="03  How We Use Your Data" icon="settings" colors={colors}>
         <Text style={[styles.body, { color: colors.text.body }]}>Your data is used exclusively to operate and improve FinanceApp. Specifically, we use it to:</Text>
         <Bullet colors={colors} text="Authenticate you and maintain a secure session" />
         <Bullet colors={colors} text="Display your financial records, summaries, and budgets" />
@@ -60,7 +61,7 @@ export default function PrivacyScreen() {
         <Text style={[styles.body, { color: colors.text.body }]}>We do not use your financial data for advertising, profiling, or selling to third parties.</Text>
       </Section>
 
-      <Section title="04  Storage & Security" icon="🔒" colors={colors}>
+      <Section title="04  Storage & Security" icon="privacy" colors={colors}>
         <Text style={[styles.body, { color: colors.text.body }]}>We take security seriously and have implemented multiple layers of protection:</Text>
         <Bullet colors={colors} text="Passwords are hashed using industry-standard algorithms — the original password is never stored" />
         <Bullet colors={colors} text="Authentication uses secure tokens with validation on every state-changing request" />
@@ -70,7 +71,7 @@ export default function PrivacyScreen() {
         <Bullet colors={colors} text="Soft deletes are used — when you delete a record it is flagged and excluded from queries" />
       </Section>
 
-      <Section title="05  Data Retention" icon="🕐" colors={colors}>
+      <Section title="05  Data Retention" icon="clock" colors={colors}>
         <Text style={[styles.body, { color: colors.text.body }]}>Your data is retained for as long as your account remains active. When you delete your account:</Text>
         <Bullet colors={colors} text="All financial records associated with your account are permanently removed" />
         <Bullet colors={colors} text="Uploaded files and receipts are deleted from the server" />
@@ -78,7 +79,7 @@ export default function PrivacyScreen() {
         <Text style={[styles.body, { color: colors.text.body }]}>You can request deletion of specific records at any time from within the application using the delete actions on each record.</Text>
       </Section>
 
-      <Section title="06  Your Rights & Controls" icon="✓" colors={colors}>
+      <Section title="06  Your Rights & Controls" icon="check" colors={colors}>
         <Text style={[styles.body, { color: colors.text.body }]}>You have full control over your data within FinanceApp:</Text>
         <Bullet colors={colors} text="Access — view all your financial records, account details, and uploaded documents at any time" />
         <Bullet colors={colors} text="Correction — edit any record through the application's edit functions" />
@@ -88,15 +89,15 @@ export default function PrivacyScreen() {
         <Text style={[styles.body, { color: colors.text.body }]}>If you need assistance exercising any of these rights, please contact us using the information in Section 10.</Text>
       </Section>
 
-      <Section title="07  Third-Party Services" icon="↗" colors={colors}>
+      <Section title="07  Third-Party Services" icon="external" colors={colors}>
         <Text style={[styles.body, { color: colors.text.body }]}>FinanceApp may load third-party resources to power the interface (e.g. fonts, icons). These services receive only your IP address and browser headers as part of standard HTTP requests. No financial data is transmitted to them. We do not use analytics tools, advertising networks, or tracking pixels.</Text>
       </Section>
 
-      <Section title="08  Cookies" icon="🍪" colors={colors}>
+      <Section title="08  Cookies" icon="cookie" colors={colors}>
         <Text style={[styles.body, { color: colors.text.body }]}>FinanceApp uses a minimal set of cookies strictly necessary for the application: session cookies for authentication, anti-forgery tokens for security, and local storage for theme preference. We do not use advertising or tracking cookies.</Text>
       </Section>
 
-      <Section title="09  Changes to This Policy" icon="✎" colors={colors}>
+      <Section title="09  Changes to This Policy" icon="edit" colors={colors}>
         <Text style={[styles.body, { color: colors.text.body }]}>We may update this policy from time to time. When we do, the "Last updated" date at the top will be revised and significant changes will be communicated through the application. Continued use after an update constitutes acceptance of the revised policy.</Text>
       </Section>
 
@@ -110,11 +111,13 @@ export default function PrivacyScreen() {
   );
 }
 
-function Section({ title, icon, colors, children }: { title: string; icon: string; colors: any; children: React.ReactNode }) {
+function Section({ title, icon, colors, children }: { title: string; icon: IconName; colors: any; children: React.ReactNode }) {
   return (
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionIcon}>{icon}</Text>
+        <View style={[styles.sectionIconWrap, { backgroundColor: colors.brandLight }]}>
+          <Icon name={icon} size={16} color={colors.brand} />
+        </View>
         <Text style={[styles.sectionTitle, { color: colors.brand }]}>{title}</Text>
       </View>
       {children}
@@ -137,7 +140,7 @@ const styles = StyleSheet.create({
   highlightText: { fontSize: 14, fontWeight: '600' },
   section: { marginTop: 20, marginBottom: 8 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
-  sectionIcon: { fontSize: 18, marginRight: 8 },
+  sectionIconWrap: { width: 28, height: 28, borderRadius: 8, justifyContent: 'center', alignItems: 'center', marginRight: 10 },
   sectionTitle: { fontSize: 15, fontWeight: '700' },
   subhead: { fontSize: 14, fontWeight: '600', marginTop: 12, marginBottom: 4 },
   bullet: { fontSize: 14, lineHeight: 22, marginBottom: 4, marginLeft: 4 },

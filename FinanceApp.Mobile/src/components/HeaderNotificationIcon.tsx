@@ -2,6 +2,8 @@ import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { getUnreadCount } from '../api/notifications';
+import { useTheme } from '../context/ThemeContext';
+import { Icon } from './Icon';
 
 interface HeaderNotificationIconProps {
   /** When 'left', use marginLeft (e.g. in headerLeft); when 'right', use marginRight (default). */
@@ -10,6 +12,7 @@ interface HeaderNotificationIconProps {
 
 export function HeaderNotificationIcon({ align = 'right' }: HeaderNotificationIconProps) {
   const router = useRouter();
+  const { colors } = useTheme();
   const { data: unreadCount = 0 } = useQuery({
     queryKey: ['notificationsUnreadCount'],
     queryFn: getUnreadCount,
@@ -27,7 +30,7 @@ export function HeaderNotificationIcon({ align = 'right' }: HeaderNotificationIc
       accessibilityLabel={showBadge ? `Notifications (${unreadCount} unread)` : 'Notifications'}
       hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
     >
-      <Text style={styles.icon}>🔔</Text>
+      <Icon name="notifications" size={22} color={colors.text.body} />
       {showBadge && (
         <View style={styles.badge}>
           <Text style={styles.badgeText} numberOfLines={1}>
@@ -48,7 +51,6 @@ const styles = StyleSheet.create({
   },
   wrapLeft: { marginLeft: 8 },
   wrapRight: { marginRight: 16 },
-  icon: { fontSize: 22 },
   badge: {
     position: 'absolute',
     top: 2,
