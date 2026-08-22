@@ -410,6 +410,10 @@ FodyWeavers.xsd
 *.sln.iml
 .idea/
 
+# Claude Code local tooling (may contain machine-specific permission rules
+# with locally-echoed secrets, e.g. sqlcmd passwords in settings.local.json)
+.claude/
+
 ##
 ## Visual studio for Mac
 ##
