@@ -1,6 +1,6 @@
 # Where We Left Off
 
-**Last updated:** 29 March 2026 — aligned with [README.md](./README.md) and [Current-State.md](./FinanceApp.Documentations/Current-State.md): backend + web + **Expo mobile** (`FinanceApp.Mobile`), notifications, monthly report + share, recurring job, **localization (en / es / sw)**, tests.
+**Last updated:** 22 August 2026 — aligned with [README.md](./README.md) and [Current-State.md](./FinanceApp.Documentations/Current-State.md): backend + web + **Expo mobile** (`FinanceApp.Mobile`), notifications, monthly report + share, recurring job, **localization (en / es / sw)**, **multi-currency correctness + ISO-4217 storage**, tests.
 
 > **When to edit this file:** Bump the date above and adjust sections when the stack, ports, or priorities in README / Current-State change materially (not every small commit).
 
@@ -15,6 +15,16 @@
   - **FinanceApp.Tests:** Unit tests (ExpenseService, CategoryService, localization resource smoke checks, …) — xUnit, Moq. Run `dotnet test` for current count.
   - **FinanceApp.API.Tests:** Integration tests (Auth + Expenses, …) — WebApplicationFactory, SQLite test DB. All passing.
 - **Domain/Application/Infrastructure:** Category types (Expense/Income/Both), supporting documents, accounts/transactions/refresh tokens, income, recurring templates + **RecurringTransactionJob**, user country/country code. **Notifications** (Notification entity, `INotificationService`). **Monthly report** (`IMonthlyReportService`, `MonthlyReportResult`; **SharedReport** + `ISharedReportService`). SQLite-specific fixes in `FinanceDbContext` for test runs (IdentityPasskeyData keyless, `DateTimeOffset` conversion).
+
+---
+
+## Multi-currency work (in progress)
+
+**Phase 0 — correctness (done).** Budget alerts and report totals silently ignored spend recorded in a currency other than the budget's own (a `GetValueOrDefault(currency, 0)` lookup returning 0). Fixed in ~10 duplicated sites across `BudgetNotificationService`, the Web dashboard, the API dashboard, and `MonthlyReportService`, and consolidated behind `ICurrencyConversionService.SumInCurrency` / `SumCategoryInCurrency`. Also fixed: `Budget.UpdateAmount` discarding the currency on update (a budget's currency could never be changed), a category-totals query summing raw amounts across currencies, and budget figures on the monthly report being labelled with the wrong currency.
+
+**Phase 1 — currency identity (done).** `Currency` now persists as its **ISO-4217 code** rather than the enum's ordinal int, so inserting a new currency into the enum can no longer silently reassign the meaning of existing rows. Migration `20260822114040_CurrencyAsIsoCode` (hand-written, `CASE`-mapped, reversible). API emits string enums; mobile no longer sends ordinal indices.
+
+**Phase 2+ — not started.** User-level base currency (+ currency selection at signup), per-transaction historical rate capture, live forex ingestion with a background refresh job and cached fallback, and per-currency decimal precision. See the plan discussion for sequencing — live forex is last and depends on the earlier phases.
 
 ---
 

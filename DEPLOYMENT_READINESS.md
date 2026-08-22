@@ -8,6 +8,8 @@ This document summarizes the current state of the project against the README and
 
 ## Critical (must fix before deploy)
 
+> **Status note (22 Aug 2026):** items 1 and 2 below have been **partly addressed in code** — `appsettings.json` now ships empty placeholders and `RoleSeeder` reads `AdminSeed:Email`/`AdminSeed:Password` from configuration instead of hardcoding them. **However, the previously committed credentials are still present in git history** and must be treated as compromised and rotated. See item 1.
+
 ### 1. Secrets in source control
 
 **Issue:** `FinanceApp.Web/appsettings.json` currently contains:
@@ -62,12 +64,9 @@ That password is then visible to anyone with access to the repo and is the same 
   - `AllowedHosts` to your production host(s)
   - Logging level (e.g. `Information` or `Warning` for production; avoid `Debug`/`Trace` in production unless needed temporarily).
 
-### 5. README vs actual stack
+### 5. README vs actual stack — ✅ resolved
 
-- **README** says “.NET 8 (LTS)”.
-- The solution targets **.NET 10** (`net10.0` in the `.csproj` files).
-
-**What to do:** Update the README to state the actual target framework (e.g. .NET 10) and, if you intend to deploy on a specific runtime, note that (e.g. “.NET 10” or “latest LTS”).
+README now states **.NET 10**, matching `net10.0` in the `.csproj` files. No action needed.
 
 ### 6. File uploads in production
 

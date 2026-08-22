@@ -32,7 +32,7 @@ Primary .NET solution (`FinanceApp.slnx` or equivalent) includes:
 | Runtime | .NET 10 |
 | Web | ASP.NET Core MVC, Razor, Bootstrap 5 |
 | API | ASP.NET Core Web API, JWT, refresh tokens, OpenAPI `/openapi/v1.json` |
-| Data | SQL Server, EF Core |
+| Data | SQL Server, EF Core (currency stored as ISO-4217 code) |
 | Auth (web) | Identity + cookies + external OAuth (Google, Facebook, Twitter) |
 | Auth (API/mobile) | JWT + refresh |
 | Mobile | Expo, React Native, Expo Router, TanStack Query |
@@ -51,6 +51,17 @@ Primary .NET solution (`FinanceApp.slnx` or equivalent) includes:
 | Dark mode (web), theme context (mobile) | ✅ |
 | **i18n** — Web + API + Mobile baseline (**en**, **es**, **sw**) | ✅ |
 | Excel export (expenses) | ✅ |
+| **Multi-currency** — cross-currency budget/report totals, ISO-4217 storage | ✅ (see below) |
+
+### Multi-currency
+
+Amounts can be recorded in any of the supported currencies (`FinanceApp.Domain/Enums/Currency.cs`), and a budget's currency does not have to match the currency its spend was recorded in.
+
+- **Storage:** `Currency` persists as its **ISO-4217 code** (`"TZS"`), not the enum's ordinal — `.HasConversion<string>()` in `FinanceDbContext`, migration `20260822114040_CurrencyAsIsoCode`. Adding a currency anywhere in the enum no longer affects existing rows.
+- **Wire format:** the API serializes enums as strings (`"currency":"TZS"`) via `JsonStringEnumConverter`.
+- **Comparison:** all "spend vs. budget" logic converts through `ICurrencyConversionService` (`SumInCurrency` / `SumCategoryInCurrency`). Conversion uses configurable fixed rates under `ExchangeRates` in appsettings, with built-in fallbacks — **not live forex**.
+
+**Not yet done:** live exchange-rate fetching, per-transaction historical rate capture, a user-level base currency, and per-currency decimal precision (JPY has 0 decimals, code currently assumes 2).
 
 ### Localization
 
