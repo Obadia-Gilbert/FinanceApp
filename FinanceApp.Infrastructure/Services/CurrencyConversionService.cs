@@ -2,11 +2,13 @@ using FinanceApp.Application.Interfaces.Services;
 using FinanceApp.Domain.Enums;
 using Microsoft.Extensions.Configuration;
 
-namespace FinanceApp.Web.Services;
+namespace FinanceApp.Infrastructure.Services;
 
 /// <summary>
-/// Converts amounts to USD using configurable exchange rates (1 unit of currency = X USD).
-/// Configure in appsettings.json under "ExchangeRates" (e.g. "TZS": 0.00038).
+/// Converts amounts between currencies using configurable fixed exchange rates
+/// (1 unit of currency = X USD). Configure in appsettings.json under "ExchangeRates"
+/// (e.g. "TZS": 0.00038). Shared by Web and API so budget/dashboard totals agree
+/// regardless of which client a user's expenses were recorded from.
 /// </summary>
 public class CurrencyConversionService : ICurrencyConversionService
 {
@@ -31,6 +33,33 @@ public class CurrencyConversionService : ICurrencyConversionService
     {
         if (amount <= 0) return 0;
         return Math.Round(amount * _ratesToUsd[currency], 2, MidpointRounding.AwayFromZero);
+    }
+
+    public decimal Convert(decimal amount, Currency from, Currency to)
+    {
+        if (amount == 0) return 0;
+        if (from == to) return amount;
+
+        var usd = amount * _ratesToUsd[from];
+        var converted = usd / _ratesToUsd[to];
+        return Math.Round(converted, 2, MidpointRounding.AwayFromZero);
+    }
+
+    public decimal SumInCurrency(IEnumerable<KeyValuePair<Currency, decimal>> totalsByCurrency, Currency target)
+    {
+        if (totalsByCurrency is null) return 0;
+        return totalsByCurrency.Sum(kv => Convert(kv.Value, kv.Key, target));
+    }
+
+    public decimal SumCategoryInCurrency(
+        IEnumerable<KeyValuePair<(Guid CategoryId, Currency Currency), decimal>> spendByCategoryAndCurrency,
+        Guid categoryId,
+        Currency target)
+    {
+        if (spendByCategoryAndCurrency is null) return 0;
+        return spendByCategoryAndCurrency
+            .Where(kv => kv.Key.CategoryId == categoryId)
+            .Sum(kv => Convert(kv.Value, kv.Key.Currency, target));
     }
 
     /// <summary>

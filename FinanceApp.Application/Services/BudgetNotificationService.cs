@@ -9,17 +9,20 @@ public class BudgetNotificationService : IBudgetNotificationService
     private readonly ICategoryBudgetService _categoryBudgetService;
     private readonly IExpenseQueryService _expenseQueryService;
     private readonly INotificationService _notificationService;
+    private readonly ICurrencyConversionService _currencyConversion;
 
     public BudgetNotificationService(
         IBudgetService budgetService,
         ICategoryBudgetService categoryBudgetService,
         IExpenseQueryService expenseQueryService,
-        INotificationService notificationService)
+        INotificationService notificationService,
+        ICurrencyConversionService currencyConversion)
     {
         _budgetService = budgetService ?? throw new ArgumentNullException(nameof(budgetService));
         _categoryBudgetService = categoryBudgetService ?? throw new ArgumentNullException(nameof(categoryBudgetService));
         _expenseQueryService = expenseQueryService ?? throw new ArgumentNullException(nameof(expenseQueryService));
         _notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
+        _currencyConversion = currencyConversion ?? throw new ArgumentNullException(nameof(currencyConversion));
     }
 
     public async Task EvaluateAndCreateNotificationsAsync(string userId, int month, int year)
@@ -33,12 +36,17 @@ public class BudgetNotificationService : IBudgetNotificationService
         var currentMonthBudget = await _budgetService.GetBudgetForMonthAsync(userId, month, year);
         var budgetAmount = currentMonthBudget?.Amount;
         var budgetCurrency = currentMonthBudget?.Currency ?? Currency.TZS;
-        var thisMonthSpendInBudgetCurrency = thisMonthTotals.GetValueOrDefault(budgetCurrency, 0);
+
+        // Spend can be recorded in a different currency than the budget (e.g. budget in
+        // TZS, an expense logged in USD) — convert every currency bucket into the budget's
+        // currency before summing, rather than matching on currency alone, or spend in any
+        // currency other than the budget's own is silently ignored.
+        var thisMonthSpendInBudgetCurrency = _currencyConversion.SumInCurrency(thisMonthTotals, budgetCurrency);
         var isOverBudget = budgetAmount.HasValue && budgetAmount.Value > 0 && thisMonthSpendInBudgetCurrency >= budgetAmount.Value;
 
         foreach (var cb in categoryBudgets)
         {
-            var spent = categorySpendForMonth.GetValueOrDefault((cb.CategoryId, cb.Currency), 0);
+            var spent = _currencyConversion.SumCategoryInCurrency(categorySpendForMonth, cb.CategoryId, cb.Currency);
             var catName = cb.Category?.Name ?? "Unknown";
             var topicKey = $"budget-category-{cb.CategoryId}-{year}-{month}";
 

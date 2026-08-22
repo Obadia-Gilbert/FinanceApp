@@ -9,7 +9,7 @@ import { getAccounts } from '../../../src/api/accounts';
 import { getCategories } from '../../../src/api/categories';
 import { createRecurringTemplate } from '../../../src/api/recurring';
 import { ApiError } from '../../../src/api/client';
-import { CURRENCY_LIST, getCurrencyIndex } from '../../../src/utils/currency';
+import { CURRENCY_LIST } from '../../../src/utils/currency';
 
 const FREQUENCIES = [
   { label: 'Weekly', value: 0 },
@@ -62,14 +62,13 @@ export default function CreateRecurringScreen() {
       return;
     }
     const intervalNum = parseInt(interval, 10) || 1;
-    const currencyNum = getCurrencyIndex(currency);
 
     createMutation.mutate({
       accountId,
       categoryId: categoryId || null,
       type,
       amount: num,
-      currency: currencyNum,
+      currency,
       frequency,
       startDate: startDate + 'T00:00:00Z',
       endDate: endDate.trim() ? endDate + 'T00:00:00Z' : null,

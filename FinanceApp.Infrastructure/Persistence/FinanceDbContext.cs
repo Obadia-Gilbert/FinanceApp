@@ -139,6 +139,12 @@ public class FinanceDbContext
             entity.Property(e => e.ReceiptPath)
                   .HasMaxLength(500);
 
+            // ISO-4217 code (e.g. "USD"), not the enum's ordinal — position-independent storage.
+            entity.Property(e => e.Currency)
+                  .HasConversion<string>()
+                  .HasMaxLength(3)
+                  .IsRequired();
+
             entity.Property(e => e.UserId)
                   .IsRequired(); // 🔥 we will add this in Expense
 
@@ -166,6 +172,7 @@ public class FinanceDbContext
         {
             entity.ToTable("Budgets");
             entity.Property(b => b.Amount).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(b => b.Currency).HasConversion<string>().HasMaxLength(3).IsRequired();
             entity.Property(b => b.UserId).IsRequired();
             entity.HasIndex(b => new { b.UserId, b.Month, b.Year }).IsUnique();
         });
@@ -177,6 +184,7 @@ public class FinanceDbContext
         {
             entity.ToTable("CategoryBudgets");
             entity.Property(cb => cb.Amount).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(cb => cb.Currency).HasConversion<string>().HasMaxLength(3).IsRequired();
             entity.Property(cb => cb.UserId).IsRequired();
             entity.HasIndex(cb => new { cb.UserId, cb.CategoryId, cb.Month, cb.Year }).IsUnique();
             entity.HasOne(cb => cb.Category)
@@ -207,6 +215,7 @@ public class FinanceDbContext
             entity.Property(a => a.Name).HasMaxLength(100).IsRequired();
             entity.Property(a => a.Description).HasMaxLength(500);
             entity.Property(a => a.InitialBalance).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(a => a.Currency).HasConversion<string>().HasMaxLength(3).IsRequired();
             entity.Property(a => a.UserId).IsRequired();
             entity.HasIndex(a => a.UserId);
         });
@@ -218,6 +227,7 @@ public class FinanceDbContext
         {
             entity.ToTable("Transactions");
             entity.Property(t => t.Amount).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(t => t.Currency).HasConversion<string>().HasMaxLength(3).IsRequired();
             entity.Property(t => t.UserId).IsRequired();
             entity.Property(t => t.Note).HasMaxLength(500);
             entity.HasIndex(t => t.UserId);
@@ -286,6 +296,7 @@ public class FinanceDbContext
         {
             entity.ToTable("Incomes");
             entity.Property(i => i.Amount).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(i => i.Currency).HasConversion<string>().HasMaxLength(3).IsRequired();
             entity.Property(i => i.UserId).HasMaxLength(450).IsRequired();
             entity.Property(i => i.Description).HasMaxLength(500);
             entity.Property(i => i.Source).HasMaxLength(200);
@@ -314,6 +325,7 @@ public class FinanceDbContext
         {
             entity.ToTable("RecurringTemplates");
             entity.Property(r => r.Amount).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(r => r.Currency).HasConversion<string>().HasMaxLength(3).IsRequired();
             entity.Property(r => r.UserId).HasMaxLength(450).IsRequired();
             entity.Property(r => r.Note).HasMaxLength(500);
             entity.HasIndex(r => r.UserId);

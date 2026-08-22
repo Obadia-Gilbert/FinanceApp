@@ -67,7 +67,6 @@ public class HomeController : Controller
         var thisMonthTotals  = await _expenseQueryService.GetMonthTotalsByCurrencyAsync(userId, currentMonth, currentYear);
         var lastMonthTotals  = await _expenseQueryService.GetMonthTotalsByCurrencyAsync(userId, lastMonth, lastMonthYear);
         var trendSums        = await _expenseQueryService.GetSumsByDayAsync(userId, last30Start, last30End, null);
-        var categoryTotals   = await _expenseQueryService.GetCategoryTotalsForMonthAsync(userId, currentMonth, currentYear, null);
         var recentExpenses   = await _expenseQueryService.GetRecentExpensesAsync(userId, 8);
         var expenseCount     = await _expenseQueryService.GetTotalCountAsync(userId);
 
@@ -77,9 +76,13 @@ public class HomeController : Controller
             : Currency.TZS;
         var displayCurrencyStr = displayCurrency.ToString();
 
-        var totalSpend = totalsByCurrency.GetValueOrDefault(displayCurrency, 0);
-        var thisMonthSpend = thisMonthTotals.GetValueOrDefault(displayCurrency, 0);
-        var lastMonthSpend = lastMonthTotals.GetValueOrDefault(displayCurrency, 0);
+        // Convert every currency bucket into the display currency. A plain
+        // GetValueOrDefault here silently treats spend recorded in any other
+        // currency as zero — which made these tiles contradict the budget
+        // figures directly beside them.
+        var totalSpend = _currencyConversion.SumInCurrency(totalsByCurrency, displayCurrency);
+        var thisMonthSpend = _currencyConversion.SumInCurrency(thisMonthTotals, displayCurrency);
+        var lastMonthSpend = _currencyConversion.SumInCurrency(lastMonthTotals, displayCurrency);
         var thisMonthExpenseCount = await _expenseQueryService.GetMonthExpenseCountAsync(userId, currentMonth, currentYear);
         var lastMonthCount = await _expenseQueryService.GetMonthExpenseCountAsync(userId, lastMonth, lastMonthYear);
 
@@ -92,9 +95,19 @@ public class HomeController : Controller
         var avgDailyLastMonth = lastMonthDays > 0 ? Math.Round(lastMonthSpend / lastMonthDays, 0) : 0m;
         decimal? momAvgChange = avgDailyLastMonth > 0 ? Math.Round((avgDailySpend - avgDailyLastMonth) / avgDailyLastMonth * 100, 1) : (decimal?)null;
 
-        // Category breakdown top 6 (by display currency if available in categoryTotals; we got all currencies)
-        var categoryTotalsInDisplay = await _expenseQueryService.GetCategoryTotalsForMonthAsync(userId, currentMonth, currentYear, displayCurrency);
-        var categoryBreakdown = categoryTotalsInDisplay.Take(6).Select(x => new { Category = x.CategoryName ?? "Other", Amount = x.Sum }).ToList();
+        // Category breakdown top 6 — include spend in every currency, converted into the
+        // display currency, so categories paid for in another currency aren't dropped.
+        var categoryTotalsAllCurrencies = await _expenseQueryService.GetCategoryTotalsForMonthAsync(userId, currentMonth, currentYear, null);
+        var categoryBreakdown = categoryTotalsAllCurrencies
+            .GroupBy(x => x.CategoryId)
+            .Select(g => new
+            {
+                Category = g.First().CategoryName ?? "Other",
+                Amount = g.Sum(x => _currencyConversion.Convert(x.Sum, x.Currency, displayCurrency))
+            })
+            .OrderByDescending(x => x.Amount)
+            .Take(6)
+            .ToList();
 
         // Trend chart: 30 days (fill missing days with 0)
         var trendByDate = trendSums.ToDictionary(s => s.Date, s => s.Sum);
@@ -107,7 +120,9 @@ public class HomeController : Controller
         var currentMonthBudget = await _budgetService.GetBudgetForMonthAsync(userId, currentMonth, currentYear);
         decimal? budgetAmount = currentMonthBudget?.Amount;
         var budgetCurrency = currentMonthBudget?.Currency ?? displayCurrency;
-        var thisMonthSpendInBudgetCurrency = thisMonthTotals.GetValueOrDefault(budgetCurrency, 0);
+        // Spend can be recorded in a different currency than the budget — convert every
+        // currency bucket into the budget's currency before comparing.
+        var thisMonthSpendInBudgetCurrency = _currencyConversion.SumInCurrency(thisMonthTotals, budgetCurrency);
         var isOverBudget = budgetAmount.HasValue && budgetAmount.Value > 0 && thisMonthSpendInBudgetCurrency >= budgetAmount.Value;
         decimal budgetPct = budgetAmount.HasValue && budgetAmount.Value > 0 ? Math.Min(100, Math.Round(thisMonthSpendInBudgetCurrency / budgetAmount.Value * 100, 1)) : 0m;
 
@@ -117,7 +132,7 @@ public class HomeController : Controller
         var categoryBudgetAlerts = new List<CategoryBudgetAlertViewModel>();
         foreach (var cb in categoryBudgets)
         {
-            var spent = categorySpendForMonth.GetValueOrDefault((cb.CategoryId, cb.Currency), 0);
+            var spent = _currencyConversion.SumCategoryInCurrency(categorySpendForMonth, cb.CategoryId, cb.Currency);
             var catName = cb.Category?.Name ?? "Unknown";
             if (spent >= cb.Amount)
                 categoryBudgetAlerts.Add(new CategoryBudgetAlertViewModel { CategoryName = catName, Spent = spent, Budget = cb.Amount, Currency = cb.Currency.ToString(), IsOver = true });
@@ -127,15 +142,17 @@ public class HomeController : Controller
 
         await _budgetNotificationService.EvaluateAndCreateNotificationsAsync(userId, currentMonth, currentYear);
 
-        // ── Account balances & total balance (in display currency only; no conversion) ─
+        // ── Account balances & total balance (converted into the display currency) ─
         var accounts = (await _accountService.GetAllAsync(userId)).Where(a => a.IsActive).ToList();
         var accountCards = new List<(string Name, string Type, decimal Balance, string Currency)>();
         decimal totalBalanceInDisplayCurrency = 0;
         foreach (var acc in accounts)
         {
             var bal = await _accountService.GetBalanceAsync(acc.Id, userId);
-            if (acc.Currency == displayCurrency)
-                totalBalanceInDisplayCurrency += bal;
+            // Accounts held in another currency still count toward the total —
+            // skipping them reported a balance of zero for users whose accounts
+            // simply weren't in the display currency.
+            totalBalanceInDisplayCurrency += _currencyConversion.Convert(bal, acc.Currency, displayCurrency);
             if (accountCards.Count < 4)
                 accountCards.Add((acc.Name, acc.Type.ToString(), bal, acc.Currency.ToString()));
         }
@@ -144,13 +161,13 @@ public class HomeController : Controller
         var transactionsThisMonth = await _transactionService.GetPagedAsync(userId, 1, 500,
             t => t.Date.Month == currentMonth && t.Date.Year == currentYear);
         var monthlyIncome = transactionsThisMonth.Items
-            .Where(t => t.Type == Domain.Enums.TransactionType.Income && t.Currency == displayCurrency)
-            .Sum(t => t.Amount);
+            .Where(t => t.Type == Domain.Enums.TransactionType.Income)
+            .Sum(t => _currencyConversion.Convert(t.Amount, t.Currency, displayCurrency));
         var transactionsLastMonth = await _transactionService.GetPagedAsync(userId, 1, 500,
             t => t.Date.Month == lastMonth && t.Date.Year == lastMonthYear);
         var lastMonthIncome = transactionsLastMonth.Items
-            .Where(t => t.Type == Domain.Enums.TransactionType.Income && t.Currency == displayCurrency)
-            .Sum(t => t.Amount);
+            .Where(t => t.Type == Domain.Enums.TransactionType.Income)
+            .Sum(t => _currencyConversion.Convert(t.Amount, t.Currency, displayCurrency));
         decimal? momIncomeChange = lastMonthIncome > 0
             ? Math.Round((monthlyIncome - lastMonthIncome) / lastMonthIncome * 100, 1)
             : (decimal?)null;
@@ -168,10 +185,12 @@ public class HomeController : Controller
             var y = d.Year;
             sixMonthLabels.Add(d.ToString("MMM", System.Globalization.CultureInfo.InvariantCulture).ToUpperInvariant());
             var monthExpenseTotals = await _expenseQueryService.GetMonthTotalsByCurrencyAsync(userId, m, y);
-            var monthExpenses = monthExpenseTotals.GetValueOrDefault(displayCurrency, 0);
+            var monthExpenses = _currencyConversion.SumInCurrency(monthExpenseTotals, displayCurrency);
             var monthTx = await _transactionService.GetPagedAsync(userId, 1, 500, t => t.Date.Month == m && t.Date.Year == y);
-            var monthIncome = monthTx.Items.Where(t => t.Type == Domain.Enums.TransactionType.Income && t.Currency == displayCurrency).Sum(t => t.Amount);
-            var monthExpenseTx = monthTx.Items.Where(t => t.Type == Domain.Enums.TransactionType.Expense && t.Currency == displayCurrency).Sum(t => t.Amount);
+            var monthIncome = monthTx.Items.Where(t => t.Type == Domain.Enums.TransactionType.Income)
+                .Sum(t => _currencyConversion.Convert(t.Amount, t.Currency, displayCurrency));
+            var monthExpenseTx = monthTx.Items.Where(t => t.Type == Domain.Enums.TransactionType.Expense)
+                .Sum(t => _currencyConversion.Convert(t.Amount, t.Currency, displayCurrency));
             sixMonthData.Add(monthIncome - monthExpenses - monthExpenseTx);
         }
 
@@ -232,6 +251,11 @@ public class HomeController : Controller
 
         ViewBag.DonutLabels       = JsonSerializer.Serialize(categoryBreakdown.Select(x => x.Category).ToList());
         ViewBag.DonutData         = JsonSerializer.Serialize(categoryBreakdown.Select(x => x.Amount).ToList());
+        // Already converted into the display currency above; surfaced on the
+        // dashboard as a ranked list rather than being computed and discarded.
+        ViewBag.CategoryBreakdown = categoryBreakdown
+            .Select(x => new KeyValuePair<string, decimal>(x.Category, x.Amount))
+            .ToList();
 
         ViewBag.RecentExpenses    = recentExpenses;
 

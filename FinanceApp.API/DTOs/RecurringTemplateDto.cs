@@ -10,7 +10,7 @@ public record RecurringTemplateDto(
     string? CategoryName,
     int Type,           // TransactionType enum
     decimal Amount,
-    int Currency,       // Currency enum
+    Currency Currency,  // serializes as its ISO-4217 code, e.g. "TZS"
     int Frequency,      // RecurrenceFrequency enum
     int Interval,
     DateTimeOffset StartDate,
@@ -24,7 +24,7 @@ public record CreateRecurringTemplateRequest(
     Guid? CategoryId,
     int Type,           // TransactionType: 0=Income, 1=Expense
     decimal Amount,
-    int Currency,
+    Currency Currency,  // ISO-4217 code, e.g. "TZS"
     int Frequency,      // RecurrenceFrequency: 0=Weekly, 1=Monthly, 2=Yearly
     string StartDate,   // ISO date
     string? EndDate,

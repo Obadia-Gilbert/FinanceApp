@@ -2,7 +2,8 @@ using FinanceApp.Application.Interfaces;
 using FinanceApp.Infrastructure.Repositories;
 using FinanceApp.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using FinanceApp.Infrastructure.Identity;   
+using FinanceApp.Infrastructure.Identity;
+using FinanceApp.Infrastructure.Email;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication;
@@ -15,7 +16,6 @@ using FinanceApp.Infrastructure.Services; // EmailService, UserService, Subscrip
 using FinanceApp.Infrastructure.Subscription;
 using FinanceApp.Localization;
 using FinanceApp.Web.Infrastructure;
-using FinanceApp.Web.Services;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Configuration.Json;
 
@@ -155,6 +155,13 @@ builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
     options.TokenLifespan = TimeSpan.FromHours(2));
 builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("EmailSettings"));
+
+// Branded email rendering — required by Register/ForgotPassword/ExternalLogin Identity pages
+// (same registrations as FinanceApp.API/Program.cs).
+builder.Services.Configure<EmailBrandingOptions>(builder.Configuration.GetSection(EmailBrandingOptions.SectionName));
+builder.Services.AddSingleton<IEmailTemplateRenderer, EmailTemplateRenderer>();
+builder.Services.AddScoped<LocalizedEmailTemplates>();
+builder.Services.AddScoped<IBrandedEmailSender, BrandedEmailSender>();
 
 builder.Services.AddTransient<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender, IdentityEmailSender>();
 builder.Services.AddRazorPages(); // For Identity UI

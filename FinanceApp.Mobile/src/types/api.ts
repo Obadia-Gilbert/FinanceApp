@@ -55,8 +55,8 @@ export interface DashboardDto {
 export interface ExpenseDto {
   id: string;
   amount: number;
-  /** API may return enum index (number); use formatCurrencyCode() for display */
-  currency: string | number;
+  /** ISO-4217 code, e.g. "USD" */
+  currency: string;
   expenseDate: string;
   description: string | null;
   categoryId: string;
@@ -118,8 +118,8 @@ export interface CategoryBudgetDto {
   month: number;
   year: number;
   amount: number;
-  /** API returns enum index (number); use formatCurrencyCode() for display */
-  currency: string | number;
+  /** ISO-4217 code, e.g. "USD" */
+  currency: string;
   spent: number;
 }
 
@@ -127,8 +127,8 @@ export interface SetBudgetRequest {
   month: number;
   year: number;
   amount: number;
-  /** Currency: string (e.g. 'USD') or enum index number for API */
-  currency: string | number;
+  /** ISO-4217 code, e.g. "USD" */
+  currency: string;
 }
 
 /** Profile */
@@ -324,7 +324,8 @@ export interface RecurringTemplateDto {
   categoryName: string | null;
   type: number; // 0=Income, 1=Expense
   amount: number;
-  currency: number;
+  /** ISO-4217 code, e.g. "USD" */
+  currency: string;
   frequency: number; // 0=Weekly, 1=Monthly, 2=Yearly
   interval: number;
   startDate: string;
@@ -339,7 +340,8 @@ export interface CreateRecurringTemplateRequest {
   categoryId?: string | null;
   type: number;
   amount: number;
-  currency: number;
+  /** ISO-4217 code, e.g. "USD" */
+  currency: string;
   frequency: number;
   startDate: string;
   endDate?: string | null;

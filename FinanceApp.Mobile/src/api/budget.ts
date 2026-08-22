@@ -20,13 +20,13 @@ export async function getCategoryBudgets(month: number, year: number): Promise<C
   return apiFetch<CategoryBudgetDto[]>(`/api/budgets/category?month=${month}&year=${year}`);
 }
 
-/** Set or update a category budget. Currency as enum index (0–15). */
+/** Set or update a category budget. Currency as its ISO-4217 code, e.g. "TZS". */
 export async function setCategoryBudget(
   categoryId: string,
   month: number,
   year: number,
   amount: number,
-  currency: number
+  currency: string
 ): Promise<CategoryBudgetDto> {
   return apiFetch<CategoryBudgetDto>(
     `/api/budgets/category/${categoryId}?month=${month}&year=${year}`,

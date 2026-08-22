@@ -95,14 +95,17 @@ public class ExpenseQueryService : IExpenseQueryService
         if (currency.HasValue)
             query = query.Where(e => e.Currency == currency.Value);
 
+        // Always group by currency as well: summing Amount across currencies would add
+        // e.g. USD and TZS into a meaningless figure. Callers convert into the currency
+        // they want to display.
         var list = await query
-            .Join(_context.Set<Category>(), e => e.CategoryId, c => c.Id, (e, c) => new { e.CategoryId, c.Name, e.Amount })
-            .GroupBy(x => new { x.CategoryId, x.Name })
-            .Select(g => new { g.Key.CategoryId, g.Key.Name, Sum = g.Sum(x => x.Amount) })
+            .Join(_context.Set<Category>(), e => e.CategoryId, c => c.Id, (e, c) => new { e.CategoryId, c.Name, e.Amount, e.Currency })
+            .GroupBy(x => new { x.CategoryId, x.Name, x.Currency })
+            .Select(g => new { g.Key.CategoryId, g.Key.Name, g.Key.Currency, Sum = g.Sum(x => x.Amount) })
             .OrderByDescending(x => x.Sum)
             .ToListAsync();
 
-        return list.Select(x => new CategoryTotalDto(x.CategoryId, x.Name, x.Sum)).ToList();
+        return list.Select(x => new CategoryTotalDto(x.CategoryId, x.Name, x.Sum, x.Currency)).ToList();
     }
 
     public async Task<IReadOnlyList<Expense>> GetRecentExpensesAsync(string userId, int count)

@@ -12,19 +12,22 @@ public class MonthlyReportService : IMonthlyReportService
     private readonly IBudgetService _budgetService;
     private readonly ICategoryBudgetService _categoryBudgetService;
     private readonly ICategoryService _categoryService;
+    private readonly ICurrencyConversionService _currencyConversion;
 
     public MonthlyReportService(
         IExpenseQueryService expenseQueryService,
         ITransactionService transactionService,
         IBudgetService budgetService,
         ICategoryBudgetService categoryBudgetService,
-        ICategoryService categoryService)
+        ICategoryService categoryService,
+        ICurrencyConversionService currencyConversion)
     {
         _expenseQueryService = expenseQueryService;
         _transactionService = transactionService;
         _budgetService = budgetService;
         _categoryBudgetService = categoryBudgetService;
         _categoryService = categoryService;
+        _currencyConversion = currencyConversion;
     }
 
     public async Task<MonthlyReportResult> GetMonthlyReportAsync(string userId, int year, int month, string? preferredCurrency = null, int topExpensesCount = 20)
@@ -48,37 +51,65 @@ public class MonthlyReportService : IMonthlyReportService
                 : Currency.TZS.ToString();
 
         var currencyEnum = Enum.TryParse<Currency>(currency, true, out var c) ? c : Currency.TZS;
-        var totalSpent = monthTotals.GetValueOrDefault(currencyEnum, 0);
 
-        var totalIncome = incomeTx.Items.Where(t => t.Currency == currencyEnum).Sum(t => t.Amount);
+        // Spend and income can be recorded in several currencies — convert each into the
+        // report currency rather than counting only the rows that already match it.
+        var totalSpent = _currencyConversion.SumInCurrency(monthTotals, currencyEnum);
 
+        var totalIncome = incomeTx.Items.Sum(t => _currencyConversion.Convert(t.Amount, t.Currency, currencyEnum));
+
+        // Compare budget vs. spend in the budget's own currency (no conversion rounding
+        // in the pass/fail decision), then convert both into the report's display currency
+        // so every figure on the page carries the same, correctly-labelled unit — a budget
+        // set in TZS must not have its number shown next to a "USD" label just because most
+        // of the user's spend happens to be in USD.
         decimal? globalBudgetAmount = globalBudget?.Amount;
         var budgetCurrency = globalBudget?.Currency ?? currencyEnum;
-        var globalSpent = globalBudgetAmount.HasValue ? monthTotals.GetValueOrDefault(budgetCurrency, 0) : (decimal?)null;
-        decimal? globalRemaining = globalBudgetAmount.HasValue && globalSpent.HasValue ? globalBudgetAmount.Value - globalSpent.Value : null;
-        var isOverGlobal = globalBudgetAmount.HasValue && globalSpent.HasValue && globalSpent.Value >= globalBudgetAmount.Value;
+        var globalSpentInBudgetCurrency = globalBudgetAmount.HasValue
+            ? _currencyConversion.SumInCurrency(monthTotals, budgetCurrency)
+            : (decimal?)null;
+        var isOverGlobal = globalBudgetAmount.HasValue && globalSpentInBudgetCurrency.HasValue
+            && globalSpentInBudgetCurrency.Value >= globalBudgetAmount.Value;
+
+        decimal? globalBudgetAmountDisplay = globalBudgetAmount.HasValue
+            ? _currencyConversion.Convert(globalBudgetAmount.Value, budgetCurrency, currencyEnum)
+            : null;
+        decimal? globalSpentDisplay = globalSpentInBudgetCurrency.HasValue
+            ? _currencyConversion.Convert(globalSpentInBudgetCurrency.Value, budgetCurrency, currencyEnum)
+            : null;
+        decimal? globalRemaining = globalBudgetAmountDisplay.HasValue && globalSpentDisplay.HasValue
+            ? globalBudgetAmountDisplay.Value - globalSpentDisplay.Value
+            : null;
 
         var categoryLines = new List<CategoryReportLine>();
         foreach (var cb in categoryBudgets)
         {
-            var spent = categorySpendForMonth.GetValueOrDefault((cb.CategoryId, cb.Currency), 0);
+            var spent = _currencyConversion.SumCategoryInCurrency(categorySpendForMonth, cb.CategoryId, cb.Currency);
+            var isOver = spent >= cb.Amount;
+
+            var spentDisplay = _currencyConversion.Convert(spent, cb.Currency, currencyEnum);
+            var budgetDisplay = _currencyConversion.Convert(cb.Amount, cb.Currency, currencyEnum);
             categoryLines.Add(new CategoryReportLine
             {
                 CategoryName = cb.Category?.Name ?? "Unknown",
-                Spent = spent,
-                BudgetAmount = cb.Amount,
-                Remaining = cb.Amount - spent,
-                IsOverBudget = spent >= cb.Amount
+                Spent = spentDisplay,
+                BudgetAmount = budgetDisplay,
+                Remaining = budgetDisplay - spentDisplay,
+                IsOverBudget = isOver
             });
         }
 
+        // categoryTotals has one row per (category, currency); collapse each category into
+        // a single line converted to the report currency.
         var budgetCategoryIds = categoryBudgets.Select(cb => cb.CategoryId).ToHashSet();
-        foreach (var ct in categoryTotals.Where(ct => !budgetCategoryIds.Contains(ct.CategoryId)))
+        foreach (var group in categoryTotals
+            .Where(ct => !budgetCategoryIds.Contains(ct.CategoryId))
+            .GroupBy(ct => ct.CategoryId))
         {
             categoryLines.Add(new CategoryReportLine
             {
-                CategoryName = ct.CategoryName ?? "Unknown",
-                Spent = ct.Sum,
+                CategoryName = group.First().CategoryName ?? "Unknown",
+                Spent = group.Sum(ct => _currencyConversion.Convert(ct.Sum, ct.Currency, currencyEnum)),
                 BudgetAmount = null,
                 Remaining = null,
                 IsOverBudget = false
@@ -104,8 +135,8 @@ public class MonthlyReportService : IMonthlyReportService
             TotalSpent = totalSpent,
             TotalIncome = totalIncome,
             Currency = currency,
-            GlobalBudgetAmount = globalBudgetAmount,
-            GlobalBudgetSpent = globalSpent,
+            GlobalBudgetAmount = globalBudgetAmountDisplay,
+            GlobalBudgetSpent = globalSpentDisplay,
             GlobalBudgetRemaining = globalRemaining,
             IsOverGlobalBudget = isOverGlobal,
             CategoryLines = categoryLines,

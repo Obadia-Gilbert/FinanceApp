@@ -34,10 +34,11 @@ public class Budget : BaseEntity
         Currency = currency;
     }
 
-    public void UpdateAmount(decimal amount)
+    public void UpdateAmount(decimal amount, Currency currency)
     {
         if (amount < 0)
             throw new ArgumentException("Budget amount cannot be negative.", nameof(amount));
         Amount = amount;
+        Currency = currency;
     }
 }

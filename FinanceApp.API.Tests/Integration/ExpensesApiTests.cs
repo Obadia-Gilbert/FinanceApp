@@ -13,6 +13,14 @@ public class ExpensesApiTests : IClassFixture<ApiWebApplicationFactory>
     private readonly ApiWebApplicationFactory _factory;
     private readonly HttpClient _client;
 
+    // The API now emits Currency (and other enums) as their string name, e.g. "TZS" —
+    // default System.Text.Json options can't parse that back into an enum, so tests
+    // that deserialize a DTO containing one need this converter, same as any real client.
+    private static readonly System.Text.Json.JsonSerializerOptions JsonOptions = new(System.Text.Json.JsonSerializerDefaults.Web)
+    {
+        Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() }
+    };
+
     public ExpensesApiTests(ApiWebApplicationFactory factory)
     {
         _factory = factory;
@@ -72,9 +80,34 @@ public class ExpensesApiTests : IClassFixture<ApiWebApplicationFactory>
         var response = await authClient.PostAsJsonAsync("/api/expenses", createRequest);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        var expense = await response.Content.ReadFromJsonAsync<ExpenseDto>();
+        var expense = await response.Content.ReadFromJsonAsync<ExpenseDto>(JsonOptions);
         Assert.NotNull(expense);
         Assert.Equal(99.99m, expense.Amount);
         Assert.Equal("Integration test expense", expense.Description);
+    }
+
+    /// <summary>
+    /// Regression cover: Currency must serialize as its ISO-4217 code ("TZS"), not its
+    /// enum ordinal (2) — a bare integer would silently break the moment a new currency
+    /// is inserted anywhere but the very end of the enum.
+    /// </summary>
+    [Fact]
+    public async Task CreateExpense_SerializesCurrencyAsIsoCode_NotOrdinal()
+    {
+        var token = await GetAuthTokenAsync();
+        using var authClient = CreateAuthenticatedClient(token);
+
+        var categoriesResponse = await authClient.GetAsync("/api/categories");
+        categoriesResponse.EnsureSuccessStatusCode();
+        var categories = await categoriesResponse.Content.ReadFromJsonAsync<List<CategoryDto>>();
+        var categoryId = categories!.First().Id;
+
+        var createRequest = new CreateExpenseRequest(50m, Currency.TZS, DateTime.UtcNow.Date, categoryId, "Currency wire format test");
+        var response = await authClient.PostAsJsonAsync("/api/expenses", createRequest);
+        response.EnsureSuccessStatusCode();
+
+        var rawJson = await response.Content.ReadAsStringAsync();
+        Assert.Contains("\"currency\":\"TZS\"", rawJson, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("\"currency\":2", rawJson, StringComparison.OrdinalIgnoreCase);
     }
 }

@@ -6,6 +6,10 @@
 # dotenv files
 .env
 
+# Local database backups (may contain real user financial data)
+.db-backups/
+*.bak
+
 # User-specific files
 *.rsuser
 *.suo

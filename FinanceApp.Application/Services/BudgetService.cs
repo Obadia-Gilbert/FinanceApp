@@ -26,7 +26,7 @@ public class BudgetService : IBudgetService
         var existing = await GetBudgetForMonthAsync(userId, month, year);
         if (existing != null)
         {
-            existing.UpdateAmount(amount);
+            existing.UpdateAmount(amount, currency);
             _budgetRepository.Update(existing);
             await _budgetRepository.SaveChangesAsync();
             return existing;

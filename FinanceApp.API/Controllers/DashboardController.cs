@@ -17,19 +17,22 @@ public class DashboardController : ControllerBase
     private readonly IBudgetService _budgetService;
     private readonly ICategoryBudgetService _categoryBudgetService;
     private readonly IBudgetNotificationService _budgetNotificationService;
+    private readonly ICurrencyConversionService _currencyConversion;
 
     public DashboardController(
         IExpenseQueryService expenseQueryService,
         ICategoryService categoryService,
         IBudgetService budgetService,
         ICategoryBudgetService categoryBudgetService,
-        IBudgetNotificationService budgetNotificationService)
+        IBudgetNotificationService budgetNotificationService,
+        ICurrencyConversionService currencyConversion)
     {
         _expenseQueryService = expenseQueryService;
         _categoryService = categoryService;
         _budgetService = budgetService;
         _categoryBudgetService = categoryBudgetService;
         _budgetNotificationService = budgetNotificationService;
+        _currencyConversion = currencyConversion;
     }
 
     private string? UserId => User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -70,7 +73,9 @@ public class DashboardController : ControllerBase
         var currentMonthBudget = await _budgetService.GetBudgetForMonthAsync(UserId, currentMonth, currentYear);
         decimal? budgetAmount = currentMonthBudget?.Amount;
         var budgetCurrency = currentMonthBudget?.Currency ?? displayCurrency;
-        var thisMonthSpendInBudgetCurrency = thisMonthTotals.GetValueOrDefault(budgetCurrency, 0);
+        // Spend can be recorded in a different currency than the budget — convert every
+        // currency bucket into the budget's currency before comparing.
+        var thisMonthSpendInBudgetCurrency = _currencyConversion.SumInCurrency(thisMonthTotals, budgetCurrency);
         var isOverBudget = budgetAmount.HasValue && budgetAmount.Value > 0 && thisMonthSpendInBudgetCurrency >= budgetAmount.Value;
 
         var categorySpendForMonth = await _categoryBudgetService.GetCategorySpendForMonthAsync(UserId, currentMonth, currentYear);
@@ -78,7 +83,7 @@ public class DashboardController : ControllerBase
         var categoryBudgetAlerts = new List<CategoryBudgetAlertDto>();
         foreach (var cb in categoryBudgets)
         {
-            var spent = categorySpendForMonth.GetValueOrDefault((cb.CategoryId, cb.Currency), 0);
+            var spent = _currencyConversion.SumCategoryInCurrency(categorySpendForMonth, cb.CategoryId, cb.Currency);
             var catName = cb.Category?.Name ?? "Unknown";
             if (spent >= cb.Amount)
                 categoryBudgetAlerts.Add(new CategoryBudgetAlertDto(catName, spent, cb.Amount, cb.Currency.ToString(), true));

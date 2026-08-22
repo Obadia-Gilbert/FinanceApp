@@ -60,6 +60,7 @@ builder.Services.AddScoped<IBudgetNotificationService, BudgetNotificationService
 builder.Services.AddScoped<IDailyActivityReminderService, DailyActivityReminderService>();
 builder.Services.AddScoped<IExpenseQueryService, FinanceApp.Infrastructure.Services.ExpenseQueryService>();
 builder.Services.AddScoped<IMonthlyReportService, MonthlyReportService>();
+builder.Services.AddSingleton<ICurrencyConversionService, CurrencyConversionService>();
 builder.Services.AddSingleton<SubscriptionProductMapper>();
 builder.Services.AddScoped<IAppleStoreTransactionVerifier, AppleStoreTransactionVerifier>();
 builder.Services.AddScoped<IGooglePlaySubscriptionVerifier, GooglePlaySubscriptionVerifier>();
@@ -138,7 +139,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddControllers();
+// Enums (notably Currency) serialize as their string name ("TZS"), not their ordinal,
+// so a currency's identity in the API contract never depends on the enum's declaration
+// order — matching how it's now stored in the database.
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()));
 builder.Services.AddHttpClient();
 
 builder.Services.AddLocalization();

@@ -1,5 +1,4 @@
 import { apiFetch } from './client';
-import { getCurrencyIndex } from '../utils/currency';
 import type {
   IncomeDto,
   CreateIncomeRequest,
@@ -7,14 +6,14 @@ import type {
   PagedResultDto,
 } from '../types/api';
 
-/** Build API payload: currency must be sent as enum index (number). */
+/** Build API payload. */
 function toCreateIncomePayload(body: CreateIncomeRequest) {
   const dateStr = body.incomeDate.includes('T') ? body.incomeDate.split('T')[0]! : body.incomeDate;
   return {
     accountId: body.accountId && body.accountId !== '' ? body.accountId : null,
     categoryId: body.categoryId,
     amount: body.amount,
-    currency: typeof body.currency === 'number' ? body.currency : getCurrencyIndex(body.currency),
+    currency: body.currency,
     incomeDate: dateStr,
     description: body.description ?? null,
     source: body.source ?? null,
