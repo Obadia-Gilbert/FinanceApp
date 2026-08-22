@@ -229,9 +229,16 @@ body,
   --bs-modal-bg:         var(--surface);
   --bs-offcanvas-bg:     var(--surface);
   --bs-list-group-bg:    var(--surface);
-  --bs-dropdown-link-color:       var(--ink-700);
-  --bs-dropdown-link-hover-bg:    var(--surface-hover);
-  --bs-dropdown-link-hover-color: var(--ink-900);
+  --bs-dropdown-link-color:        var(--ink-700);
+  --bs-dropdown-link-hover-bg:     var(--surface-hover);
+  --bs-dropdown-link-hover-color:  var(--ink-900);
+  /* Bootstrap defaults these to its own primary blue, not --bs-primary, so the
+     "current" item in the language menu rendered stock #0d6efd unless mapped
+     explicitly here. */
+  --bs-dropdown-link-active-bg:    var(--brand-soft);
+  --bs-dropdown-link-active-color: var(--brand-strong);
+  --bs-dropdown-divider-bg:        var(--border);
+  --bs-dropdown-header-color:      var(--ink-500);
   --bs-dropdown-border-color:     var(--border);
   --bs-modal-border-color:        var(--border);
   --bs-offcanvas-border-color:    var(--border);

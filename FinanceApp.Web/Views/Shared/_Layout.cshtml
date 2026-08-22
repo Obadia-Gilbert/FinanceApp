@@ -45,7 +45,13 @@
 
     <!-- ── Fixed top bar ────────────────────────────────────────── -->
     <header class="app-header">
-        <nav class="navbar navbar-modern">
+        @* navbar-expand-lg is required, not decorative: Bootstrap's base rule is
+           `.navbar-nav .dropdown-menu { position: static }` (the collapsed/mobile
+           case) and only `.navbar-expand-lg .navbar-nav .dropdown-menu { position:
+           absolute }` at >=992px restores real floating positioning. Without it,
+           the profile dropdown renders in normal document flow instead of as a
+           floating panel, shoving the whole icon row upward. *@
+        <nav class="navbar navbar-expand-lg navbar-modern">
             <div class="container-fluid px-2 px-sm-3">
                 @if (showShell)
                 {
