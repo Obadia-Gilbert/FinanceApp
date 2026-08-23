@@ -18,6 +18,7 @@ import { useTheme } from '../../src/context/ThemeContext';
 import { Icon } from '../../src/components/Icon';
 import { useAuth } from '../../src/context/AuthContext';
 import { Card } from '../../src/components/Card';
+import { ProfileAvatar } from '../../src/components/ProfileAvatar';
 import { Input } from '../../src/components/Input';
 import { Button } from '../../src/components/Button';
 import { getProfile, updateProfile, getAccountDeletionStatus, deleteAccount } from '../../src/api/profile';
@@ -303,11 +304,12 @@ export default function ProfileScreen() {
       {/* Profile header */}
       <View style={styles.profileHeader}>
         <View style={styles.avatarWrap}>
-          <View style={[styles.avatar, { backgroundColor: colors.brand }]}>
-            <Text style={[styles.avatarText, { color: colors.brandContrast }]}>
-              {initial}
-            </Text>
-          </View>
+          <ProfileAvatar
+            hasImage={!!profile?.profileImagePath}
+            initial={initial}
+            size={80}
+            cacheKey={profile?.profileImagePath ?? undefined}
+          />
           <TouchableOpacity
             style={[styles.editAvatarBtn, { backgroundColor: colors.brand }]}
             onPress={() => setEditing(!editing)}
@@ -563,8 +565,6 @@ const styles = StyleSheet.create({
   content: { padding: 16, paddingBottom: 40 },
   profileHeader: { alignItems: 'center', marginBottom: 24 },
   avatarWrap: { position: 'relative', marginBottom: 12 },
-  avatar: { width: 80, height: 80, borderRadius: 40, justifyContent: 'center', alignItems: 'center' },
-  avatarText: { fontSize: 32, fontWeight: '700' },
   editAvatarBtn: { position: 'absolute', right: -4, bottom: -4, width: 28, height: 28, borderRadius: 14, justifyContent: 'center', alignItems: 'center' },
   editAvatarIcon: { fontSize: 14 },
   displayName: { fontSize: 22, fontWeight: '700', marginBottom: 4 },

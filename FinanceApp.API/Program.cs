@@ -101,10 +101,18 @@ builder.Services.AddScoped<IStripeBillingWebhookHandler, StripeBillingWebhookHan
 // Single upload root for everything user-uploaded (documents/, profiles/) — see
 // FinanceApp.Application.Interfaces.Services.IFileStorage for why this is behind an
 // interface rather than services touching File/Directory directly.
+// Storage:UploadsRoot lets Web and API resolve the SAME uploads directory. In
+// production docker-compose mounts one `uploads` volume into both containers, so
+// the default already lines up; locally the two projects have separate wwwroot
+// folders, which is why a photo uploaded on Web was invisible to the API.
 builder.Services.AddSingleton<IFileStorage>(sp =>
 {
     var env = sp.GetRequiredService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>();
-    return new LocalFileStorage(Path.Combine(env.WebRootPath, "uploads"));
+    var configured = builder.Configuration["Storage:UploadsRoot"];
+    var root = string.IsNullOrWhiteSpace(configured)
+        ? Path.Combine(env.WebRootPath, "uploads")
+        : Path.GetFullPath(configured, env.ContentRootPath);
+    return new LocalFileStorage(root);
 });
 builder.Services.AddScoped<ISupportingDocumentService>(sp =>
 {

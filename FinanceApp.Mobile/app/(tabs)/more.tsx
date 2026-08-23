@@ -6,6 +6,7 @@ import { useTheme } from '../../src/context/ThemeContext';
 import { useAuth } from '../../src/context/AuthContext';
 import { Card } from '../../src/components/Card';
 import { Icon, type IconName } from '../../src/components/Icon';
+import { ProfileAvatar } from '../../src/components/ProfileAvatar';
 import { getProfile } from '../../src/api/profile';
 import { getSubscription } from '../../src/api/subscription';
 
@@ -135,9 +136,12 @@ export default function MoreScreen() {
         accessibilityLabel={t('more.viewProfile', { name: displayName })}
       >
         <Card style={styles.profileCard}>
-          <View style={[styles.avatar, { backgroundColor: colors.brand }]}>
-            <Text style={[styles.avatarText, { color: colors.brandContrast }]}>{initial}</Text>
-          </View>
+          <ProfileAvatar
+            hasImage={!!profile?.profileImagePath}
+            initial={initial}
+            size={48}
+            cacheKey={profile?.profileImagePath ?? undefined}
+          />
           <View style={styles.profileBody}>
             <Text style={[styles.profileName, { color: colors.text.primary }]} numberOfLines={1}>
               {displayName}

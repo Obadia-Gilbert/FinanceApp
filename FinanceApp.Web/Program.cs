@@ -65,10 +65,16 @@ builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 // Single upload root for everything user-uploaded (documents/, profiles/) — see
 // FinanceApp.Application.Interfaces.Services.IFileStorage for why this is behind an
 // interface rather than services touching File/Directory directly.
+// See FinanceApp.API/Program.cs — same knob, so both surfaces can be pointed at
+// one shared uploads directory.
 builder.Services.AddSingleton<IFileStorage>(sp =>
 {
     var env = sp.GetRequiredService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>();
-    return new LocalFileStorage(Path.Combine(env.WebRootPath, "uploads"));
+    var configured = builder.Configuration["Storage:UploadsRoot"];
+    var root = string.IsNullOrWhiteSpace(configured)
+        ? Path.Combine(env.WebRootPath, "uploads")
+        : Path.GetFullPath(configured, env.ContentRootPath);
+    return new LocalFileStorage(root);
 });
 builder.Services.AddScoped<ISupportingDocumentService>(sp =>
 {

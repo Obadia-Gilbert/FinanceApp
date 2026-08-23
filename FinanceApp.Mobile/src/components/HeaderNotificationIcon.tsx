@@ -33,9 +33,10 @@ export function HeaderNotificationIcon({ align = 'right' }: HeaderNotificationIc
       <Icon name="notifications" size={22} color={colors.text.body} />
       {showBadge && (
         <View style={styles.badge}>
-          <Text style={styles.badgeText} numberOfLines={1}>
-            {badgeLabel}
-          </Text>
+          {/* No numberOfLines/ellipsis: inside the navigation header the badge is
+              width-constrained, so a two- or three-digit count was rendering as
+              "1..". The text must be allowed to size the pill instead. */}
+          <Text style={styles.badgeText}>{badgeLabel}</Text>
         </View>
       )}
     </TouchableOpacity>
@@ -53,8 +54,10 @@ const styles = StyleSheet.create({
   wrapRight: { marginRight: 16 },
   badge: {
     position: 'absolute',
-    top: 2,
-    right: 2,
+    top: 0,
+    // Negative inset lets the pill grow past the icon's box for 2–3 digit
+    // counts; anchored at right: 2 it was clamped to the icon's own width.
+    right: -2,
     minWidth: 18,
     height: 18,
     borderRadius: 9,
@@ -67,5 +70,8 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 11,
     fontWeight: '700',
+    // Keeps the digits from being compressed by the parent's cross-axis sizing.
+    flexShrink: 0,
+    textAlign: 'center',
   },
 });

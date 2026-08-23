@@ -19,6 +19,8 @@ import { Card } from '../../src/components/Card';
 import { Icon } from '../../src/components/Icon';
 import { getDashboard } from '../../src/api/dashboard';
 import { getUnreadCount } from '../../src/api/notifications';
+import { getProfile } from '../../src/api/profile';
+import { ProfileAvatar } from '../../src/components/ProfileAvatar';
 import { formatAmount } from '../../src/utils/currency';
 import { LineChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
@@ -43,6 +45,12 @@ export default function DashboardScreen() {
     queryKey: ['notificationsUnreadCount'],
     queryFn: getUnreadCount,
     staleTime: 60 * 1000,
+  });
+  // Only for the header avatar — the stored auth user has no image path.
+  const { data: profile } = useQuery({
+    queryKey: ['profile'],
+    queryFn: getProfile,
+    staleTime: 5 * 60 * 1000,
   });
 
   useEffect(() => {
@@ -103,13 +111,15 @@ export default function DashboardScreen() {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity
-            style={[styles.avatar, { backgroundColor: colors.brand }]}
             onPress={() => router.push('/(tabs)/profile')}
             activeOpacity={0.8}
           >
-            <Text style={[styles.avatarText, { color: colors.brandContrast }]}>
-              {user?.firstName?.[0] ?? user?.email?.[0] ?? '?'}
-            </Text>
+            <ProfileAvatar
+              hasImage={!!profile?.profileImagePath}
+              initial={user?.firstName?.[0] ?? user?.email?.[0] ?? '?'}
+              size={44}
+              cacheKey={profile?.profileImagePath ?? undefined}
+            />
           </TouchableOpacity>
           <Text style={[styles.headerTitle, { color: colors.text.primary }]}>{t('dashboard.title')}</Text>
           <TouchableOpacity
@@ -120,7 +130,9 @@ export default function DashboardScreen() {
             <Icon name="notifications" size={22} color={colors.text.body} />
             {unreadCount > 0 && (
               <View style={[styles.bellBadge, { backgroundColor: colors.danger }]}>
-                <Text style={styles.bellBadgeText} numberOfLines={1}>
+                {/* See HeaderNotificationIcon: no ellipsis, or multi-digit
+                    counts render as "1..". */}
+                <Text style={styles.bellBadgeText}>
                   {unreadCount > 99 ? '99+' : unreadCount}
                 </Text>
               </View>
@@ -346,8 +358,8 @@ const styles = StyleSheet.create({
   bellWrap: { padding: 8, position: 'relative' },
   bellBadge: {
     position: 'absolute',
-    top: 2,
-    right: 0,
+    top: 0,
+    right: -2,
     minWidth: 18,
     height: 18,
     borderRadius: 9,
@@ -355,7 +367,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 5,
   },
-  bellBadgeText: { color: '#fff', fontSize: 11, fontWeight: '700' },
+  bellBadgeText: {
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: '700',
+    flexShrink: 0,
+    textAlign: 'center',
+  },
   balanceCard: {
     borderRadius: 16,
     padding: 20,
