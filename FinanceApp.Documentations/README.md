@@ -12,7 +12,8 @@ Project documentation for FinanceApp.
 | [Current-State.md](./Current-State.md) | What is implemented today (API, mobile, localization, tests) |
 | [AI_IMPLEMENTATION_LIST.md](./AI_IMPLEMENTATION_LIST.md) | Prioritized AI features: insights, categorization, receipt parsing, NL entry, chat, forecasting; implementation notes and best practices |
 | [LANGUAGE_SWITCHING_TODO.md](./LANGUAGE_SWITCHING_TODO.md) | i18n: baseline implemented (en / es / sw); optional follow-up tasks |
-| [GOING_LIVE.md](./GOING_LIVE.md) | Production deployment: VPS vs Azure, DB strategy, HTTPS/CORS, secrets, jobs, mobile go-live |
+| [GOING_LIVE.md](./GOING_LIVE.md) | Production hosting runbook: single-VPS architecture, cost breakdown, secrets, DB-first deploy order, backups, scale triggers |
+| [STORE_SUBMISSION.md](./STORE_SUBMISSION.md) | Apple App Store + Google Play submission: blockers to fix first, `eas.json`, assets, review-risk checklist |
 | [MOBILE_AUTH.md](./MOBILE_AUTH.md) | Mobile auth setup + troubleshooting: API URL per target, Google/Facebook OAuth clients, API user secrets |
 | [WEB_GOOGLE_OAUTH.md](./WEB_GOOGLE_OAUTH.md) | Web (`FinanceApp.Web`) + API Google OAuth: Cloud Console redirect URIs, user secrets, `/signin-google` |
 | [EMAIL_BREVO.md](./EMAIL_BREVO.md) | Brevo (ex-Sendinblue) transactional email setup: HTTP API vs SMTP relay, sender verification, user-secrets config |
