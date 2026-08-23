@@ -16,8 +16,11 @@ using FinanceApp.Infrastructure.Services; // EmailService, UserService, Subscrip
 using FinanceApp.Infrastructure.Subscription;
 using FinanceApp.Localization;
 using FinanceApp.Web.Infrastructure;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Configuration.Json;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 
 
@@ -38,6 +41,15 @@ builder.Configuration.Sources.Insert(0, sharedSource);
 builder.Services.AddDbContext<FinanceDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Data Protection keys persisted in the DB (not local disk) so auth cookies / reset
+// tokens survive a redeploy or a second replica — see GOING_LIVE.md.
+builder.Services.AddDataProtection()
+    .PersistKeysToDbContext<FinanceDbContext>();
+
+// See FinanceApp.API/Program.cs for the full rationale — same flag, same default,
+// gates only the jobs that would duplicate side effects if run in both processes.
+var jobsEnabled = builder.Configuration.GetValue("Jobs:Enabled", true);
+
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
@@ -47,24 +59,30 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IIncomeService, IncomeService>();
 builder.Services.AddScoped<IRecurringTemplateService, RecurringTemplateService>();
-builder.Services.AddHostedService<FinanceApp.Infrastructure.Services.RecurringTransactionJob>();
+if (jobsEnabled)
+    builder.Services.AddHostedService<FinanceApp.Infrastructure.Services.RecurringTransactionJob>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+// Single upload root for everything user-uploaded (documents/, profiles/) — see
+// FinanceApp.Application.Interfaces.Services.IFileStorage for why this is behind an
+// interface rather than services touching File/Directory directly.
+builder.Services.AddSingleton<IFileStorage>(sp =>
+{
+    var env = sp.GetRequiredService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>();
+    return new LocalFileStorage(Path.Combine(env.WebRootPath, "uploads"));
+});
 builder.Services.AddScoped<ISupportingDocumentService>(sp =>
 {
     var repo = sp.GetRequiredService<IRepository<FinanceApp.Domain.Entities.SupportingDocument>>();
-    var env  = sp.GetRequiredService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>();
-    var uploadRoot = Path.Combine(env.WebRootPath, "uploads", "documents");
-    return new SupportingDocumentService(repo, uploadRoot);
+    var fileStorage = sp.GetRequiredService<IFileStorage>();
+    return new SupportingDocumentService(repo, fileStorage);
 });
 builder.Services.AddScoped<IAccountDeletionService>(sp =>
 {
     var context = sp.GetRequiredService<FinanceDbContext>();
     var userManager = sp.GetRequiredService<UserManager<ApplicationUser>>();
-    var env = sp.GetRequiredService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>();
+    var fileStorage = sp.GetRequiredService<IFileStorage>();
     var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<AccountDeletionService>>();
-    var documentUploadRoot = Path.Combine(env.WebRootPath, "uploads", "documents");
-    var profileUploadRoot = Path.Combine(env.WebRootPath, "uploads", "profiles");
-    return new AccountDeletionService(context, userManager, documentUploadRoot, profileUploadRoot, logger);
+    return new AccountDeletionService(context, userManager, fileStorage, logger);
 });
 builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddScoped<IUserService, UserService>();
@@ -87,7 +105,8 @@ builder.Services.Configure<FinanceApp.Infrastructure.Services.ExchangeRateSettin
 builder.Services.AddHttpClient(FinanceApp.Infrastructure.Services.ExchangeRateApiProvider.HttpClientName);
 builder.Services.AddSingleton<IExchangeRateStore, FinanceApp.Infrastructure.Services.ExchangeRateStore>();
 builder.Services.AddSingleton<IExchangeRateProvider, FinanceApp.Infrastructure.Services.ExchangeRateApiProvider>();
-builder.Services.AddHostedService<FinanceApp.Infrastructure.Services.ExchangeRateRefreshJob>();
+if (jobsEnabled)
+    builder.Services.AddHostedService<FinanceApp.Infrastructure.Services.ExchangeRateRefreshJob>();
 //builder.Services.AddTransient<IEmailSender, IdentityEmailSender>();
 
 builder.Services
@@ -203,6 +222,18 @@ builder.Services.AddControllersWithViews()
         o.DataAnnotationLocalizerProvider = (_, factory) => factory.Create(typeof(SharedResource));
     });
 
+// Forwarded headers — required behind Caddy/nginx/any reverse proxy, or
+// Request.Scheme reads "http" and UseHttpsRedirection/secure cookies misbehave.
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<FinanceDbContext>();
+
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
@@ -215,6 +246,8 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline.
+app.UseForwardedHeaders();
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -241,6 +274,7 @@ app.MapControllerRoute(
     pattern: "{controller=Landing}/{action=Index}/{id?}")
     .WithStaticAssets();
 
-app.MapRazorPages(); // For Identity UI 
+app.MapRazorPages(); // For Identity UI
+app.MapHealthChecks("/health");
 
 app.Run();

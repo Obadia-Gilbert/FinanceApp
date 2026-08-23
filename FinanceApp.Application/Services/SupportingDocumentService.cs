@@ -8,19 +8,17 @@ namespace FinanceApp.Application.Services;
 public class SupportingDocumentService : ISupportingDocumentService
 {
     private readonly IRepository<SupportingDocument> _repository;
-
-    /// <summary>Absolute path to the wwwroot/uploads/documents directory, injected at startup.</summary>
-    private readonly string _uploadRoot;
+    private readonly IFileStorage _fileStorage;
 
     private static readonly HashSet<string> AllowedExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
         ".jpg", ".jpeg", ".png", ".gif", ".webp", ".pdf", ".doc", ".docx", ".xls", ".xlsx"
     };
 
-    public SupportingDocumentService(IRepository<SupportingDocument> repository, string uploadRoot)
+    public SupportingDocumentService(IRepository<SupportingDocument> repository, IFileStorage fileStorage)
     {
-        _repository  = repository;
-        _uploadRoot  = uploadRoot;
+        _repository = repository;
+        _fileStorage = fileStorage;
     }
 
     public async Task<IEnumerable<SupportingDocument>> GetForEntityAsync(
@@ -53,16 +51,8 @@ public class SupportingDocumentService : ISupportingDocumentService
         if (!AllowedExtensions.Contains(ext))
             throw new InvalidOperationException($"File type '{ext}' is not allowed.");
 
-        var uploadDir = GetUserUploadDir(userId);
-        Directory.CreateDirectory(uploadDir);
-
         var storedFileName = $"{Guid.NewGuid()}{ext}";
-        var filePath = Path.Combine(uploadDir, storedFileName);
-
-        await using (var dest = new FileStream(filePath, FileMode.Create))
-        {
-            await fileStream.CopyToAsync(dest);
-        }
+        await _fileStorage.SaveAsync(RelativePath(userId, storedFileName), fileStream);
 
         var document = new SupportingDocument(
             userId, entityType, entityId,
@@ -88,18 +78,18 @@ public class SupportingDocumentService : ISupportingDocumentService
         var doc = await GetByIdAsync(id, userId)
                   ?? throw new KeyNotFoundException($"Document {id} not found.");
 
-        var filePath = GetFilePath(doc);
-        if (File.Exists(filePath)) File.Delete(filePath);
+        _fileStorage.Delete(RelativePath(doc.UserId, doc.StoredFileName));
 
         _repository.SoftDelete(doc);
         await _repository.SaveChangesAsync();
     }
 
-    public string GetFilePath(SupportingDocument document)
+    public Stream? OpenRead(SupportingDocument document)
     {
-        return Path.Combine(GetUserUploadDir(document.UserId), document.StoredFileName);
+        var relativePath = RelativePath(document.UserId, document.StoredFileName);
+        return _fileStorage.Exists(relativePath) ? _fileStorage.OpenRead(relativePath) : null;
     }
 
-    private string GetUserUploadDir(string userId)
-        => Path.Combine(_uploadRoot, userId);
+    private static string RelativePath(string userId, string storedFileName)
+        => Path.Combine(userId, storedFileName);
 }

@@ -18,15 +18,18 @@ public class ProfileController : Controller
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly IAccountDeletionService _accountDeletionService;
+    private readonly Microsoft.AspNetCore.Hosting.IWebHostEnvironment _env;
 
     public ProfileController(
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
-        IAccountDeletionService accountDeletionService)
+        IAccountDeletionService accountDeletionService,
+        Microsoft.AspNetCore.Hosting.IWebHostEnvironment env)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _accountDeletionService = accountDeletionService;
+        _env = env;
     }
 
     [HttpGet]
@@ -79,7 +82,7 @@ public class ProfileController : Controller
                 var ext = Path.GetExtension(model.ProfileImage.FileName).ToLowerInvariant();
                 if (!string.IsNullOrEmpty(ext) && allowed.Contains(ext))
                 {
-                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "profiles");
+                    var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "profiles");
                     if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
                     var fileName = $"{Guid.NewGuid()}{ext}";
                     var filePath = Path.Combine(uploadsFolder, fileName);

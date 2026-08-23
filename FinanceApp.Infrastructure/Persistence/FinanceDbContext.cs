@@ -2,13 +2,17 @@ using FinanceApp.Domain.Entities;
 using FinanceApp.Domain.Common;
 using FinanceApp.Domain.Enums;
 using FinanceApp.Infrastructure.Identity; // <-- where ApplicationUser lives
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinanceApp.Infrastructure.Persistence;
 
-public class FinanceDbContext 
-    : IdentityDbContext<ApplicationUser> // 🔥 changed here
+public class FinanceDbContext
+    : IdentityDbContext<ApplicationUser>, // 🔥 changed here
+      IDataProtectionKeyContext // persists Data Protection keys in the DB instead of local
+                                 // disk, so auth cookies / reset tokens survive a redeploy
+                                 // or a second replica — see GOING_LIVE.md
 {
     private readonly DbContextOptions<FinanceDbContext> _options;
 
@@ -22,6 +26,7 @@ public class FinanceDbContext
     // DbSets
     // ==============================
 
+    public DbSet<Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey> DataProtectionKeys { get; set; } = null!;
     public DbSet<Expense> Expenses { get; set; } = null!;
     public DbSet<Category> Categories { get; set; } = null!;
     public DbSet<Budget> Budgets { get; set; } = null!;

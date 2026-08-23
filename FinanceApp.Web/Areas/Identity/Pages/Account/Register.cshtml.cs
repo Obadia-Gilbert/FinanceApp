@@ -36,6 +36,7 @@ namespace FinanceApp.Web.Areas.Identity.Pages.Account
         private readonly EmailBrandingOptions _emailBranding;
 
         private readonly ICategoryService _categoryService;
+        private readonly Microsoft.AspNetCore.Hosting.IWebHostEnvironment _env;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
@@ -45,7 +46,8 @@ namespace FinanceApp.Web.Areas.Identity.Pages.Account
             IBrandedEmailSender brandedEmailSender,
             LocalizedEmailTemplates emailTemplates,
             IOptions<EmailBrandingOptions> emailBrandingOptions,
-            ICategoryService categoryService) 
+            ICategoryService categoryService,
+            Microsoft.AspNetCore.Hosting.IWebHostEnvironment env)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -56,6 +58,7 @@ namespace FinanceApp.Web.Areas.Identity.Pages.Account
             _emailTemplates = emailTemplates;
             _emailBranding = emailBrandingOptions.Value;
             _categoryService = categoryService;
+            _env = env;
         }
 
         /// <summary>
@@ -138,7 +141,7 @@ namespace FinanceApp.Web.Areas.Identity.Pages.Account
                     var ext = Path.GetExtension(Input.ProfileImage.FileName).ToLowerInvariant();
                     if (!string.IsNullOrEmpty(ext) && allowed.Contains(ext))
                     {
-                        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "profiles");
+                        var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "profiles");
                         if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
                         var fileName = $"{Guid.NewGuid()}{ext}";
                         var filePath = Path.Combine(uploadsFolder, fileName);

@@ -30,6 +30,10 @@ public interface ISupportingDocumentService
     /// <summary>Deletes the DB record and the file from disk.</summary>
     Task DeleteAsync(Guid id, string userId);
 
-    /// <summary>Returns the absolute path on disk for a stored document.</summary>
-    string GetFilePath(SupportingDocument document);
+    /// <summary>
+    /// Opens the stored file for reading, or null if it's missing from storage (DB record
+    /// exists but the file doesn't — e.g. manual disk intervention). Routed through
+    /// <c>IFileStorage</c> rather than the caller touching the filesystem directly.
+    /// </summary>
+    Stream? OpenRead(SupportingDocument document);
 }

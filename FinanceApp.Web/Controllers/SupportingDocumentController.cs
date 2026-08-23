@@ -72,10 +72,9 @@ public class SupportingDocumentController : Controller
         var doc = await _documentService.GetByIdAsync(id, userId);
         if (doc == null) return NotFound();
 
-        var path = _documentService.GetFilePath(doc);
-        if (!System.IO.File.Exists(path)) return NotFound("File not found on disk.");
+        var stream = _documentService.OpenRead(doc);
+        if (stream == null) return NotFound("File not found in storage.");
 
-        var stream = System.IO.File.OpenRead(path);
         return File(stream, doc.ContentType, doc.OriginalFileName);
     }
 
@@ -88,10 +87,9 @@ public class SupportingDocumentController : Controller
         var doc = await _documentService.GetByIdAsync(id, userId);
         if (doc == null) return NotFound();
 
-        var path = _documentService.GetFilePath(doc);
-        if (!System.IO.File.Exists(path)) return NotFound("File not found on disk.");
+        var stream = _documentService.OpenRead(doc);
+        if (stream == null) return NotFound("File not found in storage.");
 
-        var stream = System.IO.File.OpenRead(path);
         Response.Headers.Append("Content-Disposition", $"inline; filename=\"{doc.OriginalFileName}\"");
         return File(stream, doc.ContentType);
     }

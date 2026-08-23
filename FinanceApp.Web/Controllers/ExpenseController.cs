@@ -20,19 +20,22 @@ public class ExpenseController : Controller
     private readonly IAccountService _accountService;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ISupportingDocumentService _documentService;
+    private readonly Microsoft.AspNetCore.Hosting.IWebHostEnvironment _env;
 
     public ExpenseController(
         IExpenseService expenseService,
         ICategoryService categoryService,
         IAccountService accountService,
         UserManager<ApplicationUser> userManager,
-        ISupportingDocumentService documentService)
+        ISupportingDocumentService documentService,
+        Microsoft.AspNetCore.Hosting.IWebHostEnvironment env)
     {
         _expenseService = expenseService;
         _categoryService = categoryService;
         _accountService = accountService;
         _userManager = userManager;
         _documentService = documentService;
+        _env = env;
     }
 
     // GET: /Expense
@@ -116,7 +119,7 @@ public class ExpenseController : Controller
             }
             else
             {
-                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads/receipts");
+                var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "receipts");
                 if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
 
                 var category = await _categoryService.GetByIdAsync(model.CategoryId, userId);
@@ -234,7 +237,7 @@ public class ExpenseController : Controller
             var ext = Path.GetExtension(model.ReceiptFile.FileName)?.ToLowerInvariant();
             if (!string.IsNullOrEmpty(ext) && allowedExtensions.Contains(ext) && model.ReceiptFile.Length <= 5 * 1024 * 1024)
             {
-                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads/receipts");
+                var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "receipts");
                 if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
                 var category = await _categoryService.GetByIdAsync(model.CategoryId, userIdCheck);
                 var categoryName = category?.Name.Replace(" ", "-") ?? "Unknown";
@@ -328,7 +331,7 @@ public class ExpenseController : Controller
 
         if (string.IsNullOrEmpty(expense.ReceiptPath)) return NotFound();
 
-        var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", expense.ReceiptPath.TrimStart('/'));
+        var fullPath = Path.Combine(_env.WebRootPath, expense.ReceiptPath.TrimStart('/'));
         if (!System.IO.File.Exists(fullPath)) return NotFound();
 
         var ext = Path.GetExtension(fullPath)?.ToLowerInvariant();

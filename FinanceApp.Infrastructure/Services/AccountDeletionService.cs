@@ -18,21 +18,18 @@ public class AccountDeletionService : IAccountDeletionService
 {
     private readonly FinanceDbContext _context;
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly string _documentUploadRoot;
-    private readonly string _profileUploadRoot;
+    private readonly IFileStorage _fileStorage;
     private readonly ILogger<AccountDeletionService> _logger;
 
     public AccountDeletionService(
         FinanceDbContext context,
         UserManager<ApplicationUser> userManager,
-        string documentUploadRoot,
-        string profileUploadRoot,
+        IFileStorage fileStorage,
         ILogger<AccountDeletionService> logger)
     {
         _context = context;
         _userManager = userManager;
-        _documentUploadRoot = documentUploadRoot;
-        _profileUploadRoot = profileUploadRoot;
+        _fileStorage = fileStorage;
         _logger = logger;
     }
 
@@ -114,16 +111,10 @@ public class AccountDeletionService : IAccountDeletionService
 
         try
         {
-            var userDocDir = Path.Combine(_documentUploadRoot, userId);
-            if (Directory.Exists(userDocDir))
-                Directory.Delete(userDocDir, recursive: true);
+            _fileStorage.DeleteDirectory(Path.Combine("documents", userId));
 
             if (!string.IsNullOrWhiteSpace(profileImagePath))
-            {
-                var profileFile = Path.Combine(_profileUploadRoot, Path.GetFileName(profileImagePath));
-                if (File.Exists(profileFile))
-                    File.Delete(profileFile);
-            }
+                _fileStorage.Delete(Path.Combine("profiles", Path.GetFileName(profileImagePath)));
         }
         catch (Exception ex)
         {

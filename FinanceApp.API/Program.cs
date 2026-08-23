@@ -11,11 +11,14 @@ using FinanceApp.Infrastructure.Subscription;
 using FinanceApp.Localization;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration.Json;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +52,18 @@ else
     builder.Services.AddDbContext<FinanceDbContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Data Protection keys persisted in the DB (not local disk) so auth/reset tokens
+// survive a redeploy or a second replica — see GOING_LIVE.md.
+builder.Services.AddDataProtection()
+    .PersistKeysToDbContext<FinanceDbContext>();
+
+// Jobs:Enabled gates the hosted services that would duplicate side effects (creating
+// recurring transactions, creating reminder notifications) if run in more than one
+// process against the same database — e.g. Web and API both running against
+// production. Defaults to true so local `dotnet run` keeps working unchanged; set
+// explicitly per-process in production (see docker-compose.yml / GOING_LIVE.md).
+var jobsEnabled = builder.Configuration.GetValue("Jobs:Enabled", true);
+
 // Repositories & Application services
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
@@ -60,7 +75,8 @@ builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IIncomeService, IncomeService>();
 builder.Services.AddScoped<IRecurringTemplateService, RecurringTemplateService>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
-builder.Services.AddHostedService<FinanceApp.Infrastructure.Services.RecurringTransactionJob>();
+if (jobsEnabled)
+    builder.Services.AddHostedService<FinanceApp.Infrastructure.Services.RecurringTransactionJob>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IBudgetNotificationService, BudgetNotificationService>();
@@ -73,7 +89,8 @@ builder.Services.Configure<FinanceApp.Infrastructure.Services.ExchangeRateSettin
 builder.Services.AddHttpClient(FinanceApp.Infrastructure.Services.ExchangeRateApiProvider.HttpClientName);
 builder.Services.AddSingleton<IExchangeRateStore, FinanceApp.Infrastructure.Services.ExchangeRateStore>();
 builder.Services.AddSingleton<IExchangeRateProvider, FinanceApp.Infrastructure.Services.ExchangeRateApiProvider>();
-builder.Services.AddHostedService<FinanceApp.Infrastructure.Services.ExchangeRateRefreshJob>();
+if (jobsEnabled)
+    builder.Services.AddHostedService<FinanceApp.Infrastructure.Services.ExchangeRateRefreshJob>();
 builder.Services.AddSingleton<SubscriptionProductMapper>();
 builder.Services.AddScoped<IAppleStoreTransactionVerifier, AppleStoreTransactionVerifier>();
 builder.Services.AddScoped<IGooglePlaySubscriptionVerifier, GooglePlaySubscriptionVerifier>();
@@ -81,24 +98,30 @@ builder.Services.AddScoped<ISubscriptionEntitlementService, SubscriptionEntitlem
 builder.Services.AddScoped<ISubscriptionBillingWebhookService, SubscriptionBillingWebhookService>();
 builder.Services.AddScoped<IStripeBillingService, StripeBillingService>();
 builder.Services.AddScoped<IStripeBillingWebhookHandler, StripeBillingWebhookHandler>();
+// Single upload root for everything user-uploaded (documents/, profiles/) — see
+// FinanceApp.Application.Interfaces.Services.IFileStorage for why this is behind an
+// interface rather than services touching File/Directory directly.
+builder.Services.AddSingleton<IFileStorage>(sp =>
+{
+    var env = sp.GetRequiredService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>();
+    return new LocalFileStorage(Path.Combine(env.WebRootPath, "uploads"));
+});
 builder.Services.AddScoped<ISupportingDocumentService>(sp =>
 {
     var repo = sp.GetRequiredService<IRepository<FinanceApp.Domain.Entities.SupportingDocument>>();
-    var env  = sp.GetRequiredService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>();
-    var uploadRoot = Path.Combine(env.WebRootPath, "uploads", "documents");
-    return new SupportingDocumentService(repo, uploadRoot);
+    var fileStorage = sp.GetRequiredService<IFileStorage>();
+    return new SupportingDocumentService(repo, fileStorage);
 });
 builder.Services.AddScoped<IAccountDeletionService>(sp =>
 {
     var context = sp.GetRequiredService<FinanceDbContext>();
     var userManager = sp.GetRequiredService<UserManager<ApplicationUser>>();
-    var env = sp.GetRequiredService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>();
+    var fileStorage = sp.GetRequiredService<IFileStorage>();
     var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<AccountDeletionService>>();
-    var documentUploadRoot = Path.Combine(env.WebRootPath, "uploads", "documents");
-    var profileUploadRoot = Path.Combine(env.WebRootPath, "uploads", "profiles");
-    return new AccountDeletionService(context, userManager, documentUploadRoot, profileUploadRoot, logger);
+    return new AccountDeletionService(context, userManager, fileStorage, logger);
 });
-builder.Services.AddHostedService<DailyActivityReminderJob>();
+if (jobsEnabled)
+    builder.Services.AddHostedService<DailyActivityReminderJob>();
 
 // Identity (required for JWT login). AddDefaultTokenProviders is required so
 // password-reset tokens can be generated for the forgot/reset password flow.
@@ -141,6 +164,14 @@ builder.Services.AddScoped<IBrandedEmailSender, BrandedEmailSender>();
 
 // JWT
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key is required.");
+// The repo's appsettings.json historically shipped a real, working default here — a
+// publicly known signing key. Refuse to boot on it outside Development, rather than
+// silently accepting requests signed by anyone who has read the source.
+const string KnownPublicDefaultJwtKey = "YourSuperSecretKeyThatIsAtLeast32CharactersLong!";
+if (jwtKey == KnownPublicDefaultJwtKey && !builder.Environment.IsDevelopment())
+    throw new InvalidOperationException(
+        "Jwt:Key is still set to the placeholder value committed in appsettings.json. " +
+        "Set a real, randomly generated value via Jwt__Key before deploying — see GOING_LIVE.md.");
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "FinanceApp.API";
 var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "FinanceApp";
 
@@ -187,24 +218,55 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 
-// CORS
+// CORS — locked to explicitly configured origins (Cors:AllowedOrigins:0, :1, ...) in
+// every environment except Development, where an empty list falls back to allow-any
+// so Swagger/local tooling keeps working without per-dev config. Native mobile HTTP
+// calls aren't subject to CORS at all; this matters for Swagger, Expo Web, and any
+// future browser-based client. See GOING_LIVE.md.
+var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
+        if (corsOrigins.Length > 0)
+            policy.WithOrigins(corsOrigins).AllowAnyMethod().AllowAnyHeader();
+        else if (builder.Environment.IsDevelopment())
+            policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+        else
+            policy.DisallowCredentials(); // no origins configured in prod: deny by default rather than open
     });
 });
 
+// Forwarded headers — required behind Caddy/nginx/any reverse proxy, or
+// Request.Scheme reads "http" and UseHttpsRedirection can loop. See GOING_LIVE.md.
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    // The proxy runs in the same docker-compose network, not a fixed public IP, so
+    // clear the default known-networks restriction rather than enumerate the bridge.
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<FinanceDbContext>();
+
 var app = builder.Build();
 
-// Ensure DB schema exists (required for SQLite in Testing; no-op for SQL Server with migrations)
+// Schema setup. Testing uses a throwaway SQLite file, so EnsureCreated is correct
+// there (no migration history to preserve). For SQL Server, calling EnsureCreated
+// against a FRESH database creates the schema with no __EFMigrationsHistory row,
+// which then permanently breaks `dotnet ef database update` — see GOING_LIVE.md.
+// Production applies migrations as a separate, explicit CD step (before this process
+// ever starts) rather than at app startup; Database:AutoMigrate is an opt-in for local
+// dev convenience only, off by default.
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<FinanceDbContext>();
-    await db.Database.EnsureCreatedAsync();
+    if (isTesting)
+        await db.Database.EnsureCreatedAsync();
+    else if (builder.Configuration.GetValue("Database:AutoMigrate", false))
+        await db.Database.MigrateAsync();
 }
 
 // Seed roles on startup (same as Web)
@@ -223,6 +285,7 @@ if (app.Environment.IsDevelopment())
     // Optional: add Swagger UI package later if needed
 }
 
+app.UseForwardedHeaders();
 if (!app.Environment.IsEnvironment("Testing"))
     app.UseHttpsRedirection();
 app.UseCors();
@@ -230,5 +293,6 @@ app.UseRequestLocalization();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 app.Run();
