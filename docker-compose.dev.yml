@@ -1,0 +1,22 @@
+# Local development — just the database. Run Web/API with `dotnet run` for hot reload;
+# containerizing them locally isn't worth the iteration-speed cost.
+#
+#   docker compose -f docker-compose.dev.yml up -d
+#
+# Matches the `sql_server` container name already referenced in CLAUDE.md's sqlcmd examples.
+
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sql_server
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: 'Y'
+      MSSQL_SA_PASSWORD: ${SA_PASSWORD:?set SA_PASSWORD in your shell or a .env file}
+    ports:
+      - '1433:1433'
+    volumes:
+      - dev-db-data:/var/opt/mssql
+
+volumes:
+  dev-db-data:

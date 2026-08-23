@@ -500,3 +500,4 @@ FinanceApp.Mobile/ios/
 *.jks
 .env.local
 .env.*.local
+google-service-account.json

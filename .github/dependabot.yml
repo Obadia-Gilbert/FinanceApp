@@ -1,0 +1,39 @@
+version: 2
+updates:
+  - package-ecosystem: 'nuget'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+    open-pull-requests-limit: 10
+    groups:
+      efcore:
+        patterns:
+          - 'Microsoft.EntityFrameworkCore*'
+      aspnet:
+        patterns:
+          - 'Microsoft.AspNetCore*'
+          - 'Microsoft.Extensions*'
+
+  - package-ecosystem: 'npm'
+    directory: '/FinanceApp.Mobile'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+    open-pull-requests-limit: 10
+    groups:
+      expo:
+        patterns:
+          - 'expo*'
+          - '@expo/*'
+      react:
+        patterns:
+          - 'react'
+          - 'react-dom'
+          - 'react-native*'
+
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'

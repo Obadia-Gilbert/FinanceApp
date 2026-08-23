@@ -1,0 +1,23 @@
+# See FinanceApp.Documentations/GOING_LIVE.md for the full runbook.
+# Replace the two hostnames with your real domain before first deploy.
+
+{$WEB_DOMAIN:app.yourdomain.com} {
+	reverse_proxy web:8080
+	encode gzip zstd
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+	}
+}
+
+{$API_DOMAIN:api.yourdomain.com} {
+	reverse_proxy api:8080
+	encode gzip zstd
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+	}
+}

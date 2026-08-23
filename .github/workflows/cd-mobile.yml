@@ -1,0 +1,82 @@
+name: CD — Mobile
+
+on:
+  push:
+    tags: ['mobile-v*']
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform to build/submit'
+        required: true
+        default: 'all'
+        type: choice
+        options: [all, ios, android]
+
+concurrency:
+  group: cd-mobile-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify (typecheck)
+    uses: ./.github/workflows/ci.yml
+
+  build-and-submit:
+    name: Build & submit
+    needs: verify
+    runs-on: ubuntu-latest
+    environment: production # requires a reviewer — see repo Settings → Environments
+    defaults:
+      run:
+        working-directory: FinanceApp.Mobile
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: FinanceApp.Mobile/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Write Google Play service account
+        run: echo '${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}' > google-service-account.json
+
+      - name: EAS Build (production profile)
+        run: >
+          eas build --non-interactive --no-wait
+          --platform ${{ github.event.inputs.platform || 'all' }}
+          --profile production
+        env:
+          # Real production URL — never the localhost default in .env.example.
+          EXPO_PUBLIC_API_URL: ${{ secrets.PRODUCTION_API_URL }}
+
+      - name: Wait for build completion
+        run: eas build:list --status finished --limit 1 --non-interactive --json
+
+      # Ships to TestFlight / Play internal track only. Promotion to public production
+      # release stays a manual step in App Store Connect / Play Console — see
+      # FinanceApp.Documentations/STORE_SUBMISSION.md.
+      - name: Submit to TestFlight
+        if: github.event.inputs.platform != 'android'
+        run: eas submit --platform ios --profile production --non-interactive --latest
+        env:
+          EXPO_APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+
+      - name: Submit to Play internal track
+        if: github.event.inputs.platform != 'ios'
+        run: eas submit --platform android --profile production --non-interactive --latest
+
+      - name: Clean up credentials
+        if: always()
+        run: rm -f google-service-account.json

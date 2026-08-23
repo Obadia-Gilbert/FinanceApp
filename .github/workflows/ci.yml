@@ -1,0 +1,146 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_call: {} # allows cd-backend.yml / cd-mobile.yml to require a green CI run
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  changes:
+    name: Detect changed areas
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      mobile: ${{ steps.filter.outputs.mobile }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'FinanceApp.Domain/**'
+              - 'FinanceApp.Application/**'
+              - 'FinanceApp.Infrastructure/**'
+              - 'FinanceApp.Web/**'
+              - 'FinanceApp.API/**'
+              - 'FinanceApp.Localization/**'
+              - 'FinanceApp.Tests/**'
+              - 'FinanceApp.API.Tests/**'
+              - 'FinanceApp.slnx'
+              - 'Shared/**'
+            mobile:
+              - 'FinanceApp.Mobile/**'
+
+  backend:
+    name: Backend (build + test)
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Restore
+        run: dotnet restore FinanceApp.slnx
+
+      - name: Build
+        run: dotnet build FinanceApp.slnx --no-restore --configuration Release
+
+      - name: Test
+        run: >
+          dotnet test FinanceApp.slnx --no-build --configuration Release
+          --logger "trx;LogFileName=test-results.trx"
+          --results-directory ./TestResults
+          --collect:"XPlat Code Coverage"
+
+      - name: Publish test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-results
+          path: TestResults/
+          retention-days: 14
+
+  mobile:
+    name: Mobile (typecheck + lint)
+    needs: changes
+    if: needs.changes.outputs.mobile == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: FinanceApp.Mobile
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: FinanceApp.Mobile/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Lint
+        # Non-blocking for now: the baseline (as of this pipeline's introduction) has
+        # pre-existing findings in code this pipeline didn't touch. Tighten to blocking
+        # once that backlog is triaged — see FinanceApp.Documentations/GOING_LIVE.md.
+        run: npx expo lint || echo "::warning::ESLint found issues — non-blocking until the pre-existing baseline is triaged"
+        continue-on-error: true
+
+  security:
+    name: Security scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Gitleaks (secret scanning)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: .NET dependency vulnerability scan
+        run: |
+          dotnet restore FinanceApp.slnx
+          dotnet list FinanceApp.slnx package --vulnerable --include-transitive 2>&1 | tee vuln-report.txt
+          if grep -qi "has the following vulnerable packages" vuln-report.txt; then
+            echo "::warning::Vulnerable NuGet packages found — see job summary. Not yet gating the build; see GOING_LIVE.md."
+          fi
+
+      - name: Mobile dependency audit
+        working-directory: FinanceApp.Mobile
+        run: npm audit --audit-level=critical || echo "::warning::npm audit found issues at or above the audit-level threshold"
+
+  # CodeQL and Dependabot are configured separately:
+  #   .github/workflows/codeql.yml
+  #   .github/dependabot.yml

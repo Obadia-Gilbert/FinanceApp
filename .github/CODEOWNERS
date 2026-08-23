@@ -1,0 +1,10 @@
+# Default owner for everything not matched below.
+* @Obadia-Gilbert
+
+# Anything touching deploy/infra needs an explicit look before merge.
+/.github/                          @Obadia-Gilbert
+/docker-compose*.yml               @Obadia-Gilbert
+/Caddyfile                         @Obadia-Gilbert
+/FinanceApp.API/Dockerfile         @Obadia-Gilbert
+/FinanceApp.Web/Dockerfile         @Obadia-Gilbert
+/FinanceApp.Mobile/eas.json        @Obadia-Gilbert

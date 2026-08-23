@@ -1,0 +1,187 @@
+name: CD — Backend
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Git ref to deploy (tag or SHA)'
+        required: true
+        default: 'main'
+
+concurrency:
+  group: cd-backend-production
+  cancel-in-progress: false # never cancel a deploy mid-flight
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAMESPACE: ${{ github.repository }}
+
+jobs:
+  # Re-run the same gates CI already defines, so a tag pushed without going through a
+  # green PR still can't reach production.
+  verify:
+    name: Verify (build + test)
+    uses: ./.github/workflows/ci.yml
+
+  build-and-push:
+    name: Build & push images
+    needs: verify
+    runs-on: ubuntu-latest
+    outputs:
+      sha_tag: ${{ steps.meta.outputs.sha_tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: meta
+        run: echo "sha_tag=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push API image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: FinanceApp.API/Dockerfile
+          target: runtime
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/api:${{ steps.meta.outputs.sha_tag }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/api:${{ github.ref_name }}
+          cache-from: type=gha,scope=api
+          cache-to: type=gha,mode=max,scope=api
+
+      - name: Build & push migrator image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: FinanceApp.API/Dockerfile
+          target: migrator
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/migrator:${{ steps.meta.outputs.sha_tag }}
+          cache-from: type=gha,scope=api
+          cache-to: type=gha,mode=max,scope=migrator
+
+      - name: Build & push Web image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: FinanceApp.Web/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/web:${{ steps.meta.outputs.sha_tag }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/web:${{ github.ref_name }}
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,mode=max,scope=web
+
+  deploy:
+    name: Deploy to production
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    # Requires a "production" GitHub Environment configured with a required reviewer —
+    # one human approves before this job runs. Repo Settings → Environments → production.
+    environment: production
+    env:
+      NEW_TAG: ${{ needs.build-and-push.outputs.sha_tag }}
+    steps:
+      - name: Snapshot current .env (for rollback)
+        # .env is host-local and gitignored by design (it holds production secrets —
+        # see GOING_LIVE.md), so rollback restores from this snapshot, not from git.
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: cp /srv/financeapp/.env /srv/financeapp/.env.previous
+
+      - name: Back up the database
+        # Belt-and-braces before schema changes touch it — separate from the nightly
+        # cron backup in GOING_LIVE.md, taken specifically pre-migration so a rollback
+        # here restores the exact pre-deploy state.
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+            docker exec financeapp-db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa \
+              -P "$(grep '^SA_PASSWORD=' /srv/financeapp/.env | cut -d= -f2)" -C \
+              -Q "BACKUP DATABASE FinanceApp TO DISK='/backups/pre-deploy-${{ env.NEW_TAG }}.bak' WITH INIT, COMPRESSION"
+
+      - name: Apply pending migrations
+        # Its own step, run BEFORE the app containers restart. This is exactly the
+        # ordering that stops EnsureCreatedAsync-style migration-history corruption —
+        # see GOING_LIVE.md. `docker run` against the migrator image, not the app
+        # containers, since the runtime image intentionally carries no SDK / ef tool.
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+            cd /srv/financeapp
+            docker run --rm --env-file .env --network financeapp_internal \
+              ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/migrator:${{ env.NEW_TAG }}
+
+      - name: Deploy new images
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+            cd /srv/financeapp
+            sed -i "s|^API_IMAGE=.*|API_IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/api:${{ env.NEW_TAG }}|" .env
+            sed -i "s|^WEB_IMAGE=.*|WEB_IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/web:${{ env.NEW_TAG }}|" .env
+            docker compose pull api web
+            docker compose up -d api web
+
+      - name: Wait for health
+        id: health
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            for i in $(seq 1 12); do
+              api_ok=$(docker inspect --format='{{.State.Health.Status}}' financeapp-api 2>/dev/null || echo starting)
+              web_ok=$(docker inspect --format='{{.State.Health.Status}}' financeapp-web 2>/dev/null || echo starting)
+              if [ "$api_ok" = "healthy" ] && [ "$web_ok" = "healthy" ]; then
+                echo "healthy"; exit 0
+              fi
+              sleep 10
+            done
+            echo "unhealthy after 120s"; exit 1
+
+      - name: Roll back on failed health check
+        if: failure() && steps.health.outcome == 'failure'
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+            cd /srv/financeapp
+            echo "Health check failed — restoring the previous image tags."
+            cp .env.previous .env
+            docker compose pull api web
+            docker compose up -d api web
+            echo "::error::Deploy rolled back to the previous images. The pre-migration DB backup" \
+                 "(pre-deploy-${{ env.NEW_TAG }}.bak) is on disk if a schema rollback is also needed" \
+                 "— restoring it is a manual, deliberate step, not automated here."
