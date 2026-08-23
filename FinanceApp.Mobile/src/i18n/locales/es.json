@@ -53,6 +53,7 @@
     "profile": "Perfil",
     "feedback": "Comentarios",
     "privacyPolicy": "Política de privacidad",
+    "termsOfService": "Términos de servicio",
     "upgradeBadge": "Mejorar",
     "viewProfile": "Ver perfil de {{name}}"
   },
@@ -178,6 +179,9 @@
     "faqTitle": "Preguntas frecuentes",
     "footerIos": "PAGO SEGURO VÍA APP STORE",
     "footerAndroid": "PAGO SEGURO VÍA GOOGLE PLAY",
+    "disclosure": "Las suscripciones se renuevan automáticamente cada mes al precio mostrado, salvo que se cancelen al menos 24 horas antes de la renovación. Administra o cancela en cualquier momento desde tu cuenta de App Store o Google Play.",
+    "termsLink": "Términos de servicio",
+    "privacyLink": "Política de privacidad",
     "restoreSuccessTitle": "Restaurado",
     "restoreSuccessBody": "Tu suscripción se sincronizó con el servidor.",
     "features": {

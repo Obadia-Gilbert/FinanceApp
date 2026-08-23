@@ -196,7 +196,7 @@ export default function RegisterScreen() {
             </TouchableOpacity>
             <Text style={[styles.termsText, { color: colors.text.body }]}>
               I agree to the{' '}
-              <Text style={[styles.termsLink, { color: colors.brand }]} onPress={() => router.push('/(auth)/privacy')}>
+              <Text style={[styles.termsLink, { color: colors.brand }]} onPress={() => router.push('/(auth)/terms')}>
                 Terms of Service
               </Text>
               {' '}and{' '}

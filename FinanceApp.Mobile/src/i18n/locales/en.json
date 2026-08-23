@@ -53,6 +53,7 @@
     "profile": "Profile",
     "feedback": "Feedback",
     "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
     "upgradeBadge": "Upgrade",
     "viewProfile": "View {{name}}'s profile"
   },
@@ -178,6 +179,9 @@
     "faqTitle": "Frequently Asked Questions",
     "footerIos": "SECURE CHECKOUT VIA APP STORE",
     "footerAndroid": "SECURE CHECKOUT VIA GOOGLE PLAY",
+    "disclosure": "Subscriptions renew automatically each month at the price shown unless cancelled at least 24 hours before the renewal date. Manage or cancel anytime in your App Store or Google Play account settings.",
+    "termsLink": "Terms of Service",
+    "privacyLink": "Privacy Policy",
     "restoreSuccessTitle": "Restored",
     "restoreSuccessBody": "Your subscription was synced with the server.",
     "features": {
@@ -213,8 +217,8 @@
         "a": "Use In-App Purchase on this device. The app verifies your purchase with our server before unlocking Pro or Premium."
       },
       "web": {
-        "q": "Can I use the website to pay?",
-        "a": "Yes. Subscribe on the web (Stripe on the Subscription page) or in this app via App Store / Google Play. The same account gets Pro or Premium on web and mobile after sign-in."
+        "q": "Does my subscription work on both web and mobile?",
+        "a": "Yes. Sign in with the same account and your plan applies everywhere — the app and the website."
       }
     },
     "errors": {

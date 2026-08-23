@@ -53,6 +53,7 @@
     "profile": "Wasifu",
     "feedback": "Maoni",
     "privacyPolicy": "Sera ya faragha",
+    "termsOfService": "Masharti ya huduma",
     "upgradeBadge": "Boresha",
     "viewProfile": "Angalia wasifu wa {{name}}"
   },
@@ -178,6 +179,9 @@
     "faqTitle": "Maswali yanayoulizwa mara kwa mara",
     "footerIos": "MALIPO SALAMA KUPITIA APP STORE",
     "footerAndroid": "MALIPO SALAMA KUPITIA GOOGLE PLAY",
+    "disclosure": "Usajili unajirejesha kila mwezi kwa bei iliyoonyeshwa isipokuwa ukighairi angalau saa 24 kabla ya tarehe ya kujirejesha. Simamia au ghairi wakati wowote katika mipangilio ya akaunti yako ya App Store au Google Play.",
+    "termsLink": "Masharti ya huduma",
+    "privacyLink": "Sera ya faragha",
     "restoreSuccessTitle": "Imerejeshwa",
     "restoreSuccessBody": "Usajili wako umesawazishwa na seva.",
     "features": {

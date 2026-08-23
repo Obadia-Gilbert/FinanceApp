@@ -3,7 +3,7 @@
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
 @{
     var path = Context.Request.Path.Value?.ToLowerInvariant() ?? string.Empty;
-    var showShell = !path.Contains("/identity/account/login") && !path.Contains("/identity/account/register") && !path.Contains("/identity/account/forgotpassword") && !path.Contains("/identity/account/externallogin") && !path.Contains("/home/privacy");
+    var showShell = !path.Contains("/identity/account/login") && !path.Contains("/identity/account/register") && !path.Contains("/identity/account/forgotpassword") && !path.Contains("/identity/account/externallogin") && !path.Contains("/home/privacy") && !path.Contains("/home/terms");
 }
 <html lang="@CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
 <head>

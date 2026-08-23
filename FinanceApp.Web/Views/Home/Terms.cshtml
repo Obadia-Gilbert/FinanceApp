@@ -1,0 +1,102 @@
+@{
+    ViewData["Title"] = "Terms of Service";
+}
+
+<style>
+.terms-page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2.5rem 1rem 4rem;
+}
+.terms-page h1 {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--ink-900);
+    margin-bottom: 0.25rem;
+}
+.terms-page .updated {
+    font-size: var(--text-sm);
+    color: var(--ink-500);
+    margin-bottom: 2rem;
+}
+.terms-page h2 {
+    font-size: var(--text-md);
+    font-weight: 700;
+    color: var(--brand-strong);
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+}
+.terms-page p, .terms-page li {
+    font-size: var(--text-base);
+    line-height: 1.7;
+    color: var(--ink-700);
+}
+.terms-page ul {
+    padding-left: 1.25rem;
+    margin-bottom: 1rem;
+}
+.terms-contact {
+    margin-top: 2.5rem;
+    padding: 1.25rem;
+    background: var(--surface-inset);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+}
+</style>
+
+<div class="terms-page">
+    <h1>Terms of Service</h1>
+    <p class="updated">Last updated: March 1, 2026</p>
+
+    <p>These terms govern your use of FinanceApp. By creating an account or using the app or website, you agree to them.</p>
+
+    <h2>1. Acceptance of terms</h2>
+    <p>By creating an account, you confirm you are at least 18 years old (or the age of legal majority in your jurisdiction) and agree to these Terms of Service and our <a asp-controller="Home" asp-action="Privacy">Privacy Policy</a>. If you do not agree, do not use FinanceApp.</p>
+
+    <h2>2. What FinanceApp is</h2>
+    <p>FinanceApp is a personal finance tracker: you manually record expenses, income, accounts, and budgets. FinanceApp does not connect to your bank, does not move money on your behalf, and is not a bank, broker, or licensed financial advisor. Nothing in the app or website is investment, tax, or legal advice.</p>
+
+    <h2>3. Your account</h2>
+    <ul>
+        <li>You are responsible for keeping your login credentials secure and for all activity under your account.</li>
+        <li>You must provide accurate information when you register.</li>
+        <li>You may delete your account at any time from your Profile page (web) or Profile → Delete Account (mobile app) — no need to contact support. See our Privacy Policy for what happens to your data.</li>
+    </ul>
+
+    <h2>4. Acceptable use</h2>
+    <p>You agree not to:</p>
+    <ul>
+        <li>Use the service for any unlawful purpose, or to store or transmit unlawful content.</li>
+        <li>Attempt to gain unauthorized access to any account, system, or network connected to FinanceApp.</li>
+        <li>Reverse-engineer, decompile, or interfere with the normal operation of the app or website.</li>
+        <li>Use automated tools to scrape or abuse the service.</li>
+    </ul>
+
+    <h2>5. Subscriptions &amp; billing</h2>
+    <ul>
+        <li>FinanceApp offers optional paid subscription tiers (Pro, Premium) that unlock additional features. The Free tier remains available at no cost.</li>
+        <li>Subscriptions purchased on the website are billed via Stripe; subscriptions purchased in the mobile app are billed by Apple (App Store) or Google (Google Play) under their respective terms. All subscriptions auto-renew until cancelled.</li>
+        <li>You can manage or cancel a web subscription from your account settings, or an app subscription in your App Store / Google Play account settings. Cancelling stops future renewals; it does not refund the current billing period unless required by law.</li>
+        <li>Prices are shown before purchase and may vary by region and currency.</li>
+    </ul>
+
+    <h2>6. Your content</h2>
+    <p>You retain ownership of the financial data, receipts, and documents you enter or upload. You grant FinanceApp a limited license to store and process that content solely to operate the service for you — see our Privacy Policy for details.</p>
+
+    <h2>7. Disclaimers</h2>
+    <p>FinanceApp is provided "as is" without warranties of any kind, express or implied. We do not guarantee the service will be uninterrupted, error-free, or that calculations (budgets, currency conversion, reports) will be free of mistakes. You are responsible for verifying important financial figures independently.</p>
+
+    <h2>8. Limitation of liability</h2>
+    <p>To the maximum extent permitted by law, FinanceApp and its operators are not liable for any indirect, incidental, or consequential damages arising from your use of the service, including financial decisions made based on data in the app.</p>
+
+    <h2>9. Changes to these terms</h2>
+    <p>We may update these terms from time to time. When we do, the "Last updated" date above will change, and significant changes will be communicated through the app or website. Continued use after an update constitutes acceptance of the revised terms.</p>
+
+    <h2>10. Termination</h2>
+    <p>You may stop using FinanceApp and delete your account at any time. We may suspend or terminate access for accounts that violate these terms, including the acceptable-use rules in Section 4.</p>
+
+    <div class="terms-contact">
+        <strong>11. Contact us</strong>
+        <p class="mb-0 mt-2">Questions about these terms? Contact <a href="mailto:support@financeapp.io">support@financeapp.io</a>.</p>
+    </div>
+</div>

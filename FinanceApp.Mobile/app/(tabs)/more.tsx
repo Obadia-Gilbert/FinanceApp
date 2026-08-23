@@ -121,6 +121,7 @@ export default function MoreScreen() {
     { label: t('more.profile'), href: '/(tabs)/profile', icon: 'profile' },
     { label: t('more.feedback'), href: '/(tabs)/feedback', icon: 'feedback' },
     { label: t('more.privacyPolicy'), href: '/(tabs)/privacy', icon: 'privacy' },
+    { label: t('more.termsOfService'), href: '/(tabs)/terms', icon: 'terms' },
   ];
 
   return (

@@ -93,6 +93,10 @@ export default function TabsLayout() {
         name="privacy"
         options={{ href: null, title: t('more.privacyPolicy'), headerLeft: () => <BackToMoreButton /> }}
       />
+      <Tabs.Screen
+        name="terms"
+        options={{ href: null, title: t('more.termsOfService'), headerLeft: () => <BackToMoreButton /> }}
+      />
       <Tabs.Screen name="income" options={{ href: null, headerShown: false }} />
       <Tabs.Screen name="accounts" options={{ href: null, headerShown: false }} />
       <Tabs.Screen name="transactions" options={{ href: null, headerShown: false }} />

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Platform, ActivityIndicator, Linking } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../src/context/ThemeContext';
@@ -8,11 +9,12 @@ import { Card } from '../../src/components/Card';
 import { Button } from '../../src/components/Button';
 import { getSubscription } from '../../src/api/subscription';
 import { useSubscriptionIap } from '../../src/iap/useSubscriptionIap';
-import { getStoreProductId } from '../../src/iap/config';
+import { getStoreProductId, type IapTier } from '../../src/iap/config';
 
 export default function SubscriptionScreen() {
   const { t } = useTranslation();
   const { colors } = useTheme();
+  const router = useRouter();
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const { available, loading, products, error, subscribe, restore } = useSubscriptionIap();
 
@@ -31,17 +33,21 @@ export default function SubscriptionScreen() {
   const proProduct = products.find((p) => p.productId === proSku);
   const proPrice = proProduct?.localizedPrice ?? '$9.99';
 
+  const premiumSku = getStoreProductId('premium');
+  const premiumProduct = products.find((p) => p.productId === premiumSku);
+  const premiumPrice = premiumProduct?.localizedPrice ?? '$24.99';
+
   const showError = (message: string) => {
     Alert.alert(t('subscription.errors.title'), message);
   };
 
-  const onSubscribePress = async () => {
+  const onSubscribePress = async (tier: IapTier) => {
     if (!available) {
       showError(error ?? t('subscription.errors.storeUnavailable'));
       return;
     }
     try {
-      await subscribe('pro');
+      await subscribe(tier);
     } catch (e) {
       showError(e instanceof Error ? e.message : t('subscription.errors.purchaseFailed'));
     }
@@ -149,7 +155,7 @@ export default function SubscriptionScreen() {
                 : t('subscription.subscribeGooglePlay')
           }
           style={styles.upgradeBtn}
-          onPress={onSubscribePress}
+          onPress={() => onSubscribePress('pro')}
           disabled={loading}
         />
         <View style={styles.featureList}>
@@ -166,15 +172,23 @@ export default function SubscriptionScreen() {
       <Card style={styles.planCard}>
         <Text style={[styles.planName, { color: colors.text.primary }]}>{t('subscription.plans.premium')}</Text>
         <View style={styles.priceRow}>
-          <Text style={[styles.price, { color: colors.text.primary }]}>$24.99</Text>
+          <Text style={[styles.price, { color: colors.text.primary }]}>{premiumPrice}</Text>
           <Text style={[styles.pricePeriod, { color: colors.text.muted }]}>{t('subscription.perMonth')}</Text>
         </View>
         <Text style={[styles.planDesc, { color: colors.text.muted }]}>{t('subscription.premiumDesc')}</Text>
-        <TouchableOpacity style={[styles.contactBtn, { backgroundColor: colors.bg.hover, borderColor: colors.border }]}>
-          <Text style={[styles.contactBtnText, { color: colors.text.primary }]}>
-            {t('subscription.contactSales')}
-          </Text>
-        </TouchableOpacity>
+        <Button
+          title={
+            loading
+              ? t('subscription.processing')
+              : Platform.OS === 'ios'
+                ? t('subscription.subscribeAppStore')
+                : t('subscription.subscribeGooglePlay')
+          }
+          variant="secondary"
+          style={styles.upgradeBtn}
+          onPress={() => onSubscribePress('premium')}
+          disabled={loading}
+        />
         <View style={styles.featureList}>
           {Array.isArray(premiumFeatures) &&
             premiumFeatures.map((f, i) => (
@@ -209,6 +223,17 @@ export default function SubscriptionScreen() {
       <Text style={[styles.footer, { color: colors.text.subtle }]}>
         {Platform.OS === 'ios' ? t('subscription.footerIos') : t('subscription.footerAndroid')}
       </Text>
+
+      <Text style={[styles.disclosure, { color: colors.text.subtle }]}>{t('subscription.disclosure')}</Text>
+      <View style={styles.legalLinks}>
+        <TouchableOpacity onPress={() => router.push('/(tabs)/terms')}>
+          <Text style={[styles.legalLink, { color: colors.brand }]}>{t('subscription.termsLink')}</Text>
+        </TouchableOpacity>
+        <Text style={[styles.legalSeparator, { color: colors.text.subtle }]}>·</Text>
+        <TouchableOpacity onPress={() => router.push('/(tabs)/privacy')}>
+          <Text style={[styles.legalLink, { color: colors.brand }]}>{t('subscription.privacyLink')}</Text>
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 }
@@ -251,4 +276,8 @@ const styles = StyleSheet.create({
   faqChevron: { fontSize: 12 },
   faqA: { fontSize: 14, marginTop: 10, lineHeight: 20 },
   footer: { fontSize: 11, textAlign: 'center', marginTop: 16, letterSpacing: 0.5 },
+  disclosure: { fontSize: 11, textAlign: 'center', marginTop: 12, lineHeight: 16, paddingHorizontal: 8 },
+  legalLinks: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 8, marginTop: 10 },
+  legalLink: { fontSize: 12, fontWeight: '600' },
+  legalSeparator: { fontSize: 12 },
 });

@@ -35,6 +35,7 @@ export const iconNames = {
   help: 'help-circle-outline',
   idea: 'bulb-outline',
   privacy: 'lock-closed-outline',
+  terms: 'document-outline',
   language: 'globe-outline',
   signOut: 'log-out-outline',
 

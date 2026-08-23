@@ -104,7 +104,7 @@ export default function PrivacyScreen() {
       <View style={[styles.contactCard, { backgroundColor: colors.bg.default, borderColor: colors.border }]}>
         <Text style={[styles.contactTitle, { color: colors.text.primary }]}>10  Contact Us</Text>
         <Text style={[styles.body, { color: colors.text.muted }]}>
-          Have questions, concerns, or a data request? We're here to help. Contact privacy@financeapp.local. We aim to respond to all privacy-related inquiries within 5 business days.
+          Have questions, concerns, or a data request? We're here to help. Contact privacy@financeapp.io. We aim to respond to all privacy-related inquiries within 5 business days.
         </Text>
       </View>
     </ScrollView>
