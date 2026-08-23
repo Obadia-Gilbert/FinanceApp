@@ -133,7 +133,25 @@
     "phonePrefixHint": "El prefijo se deriva del país. Escribe los dígitos restantes.",
     "dailyReminderTitle": "Recordatorio diario de actividad",
     "dailyReminderHint": "Notifícame cada día si no he registrado gastos o ingresos.",
-    "updateFailed": "No se pudo actualizar el perfil"
+    "updateFailed": "No se pudo actualizar el perfil",
+    "deleteAccount": "Eliminar cuenta",
+    "deleteAccountConfirmTitle": "¿Eliminar tu cuenta?",
+    "deleteAccountConfirmMessage": "Esto elimina permanentemente tu cuenta y todos tus datos. No se puede deshacer.",
+    "deleteAccountWarning": "Todos tus gastos, ingresos, cuentas, transacciones, presupuestos, categorías y documentos subidos se eliminarán permanentemente.",
+    "deleteAccountPasswordPrompt": "Introduce tu contraseña actual",
+    "deleteAccountTypeConfirm": "Escribe {{email}} para confirmar",
+    "deleteAccountFailed": "No se pudo eliminar la cuenta"
+  },
+  "onboarding": {
+    "skip": "Omitir",
+    "next": "Siguiente",
+    "getStarted": "Comenzar",
+    "slide1Title": "Registra cada chelín, dólar o euro",
+    "slide1Body": "Registra gastos e ingresos en segundos, en la moneda que gastes.",
+    "slide2Title": "Presupuestos que realmente funcionan",
+    "slide2Body": "Presupuestos por categoría, límites mensuales y alertas antes de gastar de más.",
+    "slide3Title": "Ve el panorama completo",
+    "slide3Body": "Informes e información que muestran a dónde va realmente tu dinero."
   },
   "subscription": {
     "currentPlan": "Plan actual",

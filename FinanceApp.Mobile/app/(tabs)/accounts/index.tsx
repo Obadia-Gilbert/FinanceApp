@@ -6,7 +6,7 @@ import { useTheme } from '../../../src/context/ThemeContext';
 import { Card } from '../../../src/components/Card';
 import { Icon, type IconName } from '../../../src/components/Icon';
 import { getAccounts } from '../../../src/api/accounts';
-import { formatCurrencyCode } from '../../../src/utils/currency';
+import { formatCurrencyCode, formatAmount } from '../../../src/utils/currency';
 import type { AccountDto } from '../../../src/types/api';
 
 const ACCOUNT_TYPE_LABELS: Record<string, string> = {
@@ -82,7 +82,7 @@ export default function AccountsListScreen() {
                     TOTAL {formatCurrencyCode(currency)}
                   </Text>
                   <Text style={[styles.summaryValue, { color: total < 0 ? colors.danger : colors.text.primary }]}>
-                    {total.toLocaleString()}
+                    {formatAmount(total, currency)}
                   </Text>
                 </Card>
               ))}
@@ -120,7 +120,7 @@ export default function AccountsListScreen() {
                   { color: Number(item.currentBalance) < 0 ? colors.danger : colors.text.primary },
                 ]}
               >
-                {Number(item.currentBalance).toLocaleString()}
+                {formatAmount(Number(item.currentBalance), item.currency)}
                 <Text style={[styles.rowBalanceCode, { color: colors.text.muted }]}> {formatCurrencyCode(item.currency)}</Text>
               </Text>
             </Card>

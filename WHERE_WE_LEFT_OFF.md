@@ -1,6 +1,6 @@
 # Where We Left Off
 
-**Last updated:** 23 August 2026 — aligned with [README.md](./README.md) and [Current-State.md](./FinanceApp.Documentations/Current-State.md): backend + web + **Expo mobile** (`FinanceApp.Mobile`), notifications, monthly report + share, recurring job, **localization (en / es / sw)**, **multi-currency correctness + ISO-4217 storage + live forex**, tests.
+**Last updated:** 23 August 2026 — aligned with [README.md](./README.md) and [Current-State.md](./FinanceApp.Documentations/Current-State.md): backend + web + **Expo mobile** (`FinanceApp.Mobile`), notifications, monthly report + share, recurring job, **localization (en / es / sw)**, **multi-currency correctness + ISO-4217 storage + live forex**, **self-service account deletion (Web + API + mobile, store-compliance requirement)**, **mobile first-run onboarding carousel**, tests.
 
 > **When to edit this file:** Bump the date above and adjust sections when the stack, ports, or priorities in README / Current-State change materially (not every small commit).
 
@@ -10,7 +10,8 @@
 
 - **Web app (FinanceApp.Web):** Landing page, auth (login/register, forgot password, external login), dashboard, expenses, income, categories, budgets, accounts, transactions, recurring (web flows), profile (with phone/country), supporting documents, **notifications** (bell + dropdown, mark read, full list at `/Notification/Index`), **monthly report** (`Report/Index`: month picker, totals, by category, top expenses, download as HTML, shareable link). Layout: fixed sidebar/navbar, landing at `/` for unauthenticated users. **Localization:** `FinanceApp.Localization` + `IStringLocalizer<SharedResource>` across major views; language switcher; culture from cookie / query / `Accept-Language` / user **PreferredLanguage**.
 - **API (FinanceApp.API):** Feature parity with mobile-oriented clients: Auth (register/login/refresh/revoke), Expenses (CRUD, filter, receipt stream, Excel export), Categories, Budgets, Accounts, Transactions, Income, Profile, Subscription, Supporting Documents, **Notifications**, **Reports** (`GET /api/Reports/monthly?year=&month=`), Recurring (`/api/recurring`), Feedback, Dashboard. JWT auth; **OpenAPI** at `/openapi/v1.json`. **Testing:** SQLite when `EnvironmentName == "Testing"`; `appsettings.Testing.json` for JWT.
-- **Mobile app (`FinanceApp.Mobile`):** React Native **Expo** app in-repo (not part of `FinanceApp.slnx`). Uses **FinanceApp.API** with JWT + refresh (SecureStore). Covers auth, dashboard, expenses, income, budget, accounts, transactions, categories, recurring, reports, notifications, subscription, feedback, profile, theme, and more. **i18next** + persisted locale; API calls send **`Accept-Language`**. See **`FinanceApp.Mobile/README.md`** for run instructions (`EXPO_PUBLIC_API_URL`, API **`Mobile`** launch profile on port **5279**).
+- **Mobile app (`FinanceApp.Mobile`):** React Native **Expo** app in-repo (not part of `FinanceApp.slnx`). Uses **FinanceApp.API** with JWT + refresh (SecureStore). Covers auth, dashboard, expenses, income, budget, accounts, transactions, categories, recurring, reports, notifications, subscription, feedback, profile, theme, and more. **i18next** + persisted locale; API calls send **`Accept-Language`**. **First-run onboarding carousel** (`app/onboarding.tsx`, 3 slides, shown once via AsyncStorage flag, gates only signed-out users before `/(auth)/login`). See **`FinanceApp.Mobile/README.md`** for run instructions (`EXPO_PUBLIC_API_URL`, API **`Mobile`** launch profile on port **5279**).
+- **Account deletion (store-compliance requirement, done):** Self-service account deletion, required by Apple Guideline 5.1.1(v) and Google Play policy before store submission. `IAccountDeletionService` (`FinanceApp.Application`/`FinanceApp.Infrastructure`) purges every owned row across all business tables in FK-safe order inside one DB transaction, then the Identity user, then uploaded files — see `AccountDeletionService.cs`. Re-auth required before deletion: current password for local accounts, typed email confirmation for social-login-only accounts. Wired into `ProfileController` on both Web (`POST /Profile/DeleteAccount`, danger-zone modal on Edit Profile) and API (`DELETE /api/Profile`, `GET /api/Profile/deletion-status`), and into the mobile Profile screen (Account Management → Delete Account). Also fixed a pre-existing bug where the admin panel's "delete user" action only called `UserManager.DeleteAsync` and silently orphaned every owned row — it now goes through the same service.
 - **Tests:**
   - **FinanceApp.Tests:** Unit tests (ExpenseService, CategoryService, localization resource smoke checks, …) — xUnit, Moq. Run `dotnet test` for current count.
   - **FinanceApp.API.Tests:** Integration tests (Auth + Expenses, …) — WebApplicationFactory, SQLite test DB. All passing.
@@ -26,7 +27,9 @@
 
 **Phase 2 — live forex (done).** `ExchangeRateRefreshJob` fetches from `open.er-api.com` (free, no key) on a configurable interval and feeds `ExchangeRateStore`, which resolves each currency live-fetched > configured override > hardcoded default so a network hiccup never blocks a conversion. Registered in both Web and API, each keeping its own in-memory store. See `FinanceApp.Documentations/Current-State.md` → Multi-currency for the resolution chain.
 
-**Phase 3+ — not started.** User-level base currency (+ currency selection at signup), per-transaction historical rate capture, and per-currency decimal precision.
+**Mobile display precision (done).** `formatAmount()` in `FinanceApp.Mobile/src/utils/currency.ts` now formats zero-decimal currencies (JPY) with no decimal places instead of always showing 2 — applied across all mobile screens that render a currency-tagged amount (expenses, income, budgets, accounts, transactions, recurring, categories, reports, dashboard). Also removed a dead ordinal-index code path (`getCurrencyIndex` and a numeric branch in `formatCurrencyCode`) that assumed currency was sent as an enum index — nothing called it, but it was exactly the pattern `CLAUDE.md` warns against reintroducing.
+
+**Phase 3+ — not started.** User-level base currency (+ currency selection at signup), per-transaction historical rate capture.
 
 ---
 
@@ -35,6 +38,7 @@
 1. **Polish and ship mobile v1**  
    - Core flows are implemented; treat remaining work as **QA, UX polish, store readiness**, and any gaps you still want in v1 (see mobile README).  
    - Keep API URL and **Mobile** API profile documented when testing on a device.
+   - Account deletion and onboarding were verified via direct API testing (real FK-safe purge confirmed against dev DB across all 18 tables) and `tsc`/`dotnet test` passing — the mobile Delete Account modal and onboarding carousel have **not** been click-tested end-to-end in the simulator (tooling coordinate issues blocked it this session). Do one manual pass before shipping.
 
 2. **Optional i18n follow-up:** Expand translated string coverage, add locales, or polish copy — baseline **en / es / sw** is in place ([README.md](./README.md) → Localization). See [LANGUAGE_SWITCHING_TODO.md](./FinanceApp.Documentations/LANGUAGE_SWITCHING_TODO.md) for status and optional tasks.
 

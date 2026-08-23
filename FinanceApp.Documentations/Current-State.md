@@ -1,6 +1,6 @@
 # FinanceApp – Current State
 
-**Last updated:** 29 March 2026 — bump when solution layout or shipped capabilities change (see also root [README.md](../README.md)).
+**Last updated:** 23 August 2026 — bump when solution layout or shipped capabilities change (see also root [README.md](../README.md)).
 
 What is **implemented today**. For deeper architecture history and migration narrative, see [FinanceApp-Architecture.md](./FinanceApp-Architecture.md) (note: early sections of that doc describe evolution toward API/mobile; those targets are now in place — see root [README.md](../README.md) for the operational picture).
 
@@ -52,6 +52,8 @@ Primary .NET solution (`FinanceApp.slnx` or equivalent) includes:
 | **i18n** — Web + API + Mobile baseline (**en**, **es**, **sw**) | ✅ |
 | Excel export (expenses) | ✅ |
 | **Multi-currency** — cross-currency budget/report totals, ISO-4217 storage | ✅ (see below) |
+| **Self-service account deletion** (Web + API + mobile, store-compliance) | ✅ (see below) |
+| **Mobile first-run onboarding carousel** | ✅ |
 
 ### Multi-currency
 
@@ -62,7 +64,22 @@ Amounts can be recorded in any of the supported currencies (`FinanceApp.Domain/E
 - **Comparison:** all "spend vs. budget" logic converts through `ICurrencyConversionService` (`SumInCurrency` / `SumCategoryInCurrency`), which now resolves rates through `IExchangeRateStore`.
 - **Live rates:** `ExchangeRateRefreshJob` (Infrastructure) fetches from the free, no-key `open.er-api.com` endpoint on a configurable interval (`ExchangeRates:Provider` in `Shared/appsettings.shared.json`, default every 8h) and pushes them into `ExchangeRateStore`. Rate resolution is three-tier: **live-fetched > configured override (`ExchangeRates:{CODE}`) > hardcoded default** — a failed or not-yet-run fetch never blocks a conversion, it just falls through to the next tier.
 
-**Not yet done:** per-transaction historical rate capture, a user-level base currency, and per-currency decimal precision (JPY has 0 decimals, code currently assumes 2).
+- **Mobile display precision:** `formatAmount()` (`FinanceApp.Mobile/src/utils/currency.ts`) renders zero-decimal currencies (JPY) without decimal places instead of always assuming 2, applied across every mobile screen that shows a currency-tagged amount.
+
+**Not yet done:** per-transaction historical rate capture, a user-level base currency.
+
+### Account deletion
+
+Self-service account deletion — required by Apple Guideline 5.1.1(v) and Google Play policy before store submission, and previously missing entirely (only an admin-only user-removal action existed, which itself silently orphaned every owned row since no business table has a real DB foreign key to `AspNetUsers`).
+
+- `IAccountDeletionService` (`FinanceApp.Application.Interfaces.Services` / implemented in `FinanceApp.Infrastructure.Services.AccountDeletionService`) deletes every row owned by a user across all business tables in FK-safe order, inside a single DB transaction, then the Identity user, then the user's uploaded files (documents + profile photo) from disk.
+- Re-authentication required before deletion: current password (`UserManager.CheckPasswordAsync`) for local accounts; typed email confirmation for social-login-only accounts with no password set.
+- Surfaced on all three clients: Web (`ProfileController.DeleteAccount`, danger-zone modal on the Edit Profile page), API (`DELETE /api/Profile`, `GET /api/Profile/deletion-status`), and mobile (Profile → Account Management → Delete Account).
+- The admin panel's user-delete action (`UserService.DeleteUserAsync`) now routes through the same service, fixing the pre-existing orphaning bug there too.
+
+### Mobile onboarding
+
+First-run carousel (`FinanceApp.Mobile/app/onboarding.tsx`) shown once per install before `(auth)/login`, gated by an `AsyncStorage` flag (`src/utils/onboarding.ts`) — only interposes for signed-out users, never reappears for an existing session. Three slides (Track / Budget / Thrive) using the existing icon system and theme tokens; no new dependency (plain `ScrollView` + `pagingEnabled`, reusing the splash screen's dot-indicator styling).
 
 ### Localization
 

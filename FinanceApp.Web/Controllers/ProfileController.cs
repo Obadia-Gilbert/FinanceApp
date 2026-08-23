@@ -1,3 +1,4 @@
+using FinanceApp.Application.Interfaces.Services;
 using FinanceApp.Infrastructure.Identity;
 using FinanceApp.Localization;
 using FinanceApp.Web.Helpers;
@@ -15,10 +16,17 @@ namespace FinanceApp.Web.Controllers;
 public class ProfileController : Controller
 {
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly IAccountDeletionService _accountDeletionService;
 
-    public ProfileController(UserManager<ApplicationUser> userManager)
+    public ProfileController(
+        UserManager<ApplicationUser> userManager,
+        SignInManager<ApplicationUser> signInManager,
+        IAccountDeletionService accountDeletionService)
     {
         _userManager = userManager;
+        _signInManager = signInManager;
+        _accountDeletionService = accountDeletionService;
     }
 
     [HttpGet]
@@ -37,7 +45,8 @@ public class ProfileController : Controller
             CurrentProfileImagePath = user.ProfileImagePath,
             Email = user.Email,
             PreferredLanguage = SupportedLanguages.Normalize(user.PreferredLanguage),
-            DailyReminderEnabled = user.DailyReminderEnabled
+            DailyReminderEnabled = user.DailyReminderEnabled,
+            HasPassword = await _accountDeletionService.HasPasswordAsync(user.Id)
         };
         ViewBag.Countries = new SelectList(
             CountryList.All.Select(c => new SelectListItem { Value = c.Code, Text = c.Name }),
@@ -103,6 +112,26 @@ public class ProfileController : Controller
             "Text",
             model.CountryCode);
         return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteAccount(DeleteAccountViewModel model)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null) return NotFound();
+
+        var auth = await _accountDeletionService.VerifyDeletionAuthorizationAsync(
+            user.Id, model.CurrentPassword, model.ConfirmationPhrase);
+        if (!auth.Authorized)
+            return Json(new { success = false, errorMessage = auth.ErrorMessage });
+
+        var result = await _accountDeletionService.DeleteAccountAsync(user.Id);
+        if (!result.Success)
+            return Json(new { success = false, errorMessage = result.ErrorMessage });
+
+        await _signInManager.SignOutAsync();
+        return Json(new { success = true, redirectUrl = Url.Page("/Account/Login", new { area = "Identity" }) });
     }
 
     private void AppendCultureCookie(string culture)

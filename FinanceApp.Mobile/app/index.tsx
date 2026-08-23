@@ -3,6 +3,7 @@ import { Redirect } from 'expo-router';
 import { View, Image, Text, StyleSheet, Animated, Easing } from 'react-native';
 import { useAuth } from '../src/context/AuthContext';
 import { useTheme } from '../src/context/ThemeContext';
+import { hasCompletedOnboarding } from '../src/utils/onboarding';
 
 const SPLASH_MIN_MS = 2200;
 
@@ -10,6 +11,7 @@ export default function Index() {
   const { isReady, isSignedIn } = useAuth();
   const { colors, isDark } = useTheme();
   const [showSplash, setShowSplash] = useState(true);
+  const [onboardingDone, setOnboardingDone] = useState<boolean | null>(null);
 
   const logoScale = useRef(new Animated.Value(0.3)).current;
   const logoOpacity = useRef(new Animated.Value(0)).current;
@@ -52,6 +54,10 @@ export default function Index() {
   }, []);
 
   useEffect(() => {
+    void hasCompletedOnboarding().then(setOnboardingDone);
+  }, []);
+
+  useEffect(() => {
     const loop = Animated.loop(
       Animated.sequence([
         Animated.timing(pulseAnim, { toValue: 0.4, duration: 800, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
@@ -62,7 +68,7 @@ export default function Index() {
     return () => loop.stop();
   }, []);
 
-  if (showSplash || !isReady) {
+  if (showSplash || !isReady || onboardingDone === null) {
     return (
       <View style={[styles.splash, { backgroundColor: isDark ? '#0F172A' : '#FFFFFF' }]}>
         <Animated.View style={[styles.logoWrap, { transform: [{ scale: logoScale }], opacity: logoOpacity }]}>
@@ -97,6 +103,10 @@ export default function Index() {
 
   if (isSignedIn) {
     return <Redirect href="/(tabs)" />;
+  }
+
+  if (!onboardingDone) {
+    return <Redirect href="/onboarding" />;
   }
 
   return <Redirect href="/(auth)/login" />;

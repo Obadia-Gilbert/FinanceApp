@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../../src/context/ThemeContext';
 import { Card } from '../../../src/components/Card';
 import { getRecurringTemplates } from '../../../src/api/recurring';
-import { formatCurrencyCode } from '../../../src/utils/currency';
+import { formatCurrencyCode, formatAmount } from '../../../src/utils/currency';
 import { Icon } from '../../../src/components/Icon';
 import type { RecurringTemplateDto } from '../../../src/types/api';
 
@@ -73,7 +73,7 @@ function RecurringRow({ item, colors }: { item: RecurringTemplateDto; colors: Re
           Next: {nextRun}{item.note ? ` • ${item.note}` : ''}
         </Text>
         <Text style={[styles.amount, { color: isIncome ? colors.success : colors.danger }]}>
-          {isIncome ? '+' : '−'}{Number(item.amount).toLocaleString()} {formatCurrencyCode(item.currency)}
+          {isIncome ? '+' : '−'}{formatAmount(Number(item.amount), item.currency)} {formatCurrencyCode(item.currency)}
         </Text>
       </View>
     </Card>

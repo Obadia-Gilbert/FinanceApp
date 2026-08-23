@@ -16,7 +16,7 @@ import { categoryIcon } from '../../../src/utils/categoryIcon';
 import { Card } from '../../../src/components/Card';
 import { getCategories } from '../../../src/api/categories';
 import { getCategoryBudgets } from '../../../src/api/budget';
-import { formatCurrencyCode } from '../../../src/utils/currency';
+import { formatCurrencyCode, formatAmount } from '../../../src/utils/currency';
 
 const now = new Date();
 const thisMonth = now.getMonth() + 1;
@@ -95,7 +95,7 @@ export default function ManageCategoriesScreen() {
         renderItem={({ item }) => {
           const cb = getBudgetForCategory(item.id);
           const budgetStr = cb
-            ? `${formatCurrencyCode(cb.currency as string | number)} ${cb.amount.toLocaleString()}`
+            ? `${formatCurrencyCode(cb.currency)} ${formatAmount(cb.amount, cb.currency)}`
             : '—';
           return (
             <Card style={[styles.row, { borderColor: colors.border }]}>

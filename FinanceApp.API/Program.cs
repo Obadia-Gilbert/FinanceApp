@@ -19,6 +19,13 @@ using Microsoft.Extensions.Configuration.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// The API has no physical wwwroot/ dir checked in (it serves no static files), so
+// IWebHostEnvironment.WebRootPath is null here unlike FinanceApp.Web. Upload-path
+// factories (SupportingDocumentService, AccountDeletionService) rely on WebRootPath
+// being set; the directories themselves are created on demand when first written to.
+if (string.IsNullOrEmpty(builder.Environment.WebRootPath))
+    builder.Environment.WebRootPath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
+
 // Shared billing + default LocalDB fallback — must load *first* so user secrets / env override ConnectionStrings.
 var sharedSettings = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, "..", "Shared", "appsettings.shared.json"));
 var sharedSource = new JsonConfigurationSource
@@ -80,6 +87,16 @@ builder.Services.AddScoped<ISupportingDocumentService>(sp =>
     var env  = sp.GetRequiredService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>();
     var uploadRoot = Path.Combine(env.WebRootPath, "uploads", "documents");
     return new SupportingDocumentService(repo, uploadRoot);
+});
+builder.Services.AddScoped<IAccountDeletionService>(sp =>
+{
+    var context = sp.GetRequiredService<FinanceDbContext>();
+    var userManager = sp.GetRequiredService<UserManager<ApplicationUser>>();
+    var env = sp.GetRequiredService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>();
+    var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<AccountDeletionService>>();
+    var documentUploadRoot = Path.Combine(env.WebRootPath, "uploads", "documents");
+    var profileUploadRoot = Path.Combine(env.WebRootPath, "uploads", "profiles");
+    return new AccountDeletionService(context, userManager, documentUploadRoot, profileUploadRoot, logger);
 });
 builder.Services.AddHostedService<DailyActivityReminderJob>();
 

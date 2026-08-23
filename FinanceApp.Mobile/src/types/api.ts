@@ -153,6 +153,15 @@ export interface UpdateProfileRequest {
   dailyReminderEnabled?: boolean;
 }
 
+export interface AccountAuthStatus {
+  hasPassword: boolean;
+}
+
+export interface DeleteAccountRequest {
+  currentPassword?: string;
+  confirmationPhrase?: string;
+}
+
 /** Income */
 export interface IncomeDto {
   id: string;

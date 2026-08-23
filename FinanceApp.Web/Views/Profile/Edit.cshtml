@@ -97,6 +97,77 @@
     </div>
 </div>
 
+<div class="card shadow-sm border-danger mt-4">
+    <div class="card-body p-4">
+        <h5 class="text-danger mb-2"><i class="bi bi-exclamation-triangle me-1"></i> Danger Zone</h5>
+        <p class="text-muted mb-3">Deleting your account permanently removes all your expenses, income, accounts, transactions, budgets, categories, and uploaded documents. This cannot be undone.</p>
+        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+            Delete Account
+        </button>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger" id="deleteAccountModalLabel">Delete your account?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="deleteAccountForm">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <p>This permanently deletes your account and all associated data. This action cannot be undone.</p>
+                    <div id="deleteAccountError" class="alert alert-danger d-none" role="alert"></div>
+                    @if (Model.HasPassword)
+                    {
+                        <div class="mb-3">
+                            <label for="deleteAccountPassword" class="form-label fw-600">Current password</label>
+                            <input type="password" class="form-control" id="deleteAccountPassword" name="CurrentPassword" autocomplete="current-password" />
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="mb-3">
+                            <label for="deleteAccountConfirm" class="form-label fw-600">Type your email (@Model.Email) to confirm</label>
+                            <input type="text" class="form-control" id="deleteAccountConfirm" name="ConfirmationPhrase" autocomplete="off" />
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Permanently delete my account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var form = document.getElementById('deleteAccountForm');
+        if (!form) return;
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            var errorBox = document.getElementById('deleteAccountError');
+            errorBox.classList.add('d-none');
+            var formData = new FormData(form);
+            var res = await fetch('@Url.Action("DeleteAccount", "Profile")', {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                body: formData
+            });
+            var json = await res.json();
+            if (json.success) {
+                window.location.href = json.redirectUrl;
+                return;
+            }
+            errorBox.textContent = json.errorMessage || 'Something went wrong.';
+            errorBox.classList.remove('d-none');
+        });
+    });
+</script>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script src="https://cdn.jsdelivr.net/npm/libphonenumber-js@1.10.51/bundle.min.js" crossorigin="anonymous"></script>

@@ -56,6 +56,16 @@ builder.Services.AddScoped<ISupportingDocumentService>(sp =>
     var uploadRoot = Path.Combine(env.WebRootPath, "uploads", "documents");
     return new SupportingDocumentService(repo, uploadRoot);
 });
+builder.Services.AddScoped<IAccountDeletionService>(sp =>
+{
+    var context = sp.GetRequiredService<FinanceDbContext>();
+    var userManager = sp.GetRequiredService<UserManager<ApplicationUser>>();
+    var env = sp.GetRequiredService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>();
+    var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<AccountDeletionService>>();
+    var documentUploadRoot = Path.Combine(env.WebRootPath, "uploads", "documents");
+    var profileUploadRoot = Path.Combine(env.WebRootPath, "uploads", "profiles");
+    return new AccountDeletionService(context, userManager, documentUploadRoot, profileUploadRoot, logger);
+});
 builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();

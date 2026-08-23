@@ -15,7 +15,7 @@ import { Icon } from '../../../src/components/Icon';
 import { categoryIcon } from '../../../src/utils/categoryIcon';
 import { Card } from '../../../src/components/Card';
 import { getTransactions } from '../../../src/api/transactions';
-import { formatCurrencyCode } from '../../../src/utils/currency';
+import { formatCurrencyCode, formatAmount } from '../../../src/utils/currency';
 import type { TransactionDto } from '../../../src/types/api';
 
 type DateGroup = { label: string; data: TransactionDto[] };
@@ -167,7 +167,7 @@ function TransactionRow({ item, colors }: { item: TransactionDto; colors: Return
   else if (!isTransfer) amountColor = colors.danger;
 
   const amountPrefix = isIncome ? '+' : isTransfer ? '' : '−';
-  const amountStr = `${amountPrefix}${Number(item.amount).toLocaleString()} ${formatCurrencyCode(item.currency)}`;
+  const amountStr = `${amountPrefix}${formatAmount(Number(item.amount), item.currency)} ${formatCurrencyCode(item.currency)}`;
 
   return (
     <TouchableOpacity style={[styles.row, { borderBottomColor: colors.border }]} activeOpacity={0.7}>

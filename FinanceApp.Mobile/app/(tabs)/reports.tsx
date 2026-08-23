@@ -13,6 +13,7 @@ import { useTheme } from '../../src/context/ThemeContext';
 import { Icon } from '../../src/components/Icon';
 import { Card } from '../../src/components/Card';
 import { getMonthlyReport } from '../../src/api/reports';
+import { formatAmount } from '../../src/utils/currency';
 
 const MONTHS = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ');
 
@@ -84,14 +85,14 @@ export default function ReportsScreen() {
             <Card style={[styles.summaryCard, { flex: 1 }]}>
               <Text style={[styles.summaryLabel, { color: colors.text.muted }]}>Spent</Text>
               <Text style={[styles.summaryValue, { color: colors.danger }]}>
-                {report.totalSpent.toLocaleString()}
+                {formatAmount(report.totalSpent, report.currency)}
               </Text>
               <Text style={[styles.summaryCurrency, { color: colors.text.subtle }]}>{report.currency}</Text>
             </Card>
             <Card style={[styles.summaryCard, { flex: 1 }]}>
               <Text style={[styles.summaryLabel, { color: colors.text.muted }]}>Income</Text>
               <Text style={[styles.summaryValue, { color: colors.success }]}>
-                {report.totalIncome.toLocaleString()}
+                {formatAmount(report.totalIncome, report.currency)}
               </Text>
               <Text style={[styles.summaryCurrency, { color: colors.text.subtle }]}>{report.currency}</Text>
             </Card>
@@ -102,14 +103,14 @@ export default function ReportsScreen() {
             <View style={styles.cashFlowRow}>
               <Text style={[styles.cashFlowLabel, { color: colors.text.primary }]}>Net Cash Flow</Text>
               <Text style={[styles.cashFlowValue, { color: report.netCashFlow >= 0 ? colors.success : colors.danger }]}>
-                {report.netCashFlow >= 0 ? '+' : ''}{report.netCashFlow.toLocaleString()} {report.currency}
+                {report.netCashFlow >= 0 ? '+' : ''}{formatAmount(report.netCashFlow, report.currency)} {report.currency}
               </Text>
             </View>
             {report.globalBudgetAmount != null && (
               <View style={[styles.budgetRow, { borderTopColor: colors.border }]}>
                 <Text style={[styles.statLabel, { color: colors.text.muted }]}>Budget</Text>
                 <Text style={[styles.statValue, { color: colors.text.primary }]}>
-                  {report.globalBudgetSpent?.toLocaleString() ?? 0} / {report.globalBudgetAmount.toLocaleString()} {report.currency}
+                  {report.globalBudgetSpent != null ? formatAmount(report.globalBudgetSpent, report.currency) : 0} / {formatAmount(report.globalBudgetAmount, report.currency)} {report.currency}
                 </Text>
               </View>
             )}
@@ -127,7 +128,7 @@ export default function ReportsScreen() {
                     <View style={styles.catInfo}>
                       <Text style={[styles.catName, { color: colors.text.primary }]} numberOfLines={1}>{line.categoryName}</Text>
                       <Text style={[styles.catAmount, { color: line.isOverBudget ? colors.danger : colors.text.muted }]}>
-                        {line.spent.toLocaleString()} {report.currency}
+                        {formatAmount(line.spent, report.currency)} {report.currency}
                       </Text>
                     </View>
                     <View style={[styles.catBar, { backgroundColor: colors.border }]}>
@@ -152,7 +153,7 @@ export default function ReportsScreen() {
                     {exp.description || exp.categoryName}
                   </Text>
                   <Text style={[styles.topAmount, { color: colors.text.primary }]}>
-                    {exp.amount.toLocaleString()} {exp.currency}
+                    {formatAmount(exp.amount, exp.currency)} {exp.currency}
                   </Text>
                 </View>
               ))}

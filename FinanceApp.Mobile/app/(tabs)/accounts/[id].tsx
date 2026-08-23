@@ -7,6 +7,7 @@ import { Input } from '../../../src/components/Input';
 import { Button } from '../../../src/components/Button';
 import { getAccount, updateAccount, deactivateAccount } from '../../../src/api/accounts';
 import { ApiError } from '../../../src/api/client';
+import { formatAmount } from '../../../src/utils/currency';
 
 export default function EditAccountScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -69,7 +70,7 @@ export default function EditAccountScreen() {
       <Input label="Account name" value={name} onChangeText={setName} placeholder="Name" />
       <Input label="Description" value={description} onChangeText={setDescription} placeholder="Optional" />
       <Text style={[styles.balance, { color: colors.text.muted }]}>
-        Current balance: {Number(account.currentBalance).toLocaleString()} {account.currency}
+        Current balance: {formatAmount(Number(account.currentBalance), account.currency)} {account.currency}
       </Text>
       {error ? <Text style={[styles.err, { color: colors.danger }]}>{error}</Text> : null}
       <Button title="Save" onPress={handleSave} loading={updateMutation.isPending} style={styles.btn} />

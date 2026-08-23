@@ -20,8 +20,8 @@ import { useAuth } from '../../src/context/AuthContext';
 import { Card } from '../../src/components/Card';
 import { Input } from '../../src/components/Input';
 import { Button } from '../../src/components/Button';
-import { getProfile, updateProfile } from '../../src/api/profile';
-import { ApiError } from '../../src/api/client';
+import { getProfile, updateProfile, getAccountDeletionStatus, deleteAccount } from '../../src/api/profile';
+import { ApiError, clearStoredAuth } from '../../src/api/client';
 import { normalizeAppLanguage, setAppLanguage, type AppLanguage } from '../../src/i18n/i18n';
 import { AsYouType, getCountryCallingCode } from 'libphonenumber-js';
 import { COUNTRY_OPTIONS, type CountryOption } from '../../src/utils/countryList';
@@ -29,7 +29,7 @@ import { COUNTRY_OPTIONS, type CountryOption } from '../../src/utils/countryList
 export default function ProfileScreen() {
   const { t, i18n: i18nInstance } = useTranslation();
   const { colors, setMode, isDark } = useTheme();
-  const { user, signOut } = useAuth();
+  const { user, signOut, setUser } = useAuth();
   const router = useRouter();
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState(false);
@@ -43,6 +43,11 @@ export default function ProfileScreen() {
   const [dailyReminderEnabled, setDailyReminderEnabled] = useState(true);
   const [updatingReminder, setUpdatingReminder] = useState(false);
   const [error, setError] = useState('');
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteHasPassword, setDeleteHasPassword] = useState(true);
+  const [deleteInput, setDeleteInput] = useState('');
+  const [deleteError, setDeleteError] = useState('');
+  const [deleting, setDeleting] = useState(false);
 
   const { data: profile } = useQuery({
     queryKey: ['profile'],
@@ -237,6 +242,47 @@ export default function ProfileScreen() {
     ]);
   };
 
+  const openDeleteAccount = () => {
+    setDeleteError('');
+    setDeleteInput('');
+    void (async () => {
+      try {
+        const status = await getAccountDeletionStatus();
+        setDeleteHasPassword(status.hasPassword);
+        setDeleteModalOpen(true);
+      } catch (e) {
+        Alert.alert('', e instanceof ApiError ? e.message : t('profile.updateFailed'));
+      }
+    })();
+  };
+
+  const confirmDeleteAccount = () => {
+    Alert.alert(t('profile.deleteAccountConfirmTitle'), t('profile.deleteAccountConfirmMessage'), [
+      { text: t('profile.cancel'), style: 'cancel' },
+      {
+        text: t('profile.deleteAccount'),
+        style: 'destructive',
+        onPress: async () => {
+          setDeleting(true);
+          setDeleteError('');
+          try {
+            await deleteAccount(
+              deleteHasPassword ? { currentPassword: deleteInput } : { confirmationPhrase: deleteInput }
+            );
+            await clearStoredAuth();
+            setUser(null);
+            setDeleteModalOpen(false);
+            router.replace('/(auth)/login');
+          } catch (e) {
+            setDeleteError(e instanceof ApiError ? e.message : t('profile.deleteAccountFailed'));
+          } finally {
+            setDeleting(false);
+          }
+        },
+      },
+    ]);
+  };
+
   const curLang = normalizeAppLanguage(i18nInstance.language);
   const langLabel =
     curLang === 'sw' ? t('profile.swahili') : curLang === 'es' ? t('profile.spanish') : t('profile.english');
@@ -380,11 +426,18 @@ export default function ProfileScreen() {
           </View>
           <Text style={[styles.menuArrow, { color: colors.text.subtle }]}>›</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.menuRow} onPress={() => router.push('/(tabs)/privacy')}>
+        <TouchableOpacity style={[styles.menuRow, { borderBottomColor: colors.border }]} onPress={() => router.push('/(tabs)/privacy')}>
           <View style={[styles.menuIconWrap, { backgroundColor: `${colors.info}15` }]}>
             <Icon name="security" size={18} color={colors.text.body} />
           </View>
           <Text style={[styles.menuLabel, { color: colors.text.primary }]}>{t('profile.securityPrivacy')}</Text>
+          <Text style={[styles.menuArrow, { color: colors.text.subtle }]}>›</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.menuRow} onPress={openDeleteAccount}>
+          <View style={[styles.menuIconWrap, { backgroundColor: `${colors.danger}15` }]}>
+            <Icon name="delete" size={18} color={colors.danger} />
+          </View>
+          <Text style={[styles.menuLabel, { color: colors.danger }]}>{t('profile.deleteAccount')}</Text>
           <Text style={[styles.menuArrow, { color: colors.text.subtle }]}>›</Text>
         </TouchableOpacity>
       </Card>
@@ -447,6 +500,52 @@ export default function ProfileScreen() {
         <Text style={styles.signOutText}>{t('profile.signOut')}</Text>
       </TouchableOpacity>
 
+      <Modal visible={deleteModalOpen} transparent animationType="fade" onRequestClose={() => setDeleteModalOpen(false)}>
+        <TouchableOpacity style={styles.modalBackdrop} activeOpacity={1} onPress={() => setDeleteModalOpen(false)}>
+          <TouchableOpacity activeOpacity={1} style={[styles.deleteModal, { backgroundColor: colors.bg.card, borderColor: colors.border }]}>
+            <Text style={[styles.countryModalTitle, { color: colors.danger }]}>{t('profile.deleteAccountConfirmTitle')}</Text>
+            <Text style={[styles.deleteWarning, { color: colors.text.body }]}>{t('profile.deleteAccountWarning')}</Text>
+            {deleteHasPassword ? (
+              <TextInput
+                value={deleteInput}
+                onChangeText={setDeleteInput}
+                placeholder={t('profile.deleteAccountPasswordPrompt')}
+                placeholderTextColor={colors.text.subtle}
+                secureTextEntry
+                autoCapitalize="none"
+                style={[styles.phoneInput, { backgroundColor: colors.bg.default, borderColor: colors.border, color: colors.text.primary }]}
+              />
+            ) : (
+              <TextInput
+                value={deleteInput}
+                onChangeText={setDeleteInput}
+                placeholder={t('profile.deleteAccountTypeConfirm', { email: displayEmail })}
+                placeholderTextColor={colors.text.subtle}
+                autoCapitalize="none"
+                autoCorrect={false}
+                style={[styles.phoneInput, { backgroundColor: colors.bg.default, borderColor: colors.border, color: colors.text.primary }]}
+              />
+            )}
+            {deleteError ? (
+              <View style={[styles.errorCard, { backgroundColor: `${colors.danger}10` }]}>
+                <Text style={[styles.err, { color: colors.danger }]}>{deleteError}</Text>
+              </View>
+            ) : null}
+            <View style={styles.editBtns}>
+              <Button title={t('profile.cancel')} onPress={() => setDeleteModalOpen(false)} variant="ghost" style={styles.editBtn} />
+              <Button
+                title={t('profile.deleteAccount')}
+                onPress={confirmDeleteAccount}
+                variant="danger"
+                loading={deleting}
+                disabled={!deleteInput.trim()}
+                style={styles.editBtn}
+              />
+            </View>
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
+
       <View style={styles.versionWrap}>
         <Image
           source={require('../../assets/logo.png')}
@@ -489,6 +588,8 @@ const styles = StyleSheet.create({
   countryModalTitle: { fontSize: 16, fontWeight: '700', paddingHorizontal: 16, paddingVertical: 12 },
   countryScroll: { maxHeight: 460 },
   countryItem: { paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1 },
+  deleteModal: { width: '100%', borderRadius: 14, borderWidth: 1, padding: 16 },
+  deleteWarning: { fontSize: 14, lineHeight: 20, marginTop: 8, marginBottom: 16 },
 
   sectionLabel: { fontSize: 12, fontWeight: '600', letterSpacing: 0.5, marginBottom: 8, marginLeft: 4 },
   menuCard: { marginBottom: 20, padding: 0, overflow: 'hidden' },

@@ -133,7 +133,25 @@
     "phonePrefixHint": "Kiambishi hutokana na nchi. Andika tarakimu zilizobaki.",
     "dailyReminderTitle": "Kikumbusho cha shughuli za kila siku",
     "dailyReminderHint": "Nijulishe kila siku kama sijaweka matumizi au mapato.",
-    "updateFailed": "Imeshindwa kusasisha wasifu"
+    "updateFailed": "Imeshindwa kusasisha wasifu",
+    "deleteAccount": "Futa Akaunti",
+    "deleteAccountConfirmTitle": "Futa akaunti yako?",
+    "deleteAccountConfirmMessage": "Hii itafuta akaunti yako na data yako yote kabisa. Hatua hii haiwezi kutenduliwa.",
+    "deleteAccountWarning": "Matumizi, mapato, akaunti, miamala, bajeti, kategoria, na hati zote ulizopakia zitafutwa kabisa.",
+    "deleteAccountPasswordPrompt": "Weka nenosiri lako la sasa",
+    "deleteAccountTypeConfirm": "Andika {{email}} kuthibitisha",
+    "deleteAccountFailed": "Imeshindwa kufuta akaunti"
+  },
+  "onboarding": {
+    "skip": "Ruka",
+    "next": "Endelea",
+    "getStarted": "Anza",
+    "slide1Title": "Fuatilia kila shilingi, dola, au yuro",
+    "slide1Body": "Weka matumizi na mapato kwa sekunde, katika sarafu yoyote unayotumia.",
+    "slide2Title": "Weka bajeti zinazofanya kazi",
+    "slide2Body": "Bajeti za kategoria, mipaka ya kila mwezi, na arifa kabla hujazidisha matumizi.",
+    "slide3Title": "Ona picha kamili",
+    "slide3Body": "Ripoti na maarifa yanayoonyesha fedha yako inakoenda."
   },
   "subscription": {
     "currentPlan": "Mpango wa sasa",

@@ -17,7 +17,7 @@ import { Icon } from '../../../src/components/Icon';
 import { Card } from '../../../src/components/Card';
 import { getExpenses } from '../../../src/api/expenses';
 import { getCategories } from '../../../src/api/categories';
-import { formatCurrencyCode } from '../../../src/utils/currency';
+import { formatCurrencyCode, formatAmount } from '../../../src/utils/currency';
 import type { ExpenseDto } from '../../../src/types/api';
 import { categoryIcon } from '../../../src/utils/categoryIcon';
 
@@ -222,7 +222,7 @@ function ExpenseRow({
       </View>
       <View style={styles.rowRight}>
         <Text style={[styles.rowAmount, { color: colors.danger }]}>
-          −{Number(item.amount).toLocaleString()} {formatCurrencyCode(item.currency)}
+          −{formatAmount(Number(item.amount), item.currency)} {formatCurrencyCode(item.currency)}
         </Text>
         <Text style={[styles.rowTime, { color: colors.text.subtle }]}>{time}</Text>
       </View>

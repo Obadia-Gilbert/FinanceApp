@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FinanceApp.Application.DTOs;
 using FinanceApp.Application.Interfaces;
+using FinanceApp.Application.Interfaces.Services;
 using FinanceApp.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -12,10 +13,12 @@ namespace FinanceApp.Infrastructure.Services
     public class UserService : IUserService
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IAccountDeletionService _accountDeletionService;
 
-        public UserService(UserManager<ApplicationUser> userManager)
+        public UserService(UserManager<ApplicationUser> userManager, IAccountDeletionService accountDeletionService)
         {
             _userManager = userManager;
+            _accountDeletionService = accountDeletionService;
         }
 
         public async Task<List<UserDto>> GetAllUsersAsync()
@@ -41,9 +44,7 @@ namespace FinanceApp.Infrastructure.Services
 
         public async Task DeleteUserAsync(string userId)
         {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user != null)
-                await _userManager.DeleteAsync(user);
+            await _accountDeletionService.DeleteAccountAsync(userId);
         }
 
         public async Task AddUserToRoleAsync(string userId, string role)

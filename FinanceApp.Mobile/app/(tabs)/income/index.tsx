@@ -16,7 +16,7 @@ import { Card } from '../../../src/components/Card';
 import { Icon } from '../../../src/components/Icon';
 import { getIncomes } from '../../../src/api/income';
 import { getCategories } from '../../../src/api/categories';
-import { formatCurrencyCode } from '../../../src/utils/currency';
+import { formatCurrencyCode, formatAmount } from '../../../src/utils/currency';
 import { categoryIcon } from '../../../src/utils/categoryIcon';
 import type { IncomeDto } from '../../../src/types/api';
 
@@ -79,7 +79,7 @@ export default function IncomeListScreen() {
       <View style={[styles.totalCard, { backgroundColor: colors.brandLight ?? colors.bg.alt }]}>
         <Text style={[styles.totalLabel, { color: colors.text.muted }]}>TOTAL INCOME ({monthLabel.toUpperCase()})</Text>
         <Text style={[styles.totalAmount, { color: colors.text.primary }]}>
-          {formatCurrencyCode(list[0]?.currency ?? 'USD')} {totalIncome.toLocaleString()}
+          {formatCurrencyCode(list[0]?.currency ?? 'USD')} {formatAmount(totalIncome, list[0]?.currency ?? 'USD')}
         </Text>
         <View style={styles.totalTrend}>
           <Text style={[styles.trendIcon, { color: colors.success }]}>↗</Text>
@@ -160,7 +160,7 @@ export default function IncomeListScreen() {
                 </Text>
               </View>
               <Text style={[styles.rowAmount, { color: colors.success }]}>
-                +{Number(item.amount).toLocaleString()} {formatCurrencyCode(item.currency)}
+                +{formatAmount(Number(item.amount), item.currency)} {formatCurrencyCode(item.currency)}
               </Text>
             </Card>
           </TouchableOpacity>

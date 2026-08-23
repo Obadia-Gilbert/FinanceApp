@@ -39,4 +39,7 @@ public class ProfileEditViewModel
 
     [Display(Name = "Daily reminders")]
     public bool DailyReminderEnabled { get; set; } = true;
+
+    /// <summary>Drives which re-auth field the Delete Account dialog shows (read-only).</summary>
+    public bool HasPassword { get; set; } = true;
 }

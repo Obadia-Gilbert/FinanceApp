@@ -22,7 +22,7 @@ import { getDashboard } from '../../src/api/dashboard';
 import { getBudget, getCategoryBudgets, setBudget, setCategoryBudget, deleteCategoryBudget } from '../../src/api/budget';
 import { getCategories } from '../../src/api/categories';
 import type { CategoryBudgetDto } from '../../src/types/api';
-import { CURRENCY_LIST, formatCurrencyCode } from '../../src/utils/currency';
+import { CURRENCY_LIST, formatCurrencyCode, formatAmount } from '../../src/utils/currency';
 
 const MONTHS = 'January February March April May June July August September October November December'.split(' ');
 
@@ -284,20 +284,20 @@ export default function BudgetScreen() {
         </View>
         <Text style={[styles.summaryTitle, { color: colors.text.primary }]}>Total Monthly Budget</Text>
         <Text style={[styles.summaryRemaining, { color: colors.text.body }]}>
-          You have {displayCurrency} {remaining.toLocaleString()} remaining for {MONTHS[month - 1]}
+          You have {displayCurrency} {formatAmount(remaining, displayCurrency)} remaining for {MONTHS[month - 1]}
         </Text>
         <View style={[styles.summaryRow, { borderTopColor: colors.border }]}>
           <View style={styles.summaryCol}>
             <Text style={[styles.summaryColLabel, { color: colors.text.muted }]}>SPENT</Text>
             <Text style={[styles.summaryColValue, { color: colors.text.primary }]}>
-              {displayCurrency} {thisMonthSpend.toLocaleString()}
+              {displayCurrency} {formatAmount(thisMonthSpend, displayCurrency)}
             </Text>
           </View>
           <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
           <View style={styles.summaryCol}>
             <Text style={[styles.summaryColLabel, { color: colors.text.muted }]}>BUDGET</Text>
             <Text style={[styles.summaryColValue, { color: colors.text.primary }]}>
-              {displayCurrency} {budgetAmount > 0 ? budgetAmount.toLocaleString() : '—'}
+              {displayCurrency} {budgetAmount > 0 ? formatAmount(budgetAmount, displayCurrency) : '—'}
             </Text>
           </View>
         </View>
@@ -489,7 +489,7 @@ export default function BudgetScreen() {
                       {cb.categoryName ?? 'Uncategorized'}
                     </Text>
                     <Text style={[styles.catMeta, { color: colors.text.muted }]}>
-                      {formatCurrencyCode(cb.currency)} {cb.spent.toLocaleString()} of {cb.amount.toLocaleString()} spent
+                      {formatCurrencyCode(cb.currency)} {formatAmount(cb.spent, cb.currency)} of {formatAmount(cb.amount, cb.currency)} spent
                     </Text>
                     <View style={[styles.catBarBg, { backgroundColor: colors.border }]}>
                       <View

@@ -133,7 +133,25 @@
     "phonePrefixHint": "Prefix is derived from country. You type the remaining digits.",
     "dailyReminderTitle": "Daily activity reminder",
     "dailyReminderHint": "Notify me daily if I have not logged expense or income.",
-    "updateFailed": "Failed to update profile"
+    "updateFailed": "Failed to update profile",
+    "deleteAccount": "Delete Account",
+    "deleteAccountConfirmTitle": "Delete your account?",
+    "deleteAccountConfirmMessage": "This permanently deletes your account and all your data. This cannot be undone.",
+    "deleteAccountWarning": "All your expenses, income, accounts, transactions, budgets, categories, and uploaded documents will be permanently removed.",
+    "deleteAccountPasswordPrompt": "Enter your current password",
+    "deleteAccountTypeConfirm": "Type {{email}} to confirm",
+    "deleteAccountFailed": "Failed to delete account"
+  },
+  "onboarding": {
+    "skip": "Skip",
+    "next": "Next",
+    "getStarted": "Get Started",
+    "slide1Title": "Track every shilling, dollar, or euro",
+    "slide1Body": "Log expenses and income in seconds, in whatever currency you spend.",
+    "slide2Title": "Set budgets that actually stick",
+    "slide2Body": "Category budgets, monthly limits, and alerts before you overspend.",
+    "slide3Title": "See the full picture",
+    "slide3Body": "Reports and insights that show where your money really goes."
   },
   "subscription": {
     "currentPlan": "Current Plan",

@@ -19,6 +19,7 @@ import { Card } from '../../src/components/Card';
 import { Icon } from '../../src/components/Icon';
 import { getDashboard } from '../../src/api/dashboard';
 import { getUnreadCount } from '../../src/api/notifications';
+import { formatAmount } from '../../src/utils/currency';
 import { LineChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
 
@@ -132,17 +133,17 @@ export default function DashboardScreen() {
             <View style={[styles.balanceCard, { backgroundColor: colors.brand }]}>
               <Text style={styles.balanceLabel}>{t('dashboard.thisMonthSpending')}</Text>
               <Text style={styles.balanceAmount}>
-                {data.displayCurrency} {data.thisMonthSpend.toLocaleString()}
+                {data.displayCurrency} {formatAmount(data.thisMonthSpend, data.displayCurrency)}
               </Text>
               <View style={styles.balanceRow}>
                 <View style={styles.balanceCol}>
                   <Text style={styles.balanceSubLabel}>{t('dashboard.monthlyExpenses')}</Text>
-                  <Text style={styles.balanceSubValue}>−{data.thisMonthSpend.toLocaleString()}</Text>
+                  <Text style={styles.balanceSubValue}>−{formatAmount(data.thisMonthSpend, data.displayCurrency)}</Text>
                 </View>
                 <View style={styles.balanceDivider} />
                 <View style={styles.balanceCol}>
                   <Text style={styles.balanceSubLabel}>{t('dashboard.totalSpendAllTime')}</Text>
-                  <Text style={styles.balanceSubValue}>{data.totalSpend.toLocaleString()}</Text>
+                  <Text style={styles.balanceSubValue}>{formatAmount(data.totalSpend, data.displayCurrency)}</Text>
                 </View>
               </View>
             </View>
@@ -158,9 +159,9 @@ export default function DashboardScreen() {
                 </View>
                 <Text style={[styles.alertBody, { color: colors.text.body }]}>
                   {t('dashboard.budgetExceededBody', {
-                    spent: data.thisMonthSpend.toLocaleString(),
+                    spent: formatAmount(data.thisMonthSpend, data.displayCurrency),
                     currency: data.displayCurrency,
-                    budget: data.budgetAmount.toLocaleString(),
+                    budget: formatAmount(data.budgetAmount, data.displayCurrency),
                   })}
                 </Text>
               </Card>
@@ -173,7 +174,7 @@ export default function DashboardScreen() {
                   <View>
                     <Text style={[styles.trendTitle, { color: colors.text.primary }]}>{t('dashboard.spendingTrend')}</Text>
                     <Text style={[styles.trendAmount, { color: colors.text.primary }]}>
-                      {data.displayCurrency} {data.thisMonthSpend.toLocaleString()}
+                      {data.displayCurrency} {formatAmount(data.thisMonthSpend, data.displayCurrency)}
                     </Text>
                   </View>
                   <View style={[styles.trendPill, { backgroundColor: colors.brandLight ?? colors.bg.alt }]}>
@@ -216,7 +217,7 @@ export default function DashboardScreen() {
                       <View style={{ flex: 1 }}>
                         <Text style={[styles.budgetName, { color: colors.text.primary }]}>{t('dashboard.total')}</Text>
                         <Text style={[styles.budgetMeta, { color: colors.text.muted }]}>
-                          {data.thisMonthSpend.toLocaleString()} / {data.budgetAmount.toLocaleString()} {data.displayCurrency}
+                          {formatAmount(data.thisMonthSpend, data.displayCurrency)} / {formatAmount(data.budgetAmount, data.displayCurrency)} {data.displayCurrency}
                         </Text>
                         <View style={[styles.progressTrack, { backgroundColor: colors.border }]}>
                           <View
@@ -242,7 +243,7 @@ export default function DashboardScreen() {
                       <View style={{ flex: 1 }}>
                         <Text style={[styles.budgetName, { color: colors.text.primary }]}>{a.categoryName}</Text>
                         <Text style={[styles.budgetMeta, { color: colors.text.muted }]}>
-                          {a.spent.toLocaleString()} / {a.budget.toLocaleString()} {a.currency}
+                          {formatAmount(a.spent, a.currency)} / {formatAmount(a.budget, a.currency)} {a.currency}
                         </Text>
                         <View style={[styles.progressTrack, { backgroundColor: colors.border }]}>
                           <View
