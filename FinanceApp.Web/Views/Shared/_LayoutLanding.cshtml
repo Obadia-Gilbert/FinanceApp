@@ -20,6 +20,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@title</title>
     <meta name="description" content="@metaDescription" />
+
+    @* Resolve the theme before first paint — matches _Layout.cshtml. Without this the
+       landing page always renders light and then flips for dark-theme users. *@
+    <script>
+        (function () {
+            try {
+                var t = localStorage.getItem('theme') || 'light';
+                document.documentElement.setAttribute('data-theme', t);
+                document.documentElement.setAttribute('data-bs-theme', t);
+            } catch (e) { /* private mode — fall back to light */ }
+        })();
+    </script>
     @if (!string.IsNullOrEmpty(canonicalUrl))
     {
         <link rel="canonical" href="@canonicalUrl" />
@@ -43,7 +55,11 @@
     <meta name="request-verification-token" content="@Antiforgery.GetAndStoreTokens(Context).RequestToken" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    @* Instrument Sans + IBM Plex Mono — matches _Layout.cshtml. The landing page
+       previously loaded Inter but rendered in Instrument Sans regardless (site.css's
+       --font-sans), so it downloaded an unused webfont and looked inconsistent with
+       the app shell in any DevTools inspection. *@
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">

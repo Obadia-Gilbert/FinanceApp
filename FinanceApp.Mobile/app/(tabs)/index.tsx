@@ -61,7 +61,8 @@ export default function DashboardScreen() {
     backgroundGradientFrom: colors.bg.default,
     backgroundGradientTo: colors.bg.alt,
     decimalPlaces: 0,
-    color: (opacity = 1) => isDark ? `rgba(59, 130, 246, ${opacity})` : `rgba(37, 99, 235, ${opacity})`,
+    // Brand teal (colors.brand), not chart-kit's default blue — #2DD4BF dark / #0D9488 light.
+    color: (opacity = 1) => isDark ? `rgba(45, 212, 191, ${opacity})` : `rgba(13, 148, 136, ${opacity})`,
     labelColor: () => colors.text.muted,
     style: { borderRadius: 12, paddingRight: 0 },
   };

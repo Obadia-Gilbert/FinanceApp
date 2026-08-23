@@ -1454,10 +1454,20 @@ textarea.form-control { resize: vertical; min-height: 84px; }
   .report-form-row { flex-wrap: wrap; }
 }
 
-/* ---- Auth ----------------------------------------------- */
-.auth-page .row {
-  min-height: calc(100vh - 120px);
+/* ---- Auth -------------------------------------------------
+   Centers against .app-main-content's own rendered height rather than a
+   calc(100vh - Npx) guess — that guess drifted from the real header +
+   padding chrome and never centered exactly. .app-main-content is a flex
+   item with a definite height (see LAYOUT SHELL), so a 100%-height flex
+   child here resolves correctly and stays centered at any viewport size. */
+.auth-page {
+  display: flex;
   align-items: center;
+  justify-content: center;
+  min-height: 100%;
+}
+.auth-page .row {
+  width: 100%;
 }
 .auth-card {
   max-width: 460px;
@@ -1473,7 +1483,7 @@ textarea.form-control { resize: vertical; min-height: 84px; }
   padding-top: 0.5625rem;
   padding-bottom: 0.5625rem;
 }
-.auth-page--register .row { min-height: auto; align-items: flex-start; padding-top: var(--space-4); }
+.auth-page--register { align-items: flex-start; padding-top: var(--space-4); }
 .auth-page--register .auth-card { max-width: 560px; }
 .auth-card-body--register { padding: var(--space-5) !important; }
 .auth-card-body--register .register-form__title { margin-bottom: var(--space-1) !important; }
@@ -1487,7 +1497,7 @@ textarea.form-control { resize: vertical; min-height: 84px; }
 .auth-card-body--register .register-form__social-buttons { margin-bottom: var(--space-3) !important; }
 .auth-divider hr { opacity: 0.14; }
 @media (max-width: 767.98px) {
-  .auth-page .row { min-height: auto; align-items: flex-start; }
+  .auth-page { align-items: flex-start; }
 }
 
 /* ---- External auth providers ---------------------------- */
