@@ -39,6 +39,12 @@ export function FacebookSignInButton({ clientId, colors, style, onAccessToken, o
     FACEBOOK_DISCOVERY,
   );
 
+  // Reacting to an OAuth result delivered by expo-auth-session — an external
+  // system handing back a value we did not schedule — is what this effect is
+  // for, and clearing the pending flag here is the vendor-documented shape.
+  // Restructuring it into promptAsync()'s promise would move sign-in off the
+  // path Expo documents, so the rule is disabled at this one site instead.
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (response?.type === 'error') {
       setPending(false);
@@ -66,6 +72,7 @@ export function FacebookSignInButton({ clientId, colors, style, onAccessToken, o
       else onError('Facebook did not return an access token.');
     }
   }, [response, onError, onAccessToken]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   return (
     <TouchableOpacity

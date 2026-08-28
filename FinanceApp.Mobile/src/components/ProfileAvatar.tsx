@@ -25,8 +25,12 @@ export function ProfileAvatar({ hasImage, initial, size = 80, cacheKey }: Props)
   const { colors } = useTheme();
   const [token, setToken] = useState<string | null>(null);
   // A stored path is no guarantee the file is still there, so fall back to the
-  // initial rather than leaving a broken-image box behind.
-  const [failed, setFailed] = useState(false);
+  // initial rather than leaving a broken-image box behind. The failure is
+  // recorded against the image's identity, so a fresh upload (or a switch back
+  // to having no photo) retries rather than staying stuck on the fallback.
+  const imageKey = `${hasImage}:${cacheKey ?? ''}`;
+  const [failedKey, setFailedKey] = useState<string | null>(null);
+  const failed = failedKey === imageKey;
 
   useEffect(() => {
     let active = true;
@@ -37,10 +41,6 @@ export function ProfileAvatar({ hasImage, initial, size = 80, cacheKey }: Props)
       active = false;
     };
   }, []);
-
-  useEffect(() => {
-    setFailed(false);
-  }, [cacheKey, hasImage]);
 
   const shape = {
     width: size,
@@ -56,7 +56,7 @@ export function ProfileAvatar({ hasImage, initial, size = 80, cacheKey }: Props)
           headers: { Authorization: `Bearer ${token}` },
         }}
         style={[shape, { backgroundColor: colors.bg.alt }]}
-        onError={() => setFailed(true)}
+        onError={() => setFailedKey(imageKey)}
         accessibilityIgnoresInvertColors
       />
     );

@@ -36,6 +36,12 @@ x86/
 bld/
 [Bb]in/
 [Oo]bj/
+# Directories literally named 'bin\Debug' etc. — a Windows-style path typed on a
+# non-Windows shell creates one directory with a backslash in its name, which the
+# rules above do not match. A backslash inside the project cone also disables
+# MSBuild wildcard expansion on Linux (dotnet/sdk#10172), breaking the build.
+*\\[Dd]ebug/
+*\\[Rr]elease/
 [Ll]og/
 [Ll]ogs/
 

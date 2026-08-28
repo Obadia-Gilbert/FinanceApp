@@ -30,19 +30,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user: null,
   });
 
-  const loadStored = useCallback(async () => {
-    const token = await getStoredToken();
-    const user = await getStoredUser();
-    setState({
-      isReady: true,
-      isSignedIn: !!token && !!user,
-      user: user ?? null,
-    });
-  }, []);
-
+  // The stored session lives in SecureStore, so it can only be read back
+  // asynchronously: the provider starts "not ready" and flips once the read
+  // resolves. Guarded so a provider unmounted mid-read doesn't set state.
   useEffect(() => {
-    loadStored();
-  }, [loadStored]);
+    let active = true;
+    void Promise.all([getStoredToken(), getStoredUser()]).then(([token, user]) => {
+      if (!active) return;
+      setState({
+        isReady: true,
+        isSignedIn: !!token && !!user,
+        user: user ?? null,
+      });
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const signOut = useCallback(async () => {
     try {

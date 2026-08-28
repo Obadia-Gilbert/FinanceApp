@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -34,7 +34,7 @@ export default function DashboardScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [userRefreshing, setUserRefreshing] = useState(false);
-  const fadeIn = useRef(new Animated.Value(0)).current;
+  const [fadeIn] = useState(() => new Animated.Value(0));
 
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['dashboard'],

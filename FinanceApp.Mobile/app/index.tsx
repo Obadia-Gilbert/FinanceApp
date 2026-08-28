@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Redirect } from 'expo-router';
 import { View, Image, Text, StyleSheet, Animated, Easing } from 'react-native';
 import { useAuth } from '../src/context/AuthContext';
@@ -13,11 +13,11 @@ export default function Index() {
   const [showSplash, setShowSplash] = useState(true);
   const [onboardingDone, setOnboardingDone] = useState<boolean | null>(null);
 
-  const logoScale = useRef(new Animated.Value(0.3)).current;
-  const logoOpacity = useRef(new Animated.Value(0)).current;
-  const textOpacity = useRef(new Animated.Value(0)).current;
-  const dotScale = useRef(new Animated.Value(0)).current;
-  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const [logoScale] = useState(() => new Animated.Value(0.3));
+  const [logoOpacity] = useState(() => new Animated.Value(0));
+  const [textOpacity] = useState(() => new Animated.Value(0));
+  const [dotScale] = useState(() => new Animated.Value(0));
+  const [pulseAnim] = useState(() => new Animated.Value(1));
 
   useEffect(() => {
     Animated.sequence([

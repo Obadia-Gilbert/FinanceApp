@@ -31,7 +31,7 @@ dotnet run --project FinanceApp.API                          # http://localhost:
 dotnet run --project FinanceApp.API --launch-profile Mobile  # 0.0.0.0:5279 for LAN/devices
 ```
 
-Mobile: `cd FinanceApp.Mobile && npx expo start`. Typecheck with `npx tsc --noEmit` — note there are 2 **pre-existing** TS errors (`sceneContainerStyle` in the tab layout, and a conditional style array in `notifications.tsx`) unrelated to most work; don't assume you broke something.
+Mobile: `cd FinanceApp.Mobile && npx expo start`. Typecheck with `npx tsc --noEmit` and lint with `npx expo lint` — both are clean, and CI fails the build on either, so a new error is yours.
 
 Database is SQL Server in Docker (container `sql_server`). `sqlcmd` is available on the host:
 

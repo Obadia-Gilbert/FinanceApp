@@ -22,6 +22,7 @@ import { ProfileAvatar } from '../../src/components/ProfileAvatar';
 import { Input } from '../../src/components/Input';
 import { Button } from '../../src/components/Button';
 import { getProfile, updateProfile, getAccountDeletionStatus, deleteAccount } from '../../src/api/profile';
+import type { ProfileDto } from '../../src/types/api';
 import { ApiError, clearStoredAuth } from '../../src/api/client';
 import { normalizeAppLanguage, setAppLanguage, type AppLanguage } from '../../src/i18n/i18n';
 import { AsYouType, getCountryCallingCode } from 'libphonenumber-js';
@@ -55,23 +56,18 @@ export default function ProfileScreen() {
     queryFn: getProfile,
   });
 
-  useEffect(() => {
-    if (profile) {
-      setFirstName(profile.firstName ?? '');
-      setLastName(profile.lastName ?? '');
-    }
-  }, [profile]);
+  // Mirror the server profile into the form fields. Applied during render when a
+  // new profile object arrives (and we are not mid-edit, so a background refetch
+  // cannot overwrite what is being typed), and explicitly from the handlers that
+  // leave edit mode, so cancelling discards local edits the way it always did.
+  const applyProfileToForm = (p: ProfileDto) => {
+    setFirstName(p.firstName ?? '');
+    setLastName(p.lastName ?? '');
 
-  useEffect(() => {
-    if (!profile) return;
-    // Only sync these fields from the server when not actively editing.
-    if (editing) return;
-
-    const nextCountry = profile.countryCode ?? '';
+    const nextCountry = p.countryCode ?? '';
     setCountryCode(nextCountry);
 
-    const nextRawPhone = profile.phoneNumber ?? '';
-    const digitsOnly = nextRawPhone.replace(/\D/g, '');
+    const digitsOnly = (p.phoneNumber ?? '').replace(/\D/g, '');
     const callingCode = getCallingCodeSafe(nextCountry);
     const nationalDigits = callingCode ? stripCallingCode(digitsOnly, callingCode) : digitsOnly;
 
@@ -79,8 +75,19 @@ export default function ProfileScreen() {
     const formatted = formatPhonePretty(nextCountry, nationalDigits);
     setPhoneDisplay(formatted);
     setPhoneSelection({ start: formatted.length, end: formatted.length });
-    setDailyReminderEnabled(profile.dailyReminderEnabled ?? true);
-  }, [profile, editing]);
+    setDailyReminderEnabled(p.dailyReminderEnabled ?? true);
+  };
+
+  const [syncedProfile, setSyncedProfile] = useState<ProfileDto | null>(null);
+  if (profile && profile !== syncedProfile && !editing) {
+    setSyncedProfile(profile);
+    applyProfileToForm(profile);
+  }
+
+  const stopEditing = () => {
+    setEditing(false);
+    if (profile) applyProfileToForm(profile);
+  };
 
   useEffect(() => {
     if (!profile?.preferredLanguage) return;
@@ -312,7 +319,7 @@ export default function ProfileScreen() {
           />
           <TouchableOpacity
             style={[styles.editAvatarBtn, { backgroundColor: colors.brand }]}
-            onPress={() => setEditing(!editing)}
+            onPress={() => (editing ? stopEditing() : setEditing(true))}
           >
             <Icon name="camera" size={14} color={colors.brandContrast} />
           </TouchableOpacity>
@@ -402,7 +409,7 @@ export default function ProfileScreen() {
             </View>
           ) : null}
           <View style={styles.editBtns}>
-            <Button title={t('profile.cancel')} onPress={() => setEditing(false)} variant="ghost" style={styles.editBtn} />
+            <Button title={t('profile.cancel')} onPress={stopEditing} variant="ghost" style={styles.editBtn} />
             <Button title={t('profile.save')} onPress={handleSave} loading={updateMutation.isPending} style={styles.editBtn} />
           </View>
         </Card>

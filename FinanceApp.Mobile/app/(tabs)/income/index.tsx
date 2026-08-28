@@ -74,7 +74,7 @@ export default function IncomeListScreen() {
     );
   }
 
-  const ListHeader = () => (
+  const listHeader = (
     <>
       <View style={[styles.totalCard, { backgroundColor: colors.brandLight ?? colors.bg.alt }]}>
         <Text style={[styles.totalLabel, { color: colors.text.muted }]}>TOTAL INCOME ({monthLabel.toUpperCase()})</Text>
@@ -128,7 +128,7 @@ export default function IncomeListScreen() {
         data={filtered}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
-        ListHeaderComponent={<ListHeader />}
+        ListHeaderComponent={listHeader}
         refreshControl={
           <RefreshControl refreshing={isRefetching && !isLoading} onRefresh={() => refetch()} tintColor={colors.brand} />
         }

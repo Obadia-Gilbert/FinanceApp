@@ -252,7 +252,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
     // The proxy runs in the same docker-compose network, not a fixed public IP, so
     // clear the default known-networks restriction rather than enumerate the bridge.
-    options.KnownNetworks.Clear();
+    options.KnownIPNetworks.Clear();
     options.KnownProxies.Clear();
 });
 

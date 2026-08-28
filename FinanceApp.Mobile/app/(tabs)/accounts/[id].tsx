@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -24,12 +24,14 @@ export default function EditAccountScreen() {
     enabled: !!id,
   });
 
-  useEffect(() => {
-    if (account) {
-      setName(account.name);
-      setDescription(account.description ?? '');
-    }
-  }, [account]);
+  // Seed the form from the loaded account exactly once per account, during
+  // render rather than in an effect, so the first paint already has the values.
+  const [seededId, setSeededId] = useState<string | null>(null);
+  if (account && seededId !== account.id) {
+    setSeededId(account.id);
+    setName(account.name);
+    setDescription(account.description ?? '');
+  }
 
   const updateMutation = useMutation({
     mutationFn: (payload: { name: string; description: string | null }) => updateAccount(id!, payload),

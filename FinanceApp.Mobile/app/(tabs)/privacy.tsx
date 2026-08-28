@@ -98,13 +98,13 @@ export default function PrivacyScreen() {
       </Section>
 
       <Section title="09  Changes to This Policy" icon="edit" colors={colors}>
-        <Text style={[styles.body, { color: colors.text.body }]}>We may update this policy from time to time. When we do, the "Last updated" date at the top will be revised and significant changes will be communicated through the application. Continued use after an update constitutes acceptance of the revised policy.</Text>
+        <Text style={[styles.body, { color: colors.text.body }]}>We may update this policy from time to time. When we do, the &quot;Last updated&quot; date at the top will be revised and significant changes will be communicated through the application. Continued use after an update constitutes acceptance of the revised policy.</Text>
       </Section>
 
       <View style={[styles.contactCard, { backgroundColor: colors.bg.default, borderColor: colors.border }]}>
         <Text style={[styles.contactTitle, { color: colors.text.primary }]}>10  Contact Us</Text>
         <Text style={[styles.body, { color: colors.text.muted }]}>
-          Have questions, concerns, or a data request? We're here to help. Contact privacy@financeapp.io. We aim to respond to all privacy-related inquiries within 5 business days.
+          Have questions, concerns, or a data request? We&apos;re here to help. Contact privacy@financeapp.io. We aim to respond to all privacy-related inquiries within 5 business days.
         </Text>
       </View>
     </ScrollView>

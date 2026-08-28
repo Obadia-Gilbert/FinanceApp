@@ -60,7 +60,7 @@ export default function TermsScreen() {
 
       <Section title="07  Disclaimers" icon="warning" colors={colors}>
         <Text style={[styles.body, { color: colors.text.body }]}>
-          FinanceApp is provided "as is" without warranties of any kind, express or implied. We do not guarantee the app will be uninterrupted, error-free, or that calculations (budgets, currency conversion, reports) will be free of mistakes. You are responsible for verifying important financial figures independently.
+          FinanceApp is provided &quot;as is&quot; without warranties of any kind, express or implied. We do not guarantee the app will be uninterrupted, error-free, or that calculations (budgets, currency conversion, reports) will be free of mistakes. You are responsible for verifying important financial figures independently.
         </Text>
       </Section>
 
@@ -72,7 +72,7 @@ export default function TermsScreen() {
 
       <Section title="09  Changes to these terms" icon="edit" colors={colors}>
         <Text style={[styles.body, { color: colors.text.body }]}>
-          We may update these terms from time to time. When we do, the "Last updated" date above will change, and significant changes will be communicated through the app. Continued use after an update constitutes acceptance of the revised terms.
+          We may update these terms from time to time. When we do, the &quot;Last updated&quot; date above will change, and significant changes will be communicated through the app. Continued use after an update constitutes acceptance of the revised terms.
         </Text>
       </Section>
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -33,15 +33,17 @@ export default function ExpenseDetailScreen() {
     queryFn: getCategories,
   });
 
-  useEffect(() => {
-    if (expense) {
-      setAmount(String(expense.amount));
-      setCurrency(expense.currency != null ? formatCurrencyCode(expense.currency) : 'TZS');
-      setDescription(expense.description ?? '');
-      setCategoryId(expense.categoryId);
-      setDate(expense.expenseDate ? new Date(expense.expenseDate).toISOString().slice(0, 10) : '');
-    }
-  }, [expense]);
+  // Seed the form from the loaded record exactly once per record, during render
+  // rather than in an effect, so the first paint already has the values.
+  const [seededId, setSeededId] = useState<string | null>(null);
+  if (expense && seededId !== expense.id) {
+    setSeededId(expense.id);
+    setAmount(String(expense.amount));
+    setCurrency(expense.currency != null ? formatCurrencyCode(expense.currency) : 'TZS');
+    setDescription(expense.description ?? '');
+    setCategoryId(expense.categoryId);
+    setDate(expense.expenseDate ? new Date(expense.expenseDate).toISOString().slice(0, 10) : '');
+  }
 
   const expenseCategories = categories.filter((c) => c.type === 'Expense' || c.type === 'Both');
 

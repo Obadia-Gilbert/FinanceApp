@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -27,13 +27,15 @@ export default function EditCategoryScreen() {
     enabled: !!id,
   });
 
-  useEffect(() => {
-    if (category) {
-      setName(category.name);
-      setDescription(category.description ?? '');
-      setBadgeColor(category.badgeColor || BADGE_COLORS[0]);
-    }
-  }, [category]);
+  // Seed the form from the loaded record exactly once per record, during render
+  // rather than in an effect, so the first paint already has the values.
+  const [seededId, setSeededId] = useState<string | null>(null);
+  if (category && seededId !== category.id) {
+    setSeededId(category.id);
+    setName(category.name);
+    setDescription(category.description ?? '');
+    setBadgeColor(category.badgeColor || BADGE_COLORS[0]);
+  }
 
   const mutation = useMutation({
     mutationFn: (body: { name: string; description: string | null; badgeColor: string }) =>

@@ -167,7 +167,7 @@ export default function LoginScreen() {
 
         <View style={styles.footer}>
           <Text style={[styles.footText, { color: colors.text.muted }]}>
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
           </Text>
           <Link href="/(auth)/register" asChild>
             <TouchableOpacity>

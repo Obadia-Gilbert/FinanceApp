@@ -106,11 +106,9 @@ jobs:
         run: npx tsc --noEmit
 
       - name: Lint
-        # Non-blocking for now: the baseline (as of this pipeline's introduction) has
-        # pre-existing findings in code this pipeline didn't touch. Tighten to blocking
-        # once that backlog is triaged — see FinanceApp.Documentations/GOING_LIVE.md.
-        run: npx expo lint || echo "::warning::ESLint found issues — non-blocking until the pre-existing baseline is triaged"
-        continue-on-error: true
+        # Blocking on errors: the baseline backlog this pipeline started with has been
+        # cleared. Warnings still don't fail the build — eslint exits 0 for those.
+        run: npx expo lint
 
   security:
     name: Security scan

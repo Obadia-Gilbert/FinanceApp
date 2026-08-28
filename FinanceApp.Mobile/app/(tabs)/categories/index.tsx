@@ -88,7 +88,7 @@ export default function ManageCategoriesScreen() {
         ListEmptyComponent={
           <Card style={styles.empty}>
             <Text style={[styles.emptyText, { color: colors.text.muted }]}>
-              No categories yet. Tap "New Category" to add one.
+              No categories yet. Tap &quot;New Category&quot; to add one.
             </Text>
           </Card>
         }

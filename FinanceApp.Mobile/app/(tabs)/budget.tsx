@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -75,13 +75,18 @@ export default function BudgetScreen() {
   const [categoryBudgetAmount, setCategoryBudgetAmount] = useState('');
   const [categoryBudgetCurrency, setCategoryBudgetCurrency] = useState('USD');
 
-  useEffect(() => {
+  // Reset the open forms when the visible period changes. Done during render
+  // rather than in an effect so a stale draft never paints against the new month.
+  const period = `${year}-${month}`;
+  const [formPeriod, setFormPeriod] = useState(period);
+  if (formPeriod !== period) {
+    setFormPeriod(period);
     setEditing(false);
     setShowCategoryForm(false);
     setAmountStr('');
     setCategoryBudgetCategoryId('');
     setCategoryBudgetAmount('');
-  }, [month, year]);
+  }
 
   const { data: dashboard } = useQuery({
     queryKey: ['dashboard'],
@@ -530,7 +535,7 @@ export default function BudgetScreen() {
       {dashboard?.isOverBudget && (
         <Card style={[styles.alert, { borderLeftWidth: 4, borderLeftColor: colors.danger }]}>
           <Text style={[styles.alertText, { color: colors.danger }]}>
-            You've exceeded your budget this month. Consider reducing spending or updating your budget.
+            You&apos;ve exceeded your budget this month. Consider reducing spending or updating your budget.
           </Text>
         </Card>
       )}

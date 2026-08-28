@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -34,17 +34,19 @@ export default function EditIncomeScreen() {
   const { data: accounts = [] } = useQuery({ queryKey: ['accounts'], queryFn: getAccounts });
   const incomeCategories = categories.filter((c) => c.type === 'Income' || c.type === 'Both');
 
-  useEffect(() => {
-    if (income) {
-      setAmount(String(income.amount));
-      setCurrency(income.currency ?? 'TZS');
-      setDescription(income.description ?? '');
-      setSource(income.source ?? '');
-      setCategoryId(income.categoryId);
-      setAccountId(income.accountId ?? '');
-      setDate(income.incomeDate ? new Date(income.incomeDate).toISOString().slice(0, 10) : '');
-    }
-  }, [income]);
+  // Seed the form from the loaded record exactly once per record, during render
+  // rather than in an effect, so the first paint already has the values.
+  const [seededId, setSeededId] = useState<string | null>(null);
+  if (income && seededId !== income.id) {
+    setSeededId(income.id);
+    setAmount(String(income.amount));
+    setCurrency(income.currency ?? 'TZS');
+    setDescription(income.description ?? '');
+    setSource(income.source ?? '');
+    setCategoryId(income.categoryId);
+    setAccountId(income.accountId ?? '');
+    setDate(income.incomeDate ? new Date(income.incomeDate).toISOString().slice(0, 10) : '');
+  }
 
   const updateMutation = useMutation({
     mutationFn: (payload: Parameters<typeof updateIncome>[1]) => updateIncome(id!, payload),

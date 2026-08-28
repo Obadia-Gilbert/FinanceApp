@@ -22,7 +22,7 @@ export default function AuthTermsScreen() {
         </Text>
         <Text style={[styles.sectionTitle, { color: colors.brand }]}>Your Account</Text>
         <Text style={[styles.body, { color: colors.text.body }]}>
-          You're responsible for keeping your login secure and for the accuracy of the information you provide. You can delete your account at any time from Profile → Delete Account.
+          You&apos;re responsible for keeping your login secure and for the accuracy of the information you provide. You can delete your account at any time from Profile → Delete Account.
         </Text>
         <Text style={[styles.sectionTitle, { color: colors.brand }]}>Subscriptions</Text>
         <Text style={[styles.body, { color: colors.text.body }]}>
@@ -30,7 +30,7 @@ export default function AuthTermsScreen() {
         </Text>
         <Text style={[styles.sectionTitle, { color: colors.brand }]}>No Warranty</Text>
         <Text style={[styles.body, { color: colors.text.body }]}>
-          FinanceApp is provided "as is." We don't guarantee it will be error-free, and you should independently verify important financial figures.
+          FinanceApp is provided &quot;as is.&quot; We don&apos;t guarantee it will be error-free, and you should independently verify important financial figures.
         </Text>
         <Text style={[styles.body, { color: colors.text.body }]}>
           The full terms are available in-app under More → Terms of Service once signed in.

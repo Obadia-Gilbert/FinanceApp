@@ -13,6 +13,29 @@ export type SubscriptionProduct = {
   localizedPrice?: string;
 };
 
+// Verifies a completed store purchase with our backend, then acknowledges it to
+// the store. Kept at module scope: it closes over nothing from the hook, and as
+// a function expression inside it, the purchase listener referenced it before it
+// was declared.
+async function handlePurchase(
+  iap: IapModule,
+  purchase: import('react-native-iap').Purchase
+) {
+  if (Platform.OS === 'ios') {
+    const jws =
+      (purchase as { purchaseToken?: string }).purchaseToken ??
+      (purchase as { transactionReceipt?: string }).transactionReceipt;
+    if (!jws) throw new Error('Missing Apple signed transaction from purchase.');
+    await verifyApplePurchase(jws);
+  } else {
+    const token = purchase.purchaseToken;
+    if (!token) throw new Error('Missing Google purchase token.');
+    await verifyGooglePurchase(purchase.productId, token);
+  }
+
+  await iap.finishTransaction({ purchase, isConsumable: false });
+}
+
 export function useSubscriptionIap() {
   const queryClient = useQueryClient();
   const iapRef = useRef<IapModule | null>(null);
@@ -82,25 +105,6 @@ export function useSubscriptionIap() {
       iapRef.current?.endConnection().catch(() => undefined);
     };
   }, [queryClient]);
-
-  const handlePurchase = async (
-    iap: IapModule,
-    purchase: import('react-native-iap').Purchase
-  ) => {
-    if (Platform.OS === 'ios') {
-      const jws =
-        (purchase as { purchaseToken?: string }).purchaseToken ??
-        (purchase as { transactionReceipt?: string }).transactionReceipt;
-      if (!jws) throw new Error('Missing Apple signed transaction from purchase.');
-      await verifyApplePurchase(jws);
-    } else {
-      const token = purchase.purchaseToken;
-      if (!token) throw new Error('Missing Google purchase token.');
-      await verifyGooglePurchase(purchase.productId, token);
-    }
-
-    await iap.finishTransaction({ purchase, isConsumable: false });
-  };
 
   const subscribe = useCallback(
     async (tier: IapTier) => {
